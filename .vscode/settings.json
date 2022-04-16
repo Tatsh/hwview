@@ -1,3 +1,13 @@
 {
-  "editor.tabSize": 4
+  "editor.tabSize": 4,
+  "files.associations": {
+    "**/bash-completion/completions/*": "shellscript",
+    "*.json.dist": "json",
+    ".bash_functions": "shellscript",
+    ".macos": "shellscript",
+    ".psqlrc": "sql",
+    ".pythonrc": "python",
+    "Portfile": "tcl",
+    "qactiongroup": "cpp"
+  }
 }

@@ -22,5 +22,6 @@ add_definitions(
   -DQT_STRICT_ITERATORS
   -DQT_USE_FAST_OPERATOR_PLUS
   -DQT_USE_QSTRINGBUILDER)
-add_executable(devmgmt main.cpp mainwindow.cpp)
+add_executable(devmgmt main.cpp mainwindow.cpp models/devbytypemodel.cpp
+                       models/node.cpp)
 target_link_libraries(devmgmt Qt5::Widgets)
