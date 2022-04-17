@@ -27,7 +27,6 @@ MainWindow::MainWindow() {
 
     treeView->setModel(new DevicesByTypeModel(this));
     treeView->expandToDepth(1);
-    treeView->show();
 }
 
 void MainWindow::about() {
