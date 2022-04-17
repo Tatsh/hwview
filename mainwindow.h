@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 
 QT_BEGIN_NAMESPACE
+class QAbstractItemModel;
 class QActionGroup;
 QT_END_NAMESPACE
 
@@ -14,6 +15,7 @@ public:
 
 private Q_SLOTS:
     void about();
+    void switchToModel(QAbstractItemModel *, int depth = 1);
 
 private:
     QActionGroup *actionGroupView;

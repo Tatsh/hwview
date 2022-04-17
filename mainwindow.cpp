@@ -1,11 +1,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QActionGroup>
-#include <QtWidgets/QMenuBar>
 #include <QtWidgets/QMessageBox>
-#include <QtWidgets/QStatusBar>
-#include <QtWidgets/QTreeView>
 
-#include "ui_mainwindow.h"
 #include "mainwindow.h"
 #include "models/devbytypemodel.h"
 
@@ -25,8 +21,39 @@ MainWindow::MainWindow() {
     actionGroupView->addAction(actionResourcesByConnection);
     actionGroupView->setExclusive(true);
 
-    treeView->setModel(new DevicesByTypeModel(this));
-    treeView->expandToDepth(1);
+    switchToModel(new DevicesByTypeModel(this));
+
+    connect(actionDevicesByType, &QAction::triggered, [this]() {
+        switchToModel(new DevicesByTypeModel(this));
+    });
+    connect(actionDevicesByConnection, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionDevicesByContainer, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionDevicesByDriver, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionDriversByType, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionDriversByDevice, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionResourcesByType, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+    connect(actionResourcesByConnection, &QAction::triggered, [this]() {
+        switchToModel(nullptr);
+    });
+}
+
+void MainWindow::switchToModel(QAbstractItemModel *model, int depth) {
+    treeView->setModel(model);
+    if (model != nullptr) {
+        treeView->expandToDepth(depth);
+    }
 }
 
 void MainWindow::about() {
@@ -35,7 +62,6 @@ void MainWindow::about() {
                        tr("View and manage device hardware settings and "
                           "driver software installed on your computer."));
 }
-
 
 /*
 Toolbar:
