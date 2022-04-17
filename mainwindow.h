@@ -1,11 +1,12 @@
 #include <QtWidgets/QMainWindow>
 
+#include "ui_mainwindow.h"
+
 QT_BEGIN_NAMESPACE
-class QAction;
-class QTreeView;
+class QActionGroup;
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow, private Ui::MainWindow {
     Q_OBJECT
 
 public:
@@ -15,10 +16,5 @@ private Q_SLOTS:
     void about();
 
 private:
-    void createActions();
-    void setupTreeView();
-
-    QAction *updateDriverAction;
-    QAction *updateDriverSeparatorAction;
-    QTreeView *treeView;
+    QActionGroup *actionGroupView;
 };
