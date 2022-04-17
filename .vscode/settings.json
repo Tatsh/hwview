@@ -9,5 +9,6 @@
     ".pythonrc": "python",
     "Portfile": "tcl",
     "qactiongroup": "cpp"
-  }
+  },
+  "cSpell.words": ["CDROM"]
 }
