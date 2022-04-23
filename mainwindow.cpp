@@ -1,9 +1,11 @@
+#include <QtDebug>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QMessageBox>
 
 #include "mainwindow.h"
 #include "models/devbytypemodel.h"
+#include "propertiesdialog.h"
 
 MainWindow::MainWindow() {
     setupUi(this);
@@ -47,6 +49,20 @@ MainWindow::MainWindow() {
     connect(actionResourcesByConnection, &QAction::triggered, [this]() {
         switchToModel(nullptr);
     });
+
+    connect(treeView,
+            &QTreeView::doubleClicked,
+            [this](const QModelIndex &modelIndex) {
+                QString name =
+                    static_cast<Node *>(modelIndex.internalPointer())
+                        ->data(0)
+                        .toString();
+                PropertiesDialog diag;
+                diag.setDeviceName(name);
+                diag.setWindowModality(Qt::WindowModal);
+                diag.setWindowTitle(tr("%1 Properties").arg(name));
+                diag.exec();
+            });
 }
 
 void MainWindow::switchToModel(QAbstractItemModel *model, int depth) {

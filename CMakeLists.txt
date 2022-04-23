@@ -23,5 +23,5 @@ add_definitions(
   -DQT_USE_FAST_OPERATOR_PLUS
   -DQT_USE_QSTRINGBUILDER)
 add_executable(devmgmt main.cpp mainwindow.cpp models/devbytypemodel.cpp
-                       models/node.cpp)
+                       models/node.cpp propertiesdialog.cpp)
 target_link_libraries(devmgmt Qt5::Widgets)
