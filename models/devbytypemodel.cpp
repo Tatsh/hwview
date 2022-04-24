@@ -44,9 +44,17 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     udevManager manager;
     auto devices = manager.iterDevicesSubsystem("hid");
     for (QMap<QString, QString> deviceMap : devices) {
+        QString deviceName;
+        if (deviceMap.contains(QStringLiteral("HID_NAME"))) {
+            deviceName = deviceMap[QStringLiteral("HID_NAME")];
+        } else if (deviceMap.contains(QStringLiteral("NAME"))) {
+            deviceName = deviceMap[QStringLiteral("NAME")].replace(
+                QStringLiteral("\""), QStringLiteral(""));
+        } else {
+            continue;
+        }
         humanInterfaceDevicesItem->appendChild(
-            new Node({deviceMap[QStringLiteral("HID_NAME")],
-                      deviceMap[QStringLiteral("DRIVER")]},
+            new Node({deviceName, deviceMap[QStringLiteral("DRIVER")]},
                      humanInterfaceDevicesItem,
                      NodeType::Device));
     }
