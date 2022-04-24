@@ -5,27 +5,37 @@
 #include <QtCore/QVector>
 #include <QtGui/QIcon>
 
+enum NodeType {
+    Device,
+    Label,
+};
+
 class Node {
 public:
     Node() = default;
-    explicit Node(const QVector<QVariant> &data, Node *parentItem = nullptr);
+    explicit Node(const QVector<QVariant> &data,
+                  Node *parentItem = nullptr,
+                  NodeType type = Label);
     ~Node();
 
-    void appendChild(Node *child);
-    Node *child(int row);
+    void appendChild(Node *);
+    Node *child(int);
     int childCount() const;
     int columnCount() const;
-    QVariant data(int column) const;
+    QVariant data(int) const;
+    QIcon icon() const;
     Node *parentItem();
     int row() const;
-    QIcon icon() const;
     void setIcon(QIcon);
+    void setType(NodeType);
+    NodeType type();
 
 private:
     Node *parentItem_;
     QVector<Node *> childItems;
-    QVector<QVariant> itemData;
     QIcon icon_;
+    QVector<QVariant> itemData;
+    NodeType type_;
 };
 
 #endif // NODE_H

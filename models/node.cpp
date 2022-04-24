@@ -1,7 +1,7 @@
 #include "node.h"
 
-Node::Node(const QVector<QVariant> &data, Node *parent)
-    : itemData(data), parentItem_(parent) {
+Node::Node(const QVector<QVariant> &data, Node *parent, NodeType nodeType)
+    : itemData(data), parentItem_(parent), type_(nodeType) {
 }
 
 Node::~Node() {
@@ -51,4 +51,12 @@ QIcon Node::icon() const {
 
 void Node::setIcon(QIcon icon) {
     icon_ = icon;
+}
+
+void Node::setType(NodeType type) {
+    type_ = type;
+}
+
+NodeType Node::type() {
+    return type_;
 }
