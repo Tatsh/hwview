@@ -9,4 +9,5 @@ void PropertiesDialog::setDeviceName(QString &name) {
     labelDeviceNameDetails->setText(name);
     labelDeviceNameDriver->setText(name);
     labelDeviceNameEvents->setText(name);
+    listWidgetDetailsPropertyValue->insertItem(0, name);
 }
