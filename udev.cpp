@@ -14,10 +14,7 @@ struct udev *udevManager::context() const {
 }
 
 QVector<QMap<QString, QString>>
-udevManager::iterDevicesSubsystem(const char *subsystem) const {
-    auto enumerator = udev_enumerate_new(ctx);
-    udev_enumerate_add_match_subsystem(enumerator, subsystem);
-    udev_enumerate_scan_devices(enumerator);
+udevManager::convertToQMap(struct udev_enumerate *enumerator) const {
     QVector<QMap<QString, QString>> ret;
     struct udev_list_entry *listEntry, *deviceProperty;
     udev_list_entry_foreach(listEntry,
@@ -35,6 +32,21 @@ udevManager::iterDevicesSubsystem(const char *subsystem) const {
         ret.append(entry);
         udev_device_unref(device);
     }
+    return ret;
+}
+
+QVector<QMap<QString, QString>>
+udevManager::iterDevicesSubsystem(const char *subsystem) const {
+    auto enumerator = udev_enumerate_new(ctx);
+    udev_enumerate_add_match_subsystem(enumerator, subsystem);
+    udev_enumerate_scan_devices(enumerator);
+    auto ret = convertToQMap(enumerator);
     udev_enumerate_unref(enumerator);
     return ret;
+}
+
+QVector<QMap<QString, QString>>
+udevManager::scanDevices(struct udev_enumerate *enumerator) const {
+    udev_enumerate_scan_devices(enumerator);
+    return convertToQMap(enumerator);
 }
