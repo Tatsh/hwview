@@ -13,8 +13,10 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
             new Node({tr("Audio inputs and outputs")}, hostnameItem));
     audioInputsAndOutputsItem->setIcon(
         QIcon::fromTheme(QStringLiteral("audio-card")));
-    audioInputsAndOutputsItem->appendChild(
-        new Node({tr("Fake sound card")}, audioInputsAndOutputsItem));
+
+    audioInputsAndOutputsItem->appendChild(new Node(
+        {tr("Fake sound card")}, audioInputsAndOutputsItem, NodeType::Device));
+
     hostnameItem->appendChild(batteriesItem =
                                   new Node({tr("Batteries")}, hostnameItem));
     batteriesItem->setIcon(QIcon::fromTheme(QStringLiteral("battery-ups")));
