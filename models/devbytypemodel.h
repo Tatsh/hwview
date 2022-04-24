@@ -31,6 +31,7 @@ private:
     Node *diskDrivesItem;
     Node *displayAdaptersItem;
     Node *dvdCDROMDrivesItem;
+    Node *humanInterfaceDevicesItem;
     Node *ideATAATAPIControllersItem;
     Node *keyboardsItem;
     Node *miceAndOtherPointingDevicesItem;

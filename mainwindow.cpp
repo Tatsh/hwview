@@ -56,8 +56,10 @@ MainWindow::MainWindow() {
                 auto node = static_cast<Node *>(modelIndex.internalPointer());
                 if (node->type() == NodeType::Device) {
                     auto name = node->data(0).toString();
+                    auto driver = node->data(1).toString();
                     PropertiesDialog dialog;
                     dialog.setDeviceName(name);
+                    dialog.setDriverName(driver);
                     dialog.setWindowModality(Qt::WindowModal);
                     dialog.setWindowTitle(tr("%1 Properties").arg(name));
                     dialog.exec();

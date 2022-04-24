@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.7.0)
 project(devmgmt)
 
+include(FindPkgConfig)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -11,6 +13,7 @@ find_package(
   Qt5
   COMPONENTS Widgets
   REQUIRED)
+pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
 
 # Sane flags from Kate project
 add_definitions(
@@ -23,5 +26,5 @@ add_definitions(
   -DQT_USE_FAST_OPERATOR_PLUS
   -DQT_USE_QSTRINGBUILDER)
 add_executable(devmgmt main.cpp mainwindow.cpp models/devbytypemodel.cpp
-                       models/node.cpp propertiesdialog.cpp)
-target_link_libraries(devmgmt Qt5::Widgets)
+                       models/node.cpp propertiesdialog.cpp udev.cpp)
+target_link_libraries(devmgmt Qt5::Widgets PkgConfig::UDEV)

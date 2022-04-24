@@ -1,6 +1,8 @@
-#include "devbytypemodel.h"
-
 #include <QtDebug>
+#include <libudev.h>
+
+#include "../udev.h"
+#include "devbytypemodel.h"
 
 DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     : QAbstractItemModel(parent) {
@@ -35,6 +37,20 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
                                   {tr("DVD/CD-ROM drives")}, hostnameItem));
     dvdCDROMDrivesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-optical")));
+
+    hostnameItem->appendChild(
+        humanInterfaceDevicesItem =
+            new Node({tr("Human Interface Devices")}, hostnameItem));
+    udevManager manager;
+    auto devices = manager.iterDevicesSubsystem("hid");
+    for (QMap<QString, QString> deviceMap : devices) {
+        humanInterfaceDevicesItem->appendChild(
+            new Node({deviceMap[QStringLiteral("HID_NAME")],
+                      deviceMap[QStringLiteral("DRIVER")]},
+                     humanInterfaceDevicesItem,
+                     NodeType::Device));
+    }
+
     hostnameItem->appendChild(
         ideATAATAPIControllersItem =
             new Node({tr("IDE ATA/ATAPI controllers")}, hostnameItem));
@@ -49,8 +65,10 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
                                   {tr("Network adapters")}, hostnameItem));
     hostnameItem->appendChild(
         printQueuesItem = new Node({tr("Print queues")}, hostnameItem));
+
     hostnameItem->appendChild(processorsItem =
                                   new Node({tr("Processors")}, hostnameItem));
+
     hostnameItem->appendChild(softwareComponentsItem = new Node(
                                   {tr("Software components")}, hostnameItem));
     hostnameItem->appendChild(softwareDevicesItem = new Node(
