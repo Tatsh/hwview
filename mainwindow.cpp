@@ -52,16 +52,16 @@ MainWindow::MainWindow() {
 
     connect(treeView,
             &QTreeView::doubleClicked,
-            [this](const QModelIndex &modelIndex) {
-                QString name =
-                    static_cast<Node *>(modelIndex.internalPointer())
-                        ->data(0)
-                        .toString();
-                PropertiesDialog diag;
-                diag.setDeviceName(name);
-                diag.setWindowModality(Qt::WindowModal);
-                diag.setWindowTitle(tr("%1 Properties").arg(name));
-                diag.exec();
+            [](const QModelIndex &modelIndex) {
+                auto node = static_cast<Node *>(modelIndex.internalPointer());
+                if (node->type() == NodeType::Device) {
+                    auto name = node->data(0).toString();
+                    PropertiesDialog dialog;
+                    dialog.setDeviceName(name);
+                    dialog.setWindowModality(Qt::WindowModal);
+                    dialog.setWindowTitle(tr("%1 Properties").arg(name));
+                    dialog.exec();
+                }
             });
 }
 
