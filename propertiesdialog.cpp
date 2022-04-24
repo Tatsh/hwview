@@ -5,5 +5,8 @@ PropertiesDialog::PropertiesDialog() {
 }
 
 void PropertiesDialog::setDeviceName(QString &name) {
-    labelDeviceName->setText(name);
+    labelDeviceNameGeneral->setText(name);
+    labelDeviceNameDetails->setText(name);
+    labelDeviceNameDriver->setText(name);
+    labelDeviceNameEvents->setText(name);
 }
