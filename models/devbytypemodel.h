@@ -10,6 +10,7 @@ class DevicesByTypeModel : public QAbstractItemModel {
 
 public:
     explicit DevicesByTypeModel(QObject *parent = nullptr);
+    ~DevicesByTypeModel();
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex
     index(int row,

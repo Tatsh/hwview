@@ -241,6 +241,10 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     udev_enumerate_unref(enumerator);
 }
 
+DevicesByTypeModel::~DevicesByTypeModel() {
+    delete rootItem;
+}
+
 QModelIndex DevicesByTypeModel::index(int row,
                                       int column,
                                       const QModelIndex &parent) const {
