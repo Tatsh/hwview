@@ -6,6 +6,8 @@
 
 DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     : QAbstractItemModel(parent) {
+    udevManager manager;
+
     rootItem = new Node({QStringLiteral("")});
     auto hostnameItem = new Node({QStringLiteral("HOSTNAME")}, rootItem);
     hostnameItem->setIcon(QIcon::fromTheme(QStringLiteral("computer")));
@@ -25,36 +27,60 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     hostnameItem->appendChild(computerItem =
                                   new Node({tr("Computer")}, hostnameItem));
     computerItem->setIcon(QIcon::fromTheme(QStringLiteral("computer")));
+
     hostnameItem->appendChild(diskDrivesItem =
                                   new Node({tr("Disk drives")}, hostnameItem));
     diskDrivesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-harddisk")));
+    for (DeviceInfo info : manager.iterDevicesSubsystem("block")) {
+        if (info.propertyValue("DEVTYPE") == QStringLiteral("partition") ||
+            info.propertyValue("ID_CDROM") == QStringLiteral("1") ||
+            info.propertyValue("DEVPATH").startsWith(
+                QStringLiteral("/devices/virtual/"))) {
+            continue;
+        }
+        diskDrivesItem->appendChild(new Node(
+            {info.name(), info.driver()}, diskDrivesItem, NodeType::Device));
+    }
+
     hostnameItem->appendChild(displayAdaptersItem = new Node(
                                   {tr("Display adapters")}, hostnameItem));
     displayAdaptersItem->setIcon(
         QIcon::fromTheme(QStringLiteral("video-display")));
+    auto enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(
+        enumerator, "ID_PCI_CLASS_FROM_DATABASE", "Display controller");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        displayAdaptersItem->appendChild(new Node({info.name(), info.driver()},
+                                                  displayAdaptersItem,
+                                                  NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
+
     hostnameItem->appendChild(dvdCDROMDrivesItem = new Node(
                                   {tr("DVD/CD-ROM drives")}, hostnameItem));
     dvdCDROMDrivesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-optical")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(enumerator, "ID_CDROM", "1");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            continue;
+        }
+        dvdCDROMDrivesItem->appendChild(new Node({info.name(), info.driver()},
+                                                 dvdCDROMDrivesItem,
+                                                 NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
 
     hostnameItem->appendChild(
         humanInterfaceDevicesItem =
             new Node({tr("Human Interface Devices")}, hostnameItem));
-    udevManager manager;
-    auto devices = manager.iterDevicesSubsystem("hid");
-    for (QMap<QString, QString> deviceMap : devices) {
-        QString deviceName;
-        if (deviceMap.contains(QStringLiteral("HID_NAME"))) {
-            deviceName = deviceMap[QStringLiteral("HID_NAME")];
-        } else if (deviceMap.contains(QStringLiteral("NAME"))) {
-            deviceName = deviceMap[QStringLiteral("NAME")].replace(
-                QStringLiteral("\""), QStringLiteral(""));
-        } else {
-            continue;
-        }
+    humanInterfaceDevicesItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("input-tablet")));
+    for (DeviceInfo info : manager.iterDevicesSubsystem("hid")) {
         humanInterfaceDevicesItem->appendChild(
-            new Node({deviceName, deviceMap[QStringLiteral("DRIVER")]},
+            new Node({info.name(), info.driver()},
                      humanInterfaceDevicesItem,
                      NodeType::Device));
     }
@@ -62,37 +88,157 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     hostnameItem->appendChild(
         ideATAATAPIControllersItem =
             new Node({tr("IDE ATA/ATAPI controllers")}, hostnameItem));
+    ideATAATAPIControllersItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("drive-harddisk")));
+
     hostnameItem->appendChild(keyboardsItem =
                                   new Node({tr("Keyboards")}, hostnameItem));
+    keyboardsItem->setIcon(QIcon::fromTheme(QStringLiteral("input-keyboard")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(enumerator, "ID_INPUT_KEYBOARD", "1");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            continue;
+        }
+        keyboardsItem->appendChild(new Node(
+            {info.name(), info.driver()}, keyboardsItem, NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
+
     hostnameItem->appendChild(
         miceAndOtherPointingDevicesItem =
             new Node({tr("Mice and other pointing devices")}, hostnameItem));
+    miceAndOtherPointingDevicesItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("input-mouse")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(enumerator, "ID_INPUT_MOUSE", "1");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            continue;
+        }
+        miceAndOtherPointingDevicesItem->appendChild(
+            new Node({info.name(), info.driver()},
+                     miceAndOtherPointingDevicesItem,
+                     NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
+
     hostnameItem->appendChild(monitorsItem =
                                   new Node({tr("Monitors")}, hostnameItem));
+    monitorsItem->setIcon(QIcon::fromTheme(QStringLiteral("monitor")));
+
     hostnameItem->appendChild(networkAdaptersItem = new Node(
                                   {tr("Network adapters")}, hostnameItem));
+    networkAdaptersItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("network-wired")));
+
     hostnameItem->appendChild(
         printQueuesItem = new Node({tr("Print queues")}, hostnameItem));
+    printQueuesItem->setIcon(QIcon::fromTheme(QStringLiteral("printer")));
 
     hostnameItem->appendChild(processorsItem =
                                   new Node({tr("Processors")}, hostnameItem));
+    processorsItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("preferences-devices-cpu")));
 
     hostnameItem->appendChild(softwareComponentsItem = new Node(
                                   {tr("Software components")}, hostnameItem));
+    softwareComponentsItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("preferences-other")));
+
     hostnameItem->appendChild(softwareDevicesItem = new Node(
                                   {tr("Software devices")}, hostnameItem));
+    softwareDevicesItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("preferences-other")));
+
     hostnameItem->appendChild(
         soundVideoAndGameControllersItem =
             new Node({tr("Sound, video and game controllers")}, hostnameItem));
+    soundVideoAndGameControllersItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("preferences-desktop-sound")));
+
     hostnameItem->appendChild(storageControllersItem = new Node(
                                   {tr("Storage controllers")}, hostnameItem));
+    storageControllersItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("drive-harddisk")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(
+        enumerator, "ID_PCI_CLASS_FROM_DATABASE", "Mass storage controller");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            continue;
+        }
+        storageControllersItem->appendChild(
+            new Node({info.name(), info.driver()},
+                     storageControllersItem,
+                     NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
+
     hostnameItem->appendChild(
         storageVolumesItem = new Node({tr("Storage volumes")}, hostnameItem));
+    storageVolumesItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("drive-partition")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(enumerator, "DEVTYPE", "partition");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        storageVolumesItem->appendChild(new Node({info.name(), info.driver()},
+                                                 storageVolumesItem,
+                                                 NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
+
     hostnameItem->appendChild(
         systemDevicesItem = new Node({tr("System devices")}, hostnameItem));
+    systemDevicesItem->setIcon(QIcon::fromTheme(QStringLiteral("computer")));
+    for (DeviceInfo info : manager.iterDevicesSubsystem("pci")) {
+        if (info.name().isEmpty() ||
+            info.propertyValue("ID_PCI_CLASS_FROM_DATABASE") ==
+                QStringLiteral("Display controller") ||
+            info.propertyValue("ID_PCI_SUBCLASS_FROM_DATABASE") ==
+                QStringLiteral("Audio device") ||
+            info.propertyValue("ID_PCI_INTERFACE_FROM_DATABASE") ==
+                QStringLiteral("NVM Express") ||
+            info.propertyValue("ID_PCI_SUBCLASS_FROM_DATABASE") ==
+                QStringLiteral("USB controller") ||
+            info.propertyValue("ID_PCI_SUBCLASS_FROM_DATABASE") ==
+                QStringLiteral("SATA controller") ||
+            info.propertyValue("ID_PCI_CLASS_FROM_DATABASE") ==
+                QStringLiteral("Network controller")) {
+            continue;
+        }
+        systemDevicesItem->appendChild(new Node({info.name(), info.driver()},
+                                                systemDevicesItem,
+                                                NodeType::Device));
+    }
+    // for (DeviceInfo info : manager.iterDevicesSubsystem("mem")) {
+    //     if (info.name().isEmpty()) {
+    //         continue;
+    //     }
+    //     systemDevicesItem->appendChild(new Node({info.name(),
+    //     info.driver()},
+    //                                             systemDevicesItem,
+    //                                             NodeType::Device));
+    // }
+
     hostnameItem->appendChild(
-        storageVolumesItem =
+        universalSerialBusControllersItem =
             new Node({tr("Universal Serial Bus controllers")}, hostnameItem));
+    universalSerialBusControllersItem->setIcon(
+        QIcon::fromTheme(QStringLiteral("drive-removable-media-usb")));
+    enumerator = udev_enumerate_new(manager.context());
+    udev_enumerate_add_match_property(
+        enumerator, "ID_PCI_SUBCLASS_FROM_DATABASE", "USB controller");
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            continue;
+        }
+        universalSerialBusControllersItem->appendChild(
+            new Node({info.name(), info.driver()},
+                     universalSerialBusControllersItem,
+                     NodeType::Device));
+    }
+    udev_enumerate_unref(enumerator);
 }
 
 QModelIndex DevicesByTypeModel::index(int row,
