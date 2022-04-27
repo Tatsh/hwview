@@ -1,3 +1,6 @@
+#ifndef UDEV_H
+#define UDEV_H
+
 #include <QtCore/QMap>
 #include <QtCore/QVector>
 #include <libudev.h>
@@ -19,3 +22,5 @@ public:
 private:
     struct udev *ctx;
 };
+
+#endif // UDEV_H
