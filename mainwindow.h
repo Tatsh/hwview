@@ -1,3 +1,6 @@
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include <QtWidgets/QMainWindow>
 
 #include "ui_mainwindow.h"
@@ -20,3 +23,5 @@ private Q_SLOTS:
 private:
     QActionGroup *actionGroupView;
 };
+
+#endif // MAINWINDOW_H
