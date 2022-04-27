@@ -6,12 +6,12 @@
 
 class DeviceInfo {
 public:
-    DeviceInfo(udev *ctx, const char *sysPath);
+    DeviceInfo(udev *, const char *);
     ~DeviceInfo();
 
     QString &driver();
     QString &name();
-    QString propertyValue(const char *prop);
+    QString propertyValue(const char *);
 
 private:
     void setName();
