@@ -28,9 +28,7 @@ int Node::columnCount() const {
 }
 
 QVariant Node::data(int column) const {
-    if (column < 0 || column >= itemData.size()) {
-        return QVariant();
-    }
+    Q_ASSERT(column >= 0 && column < itemData.size());
     return itemData.at(column);
 }
 
