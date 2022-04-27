@@ -1,3 +1,6 @@
+#ifndef PROPERTIESDIALOG_H
+#define PROPERTIESDIALOG_H
+
 #include <QtWidgets/QDialog>
 
 #include "ui_propertiesdialog.h"
@@ -10,3 +13,5 @@ public:
     void setDeviceName(QString &);
     void setDriverName(QString &);
 };
+
+#endif // PROPERTIESDIALOG_H
