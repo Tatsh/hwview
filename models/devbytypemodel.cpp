@@ -1,3 +1,4 @@
+#include <QtCore/QRegularExpression>
 #include <QtDebug>
 #include <libudev.h>
 
@@ -48,6 +49,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     displayAdaptersItem->setIcon(
         QIcon::fromTheme(QStringLiteral("video-display")));
     auto enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(
         enumerator, "ID_PCI_CLASS_FROM_DATABASE", "Display controller");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
@@ -62,6 +64,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     dvdCDROMDrivesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-optical")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(enumerator, "ID_CDROM", "1");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
@@ -95,6 +98,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
                                   new Node({tr("Keyboards")}, hostnameItem));
     keyboardsItem->setIcon(QIcon::fromTheme(QStringLiteral("input-keyboard")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(enumerator, "ID_INPUT_KEYBOARD", "1");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
@@ -111,6 +115,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     miceAndOtherPointingDevicesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("input-mouse")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(enumerator, "ID_INPUT_MOUSE", "1");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
@@ -150,6 +155,14 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
                                   {tr("Software devices")}, hostnameItem));
     softwareDevicesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("preferences-other")));
+    for (DeviceInfo info : manager.iterDevicesSubsystem("misc")) {
+        softwareDevicesItem->appendChild(new Node(
+            {info.name().replace(QRegularExpression(QStringLiteral("^/dev/")),
+                                 QStringLiteral("")),
+             info.driver()},
+            softwareDevicesItem,
+            NodeType::Device));
+    }
 
     hostnameItem->appendChild(
         soundVideoAndGameControllersItem =
@@ -162,6 +175,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     storageControllersItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-harddisk")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(
         enumerator, "ID_PCI_CLASS_FROM_DATABASE", "Mass storage controller");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
@@ -180,6 +194,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     storageVolumesItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-partition")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(enumerator, "DEVTYPE", "partition");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         storageVolumesItem->appendChild(new Node({info.name(), info.driver()},
@@ -227,6 +242,7 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     universalSerialBusControllersItem->setIcon(
         QIcon::fromTheme(QStringLiteral("drive-removable-media-usb")));
     enumerator = udev_enumerate_new(manager.context());
+    Q_ASSERT(enumerator);
     udev_enumerate_add_match_property(
         enumerator, "ID_PCI_SUBCLASS_FROM_DATABASE", "USB controller");
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
