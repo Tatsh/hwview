@@ -25,6 +25,8 @@ DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
     hostnameItem->appendChild(batteriesItem =
                                   new Node({tr("Batteries")}, hostnameItem));
     batteriesItem->setIcon(QIcon::fromTheme(QStringLiteral("battery-ups")));
+
+    // /devices/virtual/dmi/id, exclude form system devices
     hostnameItem->appendChild(computerItem =
                                   new Node({tr("Computer")}, hostnameItem));
     computerItem->setIcon(QIcon::fromTheme(QStringLiteral("computer")));
