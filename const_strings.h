@@ -88,6 +88,10 @@ namespace strings {
                 const QString usbInterface = QStringLiteral("usb_interface");
             } // namespace devType
 
+            namespace driver {
+                const QString battery = QStringLiteral("battery");
+            }
+
             namespace idModelFromDatabase {
                 const QString ups =
                     QStringLiteral("Uninterruptible Power Supply");
