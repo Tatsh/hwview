@@ -10,7 +10,7 @@ namespace s = strings;
 namespace us = strings::udev;
 
 DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
-    : QAbstractItemModel(parent), manager(udevManager()),
+    : QAbstractItemModel(parent), manager(UdevManager()),
       rootItem(new Node({strings::empty})),
       hostnameItem(new Node({QHostInfo::localHostName()}, rootItem)) {
     hostnameItem->setIconFromTheme(s::categoryIcons::computer);

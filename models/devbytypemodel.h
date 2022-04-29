@@ -46,7 +46,7 @@ private:
     void addSystemDevices();
     void addUsbControllers();
 
-    udevManager manager;
+    UdevManager manager;
     QString hostname;
     Node *rootItem;
     Node *hostnameItem;

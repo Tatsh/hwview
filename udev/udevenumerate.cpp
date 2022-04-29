@@ -1,7 +1,7 @@
 #include "udev/udevenumerate.h"
 #include "udev/udevmanager.h"
 
-UdevEnumerate::UdevEnumerate(udevManager &manager)
+UdevEnumerate::UdevEnumerate(UdevManager &manager)
     : enumerator_(udev_enumerate_new(manager.context())) {
 }
 

@@ -10,10 +10,10 @@
 #include "deviceinfo.h"
 #include "udev/udevenumerate.h"
 
-class udevManager {
+class UdevManager {
 public:
-    udevManager();
-    ~udevManager();
+    UdevManager();
+    ~UdevManager();
 
     struct udev *context() const;
 

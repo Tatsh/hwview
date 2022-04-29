@@ -4,11 +4,11 @@
 #include <QtCore/QString>
 #include <libudev.h>
 
-class udevManager;
+class UdevManager;
 
 class UdevEnumerate {
 public:
-    UdevEnumerate(udevManager &);
+    UdevEnumerate(UdevManager &);
     ~UdevEnumerate();
     void addMatchProperty(const char *);
     void addMatchProperty(const char *, const QString &);
