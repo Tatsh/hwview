@@ -85,11 +85,11 @@ void DevicesByTypeModel::addDisplayAdapters() {
     hostnameItem->appendChild(displayAdaptersItem = new Node(
                                   {tr("Display adapters")}, hostnameItem));
     displayAdaptersItem->setIconFromTheme(s::categoryIcons::displayAdapters);
-    auto wrapper = std::make_unique<UdevEnumerate>(manager);
-    wrapper->addMatchProperty(
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(
         us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
         us::propertyValues::idPciClassFromDatabase::displayController);
-    for (DeviceInfo info : manager.scanDevices(wrapper)) {
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
         displayAdaptersItem->appendChild(new Node({info.name(), info.driver()},
                                                   displayAdaptersItem,
                                                   NodeType::Device));
@@ -100,9 +100,9 @@ void DevicesByTypeModel::addOptical() {
     hostnameItem->appendChild(dvdCDROMDrivesItem = new Node(
                                   {tr("DVD/CD-ROM drives")}, hostnameItem));
     dvdCDROMDrivesItem->setIconFromTheme(s::categoryIcons::dvdCdromDrives);
-    auto wrapper = std::make_unique<UdevEnumerate>(manager);
-    wrapper->addMatchProperty(us::propertyNames::ID_CDROM);
-    for (DeviceInfo info : manager.scanDevices(wrapper)) {
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(us::propertyNames::ID_CDROM);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             continue;
         }
