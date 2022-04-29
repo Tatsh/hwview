@@ -46,8 +46,7 @@ void DevicesByTypeModel::addAudio() {
     hostnameItem->appendChild(
         audioInputsAndOutputsItem =
             new Node({tr("Audio inputs and outputs")}, hostnameItem));
-    audioInputsAndOutputsItem->setIcon(
-        QIcon::fromTheme(s::categoryIcons::audioInputs));
+    audioInputsAndOutputsItem->setIconFromTheme(s::categoryIcons::audioInputs);
 }
 
 void DevicesByTypeModel::addBatteries() {
@@ -69,6 +68,11 @@ void DevicesByTypeModel::addDiskDrives() {
     diskDrivesItem->setIconFromTheme(s::categoryIcons::diskDrives);
     for (DeviceInfo info :
          manager.iterDevicesSubsystem(us::subsystems::block)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
         if (info.propertyValue(us::propertyNames::DEVTYPE) ==
                 us::propertyValues::devType::partition ||
             info.propertyValue(us::propertyNames::ID_CDROM) == s::digit1 ||
@@ -90,6 +94,11 @@ void DevicesByTypeModel::addDisplayAdapters() {
         us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
         us::propertyValues::idPciClassFromDatabase::displayController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
         displayAdaptersItem->appendChild(new Node({info.name(), info.driver()},
                                                   displayAdaptersItem,
                                                   NodeType::Device));
@@ -104,7 +113,9 @@ void DevicesByTypeModel::addOptical() {
     enumerator->addMatchProperty(us::propertyNames::ID_CDROM);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
-            continue;
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
         }
         dvdCdromDrivesItem->appendChild(new Node({info.name(), info.driver()},
                                                  dvdCdromDrivesItem,
@@ -118,6 +129,11 @@ void DevicesByTypeModel::addHid() {
             new Node({tr("Human Interface Devices")}, hostnameItem));
     humanInterfaceDevicesItem->setIconFromTheme(s::categoryIcons::hid);
     for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::hid)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
         humanInterfaceDevicesItem->appendChild(
             new Node({info.name(), info.driver()},
                      humanInterfaceDevicesItem,
@@ -141,7 +157,9 @@ void DevicesByTypeModel::addKeyboards() {
     enumerator->addMatchProperty(us::propertyNames::ID_INPUT_KEYBOARD);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
-            continue;
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
         }
         keyboardsItem->appendChild(new Node(
             {info.name(), info.driver()}, keyboardsItem, NodeType::Device));
@@ -157,7 +175,9 @@ void DevicesByTypeModel::addMice() {
     enumerator->addMatchProperty(us::propertyNames::ID_INPUT_MOUSE);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
-            continue;
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
         }
         miceAndOtherPointingDevicesItem->appendChild(
             new Node({info.name(), info.driver()},
@@ -196,15 +216,21 @@ void DevicesByTypeModel::addSoftwareComponents() {
     softwareComponentsItem->setIconFromTheme(s::categoryIcons::other);
 }
 
+const QRegularExpression kBeginningWithSlashDevRe(QStringLiteral("^/dev/"));
+
 void DevicesByTypeModel::addSoftwareDevices() {
     hostnameItem->appendChild(softwareDevicesItem = new Node(
                                   {tr("Software devices")}, hostnameItem));
     softwareDevicesItem->setIconFromTheme(s::categoryIcons::other);
     for (DeviceInfo info :
          manager.iterDevicesSubsystem(us::subsystems::misc)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
         softwareDevicesItem->appendChild(new Node(
-            {info.name().replace(QRegularExpression(QStringLiteral("^/dev/")),
-                                 strings::empty),
+            {info.name().replace(kBeginningWithSlashDevRe, strings::empty),
              info.driver()},
             softwareDevicesItem,
             NodeType::Device));
@@ -230,7 +256,9 @@ void DevicesByTypeModel::addStorageControllers() {
         us::propertyValues::idPciClassFromDatabase::massStorageController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
-            continue;
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
         }
         storageControllersItem->appendChild(
             new Node({info.name(), info.driver()},
@@ -247,6 +275,11 @@ void DevicesByTypeModel::addStorageVolumes() {
     enumerator->addMatchProperty(us::propertyNames::DEVTYPE,
                                  us::propertyValues::devType::partition);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
         storageVolumesItem->appendChild(new Node({info.name(), info.driver()},
                                                  storageVolumesItem,
                                                  NodeType::Device));
@@ -258,8 +291,12 @@ void DevicesByTypeModel::addSystemDevices() {
         systemDevicesItem = new Node({tr("System devices")}, hostnameItem));
     systemDevicesItem->setIconFromTheme(s::categoryIcons::systemDevices);
     for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::pci)) {
-        if (info.name().isEmpty() ||
-            info.propertyValue(
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        if (info.propertyValue(
                 us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
                 us::propertyValues::idPciClassFromDatabase::
                     displayController ||
@@ -279,7 +316,11 @@ void DevicesByTypeModel::addSystemDevices() {
             info.propertyValue(
                 us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
                 us::propertyValues::idPciClassFromDatabase::
-                    networkController) {
+                    networkController ||
+            info.propertyValue(
+                us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
+                us::propertyValues::idPciClassFromDatabase::
+                    multimediaController) {
             continue;
         }
         systemDevicesItem->appendChild(new Node({info.name(), info.driver()},
@@ -287,9 +328,6 @@ void DevicesByTypeModel::addSystemDevices() {
                                                 NodeType::Device));
     }
     // for (DeviceInfo info : manager.iterDevicesSubsystem("mem")) {
-    //     if (info.name().isEmpty()) {
-    //         continue;
-    //     }
     //     systemDevicesItem->appendChild(new Node({info.name(),
     //     info.driver()},
     //                                             systemDevicesItem,
@@ -309,7 +347,9 @@ void DevicesByTypeModel::addUsbControllers() {
         us::propertyValues::idPciSubclassFromDatabase::usbController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
-            continue;
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
         }
         universalSerialBusControllersItem->appendChild(
             new Node({info.name(), info.driver()},
