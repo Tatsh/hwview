@@ -1,5 +1,8 @@
 {
-  "cSpell.words": ["CDROM", "udev"],
+  "cSpell.words": [
+    "CDROM",
+    "udev"
+  ],
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
@@ -62,6 +65,7 @@
     "optional": "cpp",
     "ostream": "cpp",
     "qactiongroup": "cpp",
+    "qtglobal": "cpp",
     "random": "cpp",
     "ratio": "cpp",
     "semaphore": "cpp",
