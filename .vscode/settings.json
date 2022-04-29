@@ -1,8 +1,5 @@
 {
-  "cSpell.words": [
-    "CDROM",
-    "udev"
-  ],
+  "cSpell.words": ["CDROM", "qstrlen", "sata", "tatsh", "udev"],
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
