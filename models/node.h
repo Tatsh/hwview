@@ -29,6 +29,7 @@ public:
     void setIcon(QIcon);
     void setType(NodeType);
     NodeType type();
+    void setIconFromTheme(const QString &);
 
 private:
     Node *parentItem_;

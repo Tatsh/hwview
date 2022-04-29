@@ -1,4 +1,4 @@
-#include "node.h"
+#include "models/node.h"
 
 Node::Node(const QVector<QVariant> &data, Node *parent, NodeType nodeType)
     : itemData(data), parentItem_(parent), type_(nodeType) {
@@ -49,6 +49,10 @@ QIcon Node::icon() const {
 
 void Node::setIcon(QIcon icon) {
     icon_ = icon;
+}
+
+void Node::setIconFromTheme(const QString &name) {
+    icon_ = QIcon::fromTheme(name);
 }
 
 void Node::setType(NodeType type) {

@@ -1,7 +1,5 @@
-#include <QtDebug>
-
+#include "udev/udevmanager.h"
 #include "deviceinfo.h"
-#include "udev.h"
 
 udevManager::udevManager() : ctx(udev_new()) {
 }
@@ -40,7 +38,18 @@ udevManager::iterDevicesSubsystem(const char *subsystem) const {
 }
 
 QVector<DeviceInfo>
+udevManager::iterDevicesSubsystem(const QString &subsystem) const {
+    return iterDevicesSubsystem(subsystem.toLocal8Bit().constData());
+}
+
+QVector<DeviceInfo>
 udevManager::scanDevices(struct udev_enumerate *enumerator) const {
     udev_enumerate_scan_devices(enumerator);
     return convertToDeviceInfo(enumerator);
+}
+
+QVector<DeviceInfo>
+udevManager::scanDevices(const std::unique_ptr<UdevEnumerate> &wrapper) const {
+    udev_enumerate_scan_devices(wrapper->enumerator());
+    return convertToDeviceInfo(wrapper->enumerator());
 }

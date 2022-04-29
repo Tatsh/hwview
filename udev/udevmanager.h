@@ -4,9 +4,11 @@
 #include <QtCore/QMap>
 #include <QtCore/QVector>
 #include <libudev.h>
+#include <memory>
 #include <vector>
 
 #include "deviceinfo.h"
+#include "udev/udevenumerate.h"
 
 class udevManager {
 public:
@@ -16,9 +18,11 @@ public:
     struct udev *context() const;
 
     QVector<DeviceInfo> iterDevicesSubsystem(const char *) const;
+    QVector<DeviceInfo> iterDevicesSubsystem(const QString &) const;
+    QVector<DeviceInfo> convertToDeviceInfo(struct udev_enumerate *) const;
+    QVector<DeviceInfo> scanDevices(struct udev_enumerate *) const;
     QVector<DeviceInfo>
-    convertToDeviceInfo(struct udev_enumerate *enumerator) const;
-    QVector<DeviceInfo> scanDevices(struct udev_enumerate *enumerator) const;
+    scanDevices(const std::unique_ptr<UdevEnumerate> &) const;
 
 private:
     struct udev *ctx;

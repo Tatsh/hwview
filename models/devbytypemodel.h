@@ -4,6 +4,7 @@
 #include <QtCore/QAbstractItemModel>
 
 #include "node.h"
+#include "udev/udevmanager.h"
 
 class DevicesByTypeModel : public QAbstractItemModel {
     Q_OBJECT
@@ -23,8 +24,32 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 private:
+    void addAudio();
+    void addBatteries();
+    void addComputer();
+    void addDiskDrives();
+    void addDisplayAdapters();
+    void addOptical();
+    void addHid();
+    void addIdeAtapi();
+    void addKeyboards();
+    void addMice();
+    void addMonitors();
+    void addNetwork();
+    void addPrintQueues();
+    void addProcessors();
+    void addSoftwareComponents();
+    void addSoftwareDevices();
+    void addSoundVideoAndGameControllers();
+    void addStorageControllers();
+    void addStorageVolumes();
+    void addSystemDevices();
+    void addUsbControllers();
+
+    udevManager manager;
     QString hostname;
     Node *rootItem;
+    Node *hostnameItem;
     // Categories
     Node *audioInputsAndOutputsItem;
     Node *batteriesItem;

@@ -1,5 +1,8 @@
 #include "deviceinfo.h"
 
+#include "const_strings.h"
+
+#include <QtCore/QRegularExpression>
 #include <QtCore/QVector>
 
 DeviceInfo::DeviceInfo(udev *ctx, const char *syspath) : ctx(ctx) {
@@ -43,8 +46,11 @@ void DeviceInfo::setName() {
         const char *prop;
         if ((prop = udev_device_get_property_value(dev, key))) {
             name_ = QString::fromLocal8Bit(prop)
-                        .replace(QStringLiteral("\""), QStringLiteral(""))
-                        .replace(QStringLiteral("_"), QStringLiteral(" "))
+                        .replace(QRegularExpression(QStringLiteral("^\"")),
+                                 strings::empty)
+                        .replace(QRegularExpression(QStringLiteral("\"$")),
+                                 strings::empty)
+                        .replace(QStringLiteral("_"), strings::singleSpace)
                         .trimmed();
             break;
         }

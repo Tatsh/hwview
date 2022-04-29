@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(
   Qt5
-  COMPONENTS Widgets
+  COMPONENTS Network Widgets
   REQUIRED)
 pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
 
@@ -25,6 +25,7 @@ add_definitions(
   -DQT_STRICT_ITERATORS
   -DQT_USE_FAST_OPERATOR_PLUS
   -DQT_USE_QSTRINGBUILDER)
+include_directories(.)
 add_executable(
   devmgmt
   deviceinfo.cpp
@@ -33,5 +34,6 @@ add_executable(
   models/devbytypemodel.cpp
   models/node.cpp
   propertiesdialog.cpp
-  udev.cpp)
-target_link_libraries(devmgmt Qt5::Widgets PkgConfig::UDEV)
+  udev/udevenumerate.cpp
+  udev/udevmanager.cpp)
+target_link_libraries(devmgmt PkgConfig::UDEV Qt5::Network Qt5::Widgets)
