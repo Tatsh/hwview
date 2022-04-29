@@ -7,7 +7,7 @@ namespace strings {
     const QString digit1 = QStringLiteral("1");
     const QString empty = QStringLiteral("");
     const QString singleSpace = QStringLiteral(" ");
-
+    const QString underscore = QStringLiteral("_");
     namespace categoryIcons {
         const QString audioInputs = QStringLiteral("audio-card");
         const QString batteries = QStringLiteral("battery-ups");
@@ -35,17 +35,34 @@ namespace strings {
 
     namespace udev {
         namespace propertyNames {
+            constexpr char DEVNAME[] = "DEVNAME";
             constexpr char DEVPATH[] = "DEVPATH";
             constexpr char DEVTYPE[] = "DEVTYPE";
+            constexpr char DM_NAME[] = "DM_NAME";
+            constexpr char DRIVER[] = "DRIVER";
+            constexpr char HID_NAME[] = "HID_NAME";
+            constexpr char HID_ID[] = "HID_ID";
+            constexpr char HID_PHYS[] = "HID_PHYS";
+            constexpr char HID_UNIQ[] = "HID_UNIQ";
             constexpr char ID_CDROM[] = "ID_CDROM";
+            constexpr char MODALIAS[] = "MODALIAS";
+            constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";
+            constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME";
+            constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID";
             constexpr char ID_INPUT_KEYBOARD[] = "ID_INPUT_KEYBOARD";
             constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";
+            constexpr char ID_MODEL[] = "ID_MODEL";
+            constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE";
             constexpr char ID_PCI_CLASS_FROM_DATABASE[] =
                 "ID_PCI_CLASS_FROM_DATABASE";
             constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] =
                 "ID_PCI_INTERFACE_FROM_DATABASE";
             constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] =
                 "ID_PCI_SUBCLASS_FROM_DATABASE";
+            constexpr char ID_VENDOR_FROM_DATABASE[] =
+                "ID_VENDOR_FROM_DATABASE";
+            constexpr char NAME[] = "NAME";
+            constexpr char SUBSYSTEM[] = "SUBSYSTEM";
         } // namespace propertyNames
 
         namespace propertyValues {
