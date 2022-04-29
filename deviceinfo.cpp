@@ -35,8 +35,8 @@ DeviceInfo::DeviceInfo(udev *ctx, const char *syspath) : ctx(ctx) {
         udev_device_get_property_value(dev, props::ID_VENDOR_FROM_DATABASE));
 }
 
-const QRegularExpression quoteAtBeginning(QStringLiteral("^\""));
-const QRegularExpression quoteAtEnd(QStringLiteral("\"$"));
+static const QRegularExpression quoteAtBeginning(QStringLiteral("^\""));
+static const QRegularExpression quoteAtEnd(QStringLiteral("\"$"));
 
 void DeviceInfo::setName() {
     QVector<const char *> keys;
