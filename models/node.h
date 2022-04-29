@@ -27,9 +27,9 @@ public:
     Node *parentItem();
     int row() const;
     void setIcon(QIcon);
+    void setIconFromTheme(const QString &);
     void setType(NodeType);
     NodeType type();
-    void setIconFromTheme(const QString &);
 
 private:
     Node *parentItem_;
