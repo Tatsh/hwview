@@ -75,6 +75,8 @@ namespace strings {
                     QStringLiteral("Display controller");
                 const QString massStorageController =
                     QStringLiteral("Mass storage controller");
+                const QString multimediaController =
+                    QStringLiteral("Multimedia controller");
                 const QString networkController =
                     QStringLiteral("Network controller");
             } // namespace idPciClassFromDatabase
