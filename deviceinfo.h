@@ -9,9 +9,9 @@ public:
     DeviceInfo(udev *, const char *);
     ~DeviceInfo();
 
-    QString &driver();
-    QString &name();
-    QString propertyValue(const char *);
+    QString driver() const;
+    QString name() const;
+    QString propertyValue(const char *) const;
 
 private:
     void setName();
@@ -22,7 +22,7 @@ private:
     QString driver_;
     QString hidID_;
     QString hidName_;
-    QString hidPhysicalMAC_;
+    QString hidPhysicalMac_;
     QString hidUniq_;
     QString modAlias_;
     QString name_;
