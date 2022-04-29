@@ -58,6 +58,7 @@ namespace strings {
                 "ID_PCI_INTERFACE_FROM_DATABASE";
             constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] =
                 "ID_PCI_SUBCLASS_FROM_DATABASE";
+            constexpr char ID_TYPE[] = "ID_TYPE";
             constexpr char ID_VENDOR_FROM_DATABASE[] =
                 "ID_VENDOR_FROM_DATABASE";
             constexpr char MODALIAS[] = "MODALIAS";
@@ -86,6 +87,11 @@ namespace strings {
                 const QString usbDevice = QStringLiteral("usb_device");
                 const QString usbInterface = QStringLiteral("usb_interface");
             } // namespace devType
+
+            namespace idModelFromDatabase {
+                const QString ups =
+                    QStringLiteral("Uninterruptible Power Supply");
+            }
 
             namespace idPciClassFromDatabase {
                 const QString bridge = QStringLiteral("bridge");
@@ -142,7 +148,11 @@ namespace strings {
                 const QString vgaCompatibleController =
                     QStringLiteral("VGA compatible controller");
             } // namespace idPciSubclassFromDatabase
-        }     // namespace propertyValues
+
+            namespace idType {
+                const QString audio = QStringLiteral("audio");
+            }
+        } // namespace propertyValues
 
         namespace subsystems {
             const QString acpi = QStringLiteral("acpi");
