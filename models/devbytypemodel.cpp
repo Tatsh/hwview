@@ -71,14 +71,34 @@ void DevicesByTypeModel::addBatteries() {
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_MODEL_FROM_DATABASE,
                                  us::propertyValues::idModelFromDatabase::ups);
+    QVector<Node *> devInfoVec;
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        batteriesItem->appendChild(new Node(
-            {info.name(), info.driver()}, batteriesItem, NodeType::Device));
+        devInfoVec << new Node(
+            {info.name(), info.driver()}, batteriesItem, NodeType::Device);
+    }
+    enumerator.reset(nullptr);
+    enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(us::propertyNames::DRIVER,
+                                 us::propertyValues::driver::battery);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        devInfoVec << new Node(
+            {info.name(), info.driver()}, batteriesItem, NodeType::Device);
+    }
+    std::sort(devInfoVec.begin(), devInfoVec.end(), [](Node *a, Node *b) {
+        return a->data(0).toString() < b->data(0).toString();
+    });
+    for (Node *node : devInfoVec) {
+        batteriesItem->appendChild(node);
     }
 }
 
