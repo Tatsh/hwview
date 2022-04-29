@@ -47,12 +47,39 @@ void DevicesByTypeModel::addAudio() {
         audioInputsAndOutputsItem =
             new Node({tr("Audio inputs and outputs")}, hostnameItem));
     audioInputsAndOutputsItem->setIconFromTheme(s::categoryIcons::audioInputs);
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(
+        us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE,
+        us::propertyValues::idPciSubclassFromDatabase::audioDevice);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        audioInputsAndOutputsItem->appendChild(
+            new Node({info.name(), info.driver()},
+                     audioInputsAndOutputsItem,
+                     NodeType::Device));
+    }
 }
 
 void DevicesByTypeModel::addBatteries() {
     hostnameItem->appendChild(batteriesItem =
                                   new Node({tr("Batteries")}, hostnameItem));
     batteriesItem->setIconFromTheme(s::categoryIcons::batteries);
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(us::propertyNames::ID_MODEL_FROM_DATABASE,
+                                 us::propertyValues::idModelFromDatabase::ups);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        batteriesItem->appendChild(new Node(
+            {info.name(), info.driver()}, batteriesItem, NodeType::Device));
+    }
 }
 
 void DevicesByTypeModel::addComputer() {
@@ -196,6 +223,20 @@ void DevicesByTypeModel::addNetwork() {
     hostnameItem->appendChild(networkAdaptersItem = new Node(
                                   {tr("Network adapters")}, hostnameItem));
     networkAdaptersItem->setIconFromTheme(s::categoryIcons::networkAdapters);
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(
+        us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
+        us::propertyValues::idPciClassFromDatabase::networkController);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        networkAdaptersItem->appendChild(new Node({info.name(), info.driver()},
+                                                  networkAdaptersItem,
+                                                  NodeType::Device));
+    }
 }
 
 void DevicesByTypeModel::addPrintQueues() {
@@ -243,6 +284,20 @@ void DevicesByTypeModel::addSoundVideoAndGameControllers() {
             new Node({tr("Sound, video and game controllers")}, hostnameItem));
     soundVideoAndGameControllersItem->setIconFromTheme(
         s::categoryIcons::soundVideoGameControllers);
+    auto enumerator = std::make_unique<UdevEnumerate>(manager);
+    enumerator->addMatchProperty(us::propertyNames::ID_TYPE,
+                                 us::propertyValues::idType::audio);
+    for (DeviceInfo info : manager.scanDevices(enumerator)) {
+        if (info.name().isEmpty()) {
+            qDebug() << "Empty name";
+            info.dump();
+            qDebug() << "END\n";
+        }
+        soundVideoAndGameControllersItem->appendChild(
+            new Node({info.name(), info.driver()},
+                     soundVideoAndGameControllersItem,
+                     NodeType::Device));
+    }
 }
 
 void DevicesByTypeModel::addStorageControllers() {
