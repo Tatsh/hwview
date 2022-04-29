@@ -12,6 +12,7 @@ public:
     QString driver() const;
     QString name() const;
     QString propertyValue(const char *) const;
+    void dump();
 
 private:
     void setName();
