@@ -92,7 +92,8 @@ void DevicesByTypeModel::addComputer() {
         new Node({QStringLiteral("%1 %2")
                       .arg(info.propertyValue("ID_VENDOR"))
                       .arg(info.propertyValue("ID_MODEL"))},
-                 computerItem));
+                 computerItem,
+                 NodeType::Device));
 }
 
 void DevicesByTypeModel::addDiskDrives() {
