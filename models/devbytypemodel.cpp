@@ -83,7 +83,7 @@ void DevicesByTypeModel::addBatteries() {
 }
 
 void DevicesByTypeModel::addComputer() {
-    // /devices/virtual/dmi/id, exclude form system devices
+    // /devices/virtual/dmi/id, exclude from system devices
     hostnameItem->appendChild(computerItem =
                                   new Node({tr("Computer")}, hostnameItem));
     computerItem->setIconFromTheme(s::categoryIcons::computer);
