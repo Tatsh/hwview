@@ -87,6 +87,12 @@ void DevicesByTypeModel::addComputer() {
     hostnameItem->appendChild(computerItem =
                                   new Node({tr("Computer")}, hostnameItem));
     computerItem->setIconFromTheme(s::categoryIcons::computer);
+    DeviceInfo info(manager.context(), "/sys/devices/virtual/dmi/id");
+    computerItem->appendChild(
+        new Node({QStringLiteral("%1 %2")
+                      .arg(info.propertyValue("ID_VENDOR"))
+                      .arg(info.propertyValue("ID_MODEL"))},
+                 computerItem));
 }
 
 void DevicesByTypeModel::addDiskDrives() {
