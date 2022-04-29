@@ -163,6 +163,7 @@ namespace strings {
             const QString ataDevice = QStringLiteral("ata_device");
             const QString ataLink = QStringLiteral("ata_link");
             const QString ataPort = QStringLiteral("ata_port");
+            const QString battery = QStringLiteral("battery");
             const QString bdi = QStringLiteral("bdi");
             const QString block = QStringLiteral("block");
             const QString bluetooth = QStringLiteral("bluetooth");
@@ -203,6 +204,7 @@ namespace strings {
             const QString pciBus = QStringLiteral("pci_bus");
             const QString pciExpress = QStringLiteral("pci_express");
             const QString platform = QStringLiteral("platform");
+            const QString powerSupply = QStringLiteral("power_supply");
             const QString pnp = QStringLiteral("pnp");
             const QString ppp = QStringLiteral("ppp");
             const QString pps = QStringLiteral("pps");
