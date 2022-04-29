@@ -97,17 +97,17 @@ void DevicesByTypeModel::addDisplayAdapters() {
 }
 
 void DevicesByTypeModel::addOptical() {
-    hostnameItem->appendChild(dvdCDROMDrivesItem = new Node(
+    hostnameItem->appendChild(dvdCdromDrivesItem = new Node(
                                   {tr("DVD/CD-ROM drives")}, hostnameItem));
-    dvdCDROMDrivesItem->setIconFromTheme(s::categoryIcons::dvdCdromDrives);
+    dvdCdromDrivesItem->setIconFromTheme(s::categoryIcons::dvdCdromDrives);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_CDROM);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             continue;
         }
-        dvdCDROMDrivesItem->appendChild(new Node({info.name(), info.driver()},
-                                                 dvdCDROMDrivesItem,
+        dvdCdromDrivesItem->appendChild(new Node({info.name(), info.driver()},
+                                                 dvdCdromDrivesItem,
                                                  NodeType::Device));
     }
 }
@@ -127,9 +127,9 @@ void DevicesByTypeModel::addHid() {
 
 void DevicesByTypeModel::addIdeAtapi() {
     hostnameItem->appendChild(
-        ideATAATAPIControllersItem =
+        ideAtaAtapiControllersItem =
             new Node({tr("IDE ATA/ATAPI controllers")}, hostnameItem));
-    ideATAATAPIControllersItem->setIconFromTheme(
+    ideAtaAtapiControllersItem->setIconFromTheme(
         s::categoryIcons::ideAtapiControllers);
 }
 

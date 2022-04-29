@@ -47,7 +47,6 @@ private:
     void addUsbControllers();
 
     UdevManager manager;
-    QString hostname;
     Node *rootItem;
     Node *hostnameItem;
     // Categories
@@ -56,9 +55,9 @@ private:
     Node *computerItem;
     Node *diskDrivesItem;
     Node *displayAdaptersItem;
-    Node *dvdCDROMDrivesItem;
+    Node *dvdCdromDrivesItem;
     Node *humanInterfaceDevicesItem;
-    Node *ideATAATAPIControllersItem;
+    Node *ideAtaAtapiControllersItem;
     Node *keyboardsItem;
     Node *miceAndOtherPointingDevicesItem;
     Node *monitorsItem;
