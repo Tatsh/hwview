@@ -45,7 +45,6 @@ namespace strings {
             constexpr char HID_PHYS[] = "HID_PHYS";
             constexpr char HID_UNIQ[] = "HID_UNIQ";
             constexpr char ID_CDROM[] = "ID_CDROM";
-            constexpr char MODALIAS[] = "MODALIAS";
             constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";
             constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME";
             constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID";
@@ -61,6 +60,7 @@ namespace strings {
                 "ID_PCI_SUBCLASS_FROM_DATABASE";
             constexpr char ID_VENDOR_FROM_DATABASE[] =
                 "ID_VENDOR_FROM_DATABASE";
+            constexpr char MODALIAS[] = "MODALIAS";
             constexpr char NAME[] = "NAME";
             constexpr char SUBSYSTEM[] = "SUBSYSTEM";
         } // namespace propertyNames
