@@ -24,13 +24,11 @@ namespace strings {
         const QString other = QStringLiteral("preferences-other");
         const QString printer = QStringLiteral("printer");
         const QString processors = QStringLiteral("preferences-devices-cpu");
-        const QString soundVideoGameControllers =
-            QStringLiteral("preferences-desktop-sound");
+        const QString soundVideoGameControllers = QStringLiteral("preferences-desktop-sound");
         const QString storageControllers = QStringLiteral("drive-harddisk");
         const QString storageVolumes = QStringLiteral("drive-partition");
         const QString systemDevices = QStringLiteral("computer");
-        const QString usbControllers =
-            QStringLiteral("drive-removable-media-usb");
+        const QString usbControllers = QStringLiteral("drive-removable-media-usb");
     } // namespace categoryIcons
 
     namespace udev {
@@ -52,15 +50,11 @@ namespace strings {
             constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";
             constexpr char ID_MODEL[] = "ID_MODEL";
             constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE";
-            constexpr char ID_PCI_CLASS_FROM_DATABASE[] =
-                "ID_PCI_CLASS_FROM_DATABASE";
-            constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] =
-                "ID_PCI_INTERFACE_FROM_DATABASE";
-            constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] =
-                "ID_PCI_SUBCLASS_FROM_DATABASE";
+            constexpr char ID_PCI_CLASS_FROM_DATABASE[] = "ID_PCI_CLASS_FROM_DATABASE";
+            constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] = "ID_PCI_INTERFACE_FROM_DATABASE";
+            constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] = "ID_PCI_SUBCLASS_FROM_DATABASE";
             constexpr char ID_TYPE[] = "ID_TYPE";
-            constexpr char ID_VENDOR_FROM_DATABASE[] =
-                "ID_VENDOR_FROM_DATABASE";
+            constexpr char ID_VENDOR_FROM_DATABASE[] = "ID_VENDOR_FROM_DATABASE";
             constexpr char MODALIAS[] = "MODALIAS";
             constexpr char NAME[] = "NAME";
             constexpr char SUBSYSTEM[] = "SUBSYSTEM";
@@ -80,10 +74,8 @@ namespace strings {
                 const QString scsiDevice = QStringLiteral("scsi_device");
                 const QString scsiHost = QStringLiteral("scsi_host");
                 const QString scsiTarget = QStringLiteral("scsi_target");
-                const QString thunderboltDevice =
-                    QStringLiteral("thunderbolt_device");
-                const QString thunderboltDomain =
-                    QStringLiteral("thunderbolt_domain");
+                const QString thunderboltDevice = QStringLiteral("thunderbolt_device");
+                const QString thunderboltDomain = QStringLiteral("thunderbolt_domain");
                 const QString usbDevice = QStringLiteral("usb_device");
                 const QString usbInterface = QStringLiteral("usb_interface");
             } // namespace devType
@@ -93,46 +85,34 @@ namespace strings {
             }
 
             namespace idModelFromDatabase {
-                const QString ups =
-                    QStringLiteral("Uninterruptible Power Supply");
+                const QString ups = QStringLiteral("Uninterruptible Power Supply");
             }
 
             namespace idPciClassFromDatabase {
                 const QString bridge = QStringLiteral("bridge");
-                const QString communicationController =
-                    QStringLiteral("Communication controller");
-                const QString displayController =
-                    QStringLiteral("Display controller");
-                const QString genericSystemPeripheral =
-                    QStringLiteral("Generic system peripheral");
-                const QString massStorageController =
-                    QStringLiteral("Mass storage controller");
-                const QString memoryController =
-                    QStringLiteral("Memory controller");
-                const QString multimediaController =
-                    QStringLiteral("Multimedia controller");
-                const QString networkController =
-                    QStringLiteral("Network controller");
-                const QString serialBusController =
-                    QStringLiteral("Serial bus controller");
+                const QString communicationController = QStringLiteral("Communication controller");
+                const QString displayController = QStringLiteral("Display controller");
+                const QString genericSystemPeripheral = QStringLiteral("Generic system peripheral");
+                const QString massStorageController = QStringLiteral("Mass storage controller");
+                const QString memoryController = QStringLiteral("Memory controller");
+                const QString multimediaController = QStringLiteral("Multimedia controller");
+                const QString networkController = QStringLiteral("Network controller");
+                const QString serialBusController = QStringLiteral("Serial bus controller");
             } // namespace idPciClassFromDatabase
 
             namespace idPciInterfaceFromDatabase {
                 const QString ahci1_0 = QStringLiteral("AHCI 1.0");
                 const QString normalDecode = QStringLiteral("Normal decode");
                 const QString nvmExpress = QStringLiteral("NVM Express");
-                const QString usb4HostInterface =
-                    QStringLiteral("USB4 Host Interface");
+                const QString usb4HostInterface = QStringLiteral("USB4 Host Interface");
                 const QString vgaController = QStringLiteral("VGA controller");
                 const QString xhci = QStringLiteral("XHCI");
             } // namespace idPciInterfaceFromDatabase
 
             namespace idPciSubclassFromDatabase {
                 const QString audioDevice = QStringLiteral("Audio device");
-                const QString communicationController =
-                    QStringLiteral("Communication controller");
-                const QString ethernetController =
-                    QStringLiteral("Ethernet controller");
+                const QString communicationController = QStringLiteral("Communication controller");
+                const QString ethernetController = QStringLiteral("Ethernet controller");
                 const QString hostBridge = QStringLiteral("Host bridge");
                 const QString isaBridge = QStringLiteral("ISA bridge");
                 const QString multimediaVideoController =
@@ -141,16 +121,12 @@ namespace strings {
                     QStringLiteral("Non-Volatile memory controller");
                 const QString pciBridge = QStringLiteral("PCI bridge");
                 const QString ramMemory = QStringLiteral("RAM memory");
-                const QString sataController =
-                    QStringLiteral("SATA controller");
-                const QString serialBusController =
-                    QStringLiteral("Serial bus controller");
+                const QString sataController = QStringLiteral("SATA controller");
+                const QString serialBusController = QStringLiteral("Serial bus controller");
                 const QString smBus = QStringLiteral("SMBus");
-                const QString systemPeripheral =
-                    QStringLiteral("systemPeripheral");
+                const QString systemPeripheral = QStringLiteral("systemPeripheral");
                 const QString usbController = QStringLiteral("USB controller");
-                const QString vgaCompatibleController =
-                    QStringLiteral("VGA compatible controller");
+                const QString vgaCompatibleController = QStringLiteral("VGA compatible controller");
             } // namespace idPciSubclassFromDatabase
 
             namespace idType {

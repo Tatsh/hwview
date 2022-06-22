@@ -13,9 +13,7 @@ enum NodeType {
 class Node {
 public:
     Node() = default;
-    explicit Node(const QVector<QVariant> &data,
-                  Node *parentItem = nullptr,
-                  NodeType type = Label);
+    explicit Node(const QVector<QVariant> &data, Node *parentItem = nullptr, NodeType type = Label);
     ~Node();
 
     void appendChild(Node *);

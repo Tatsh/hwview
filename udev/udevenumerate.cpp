@@ -9,10 +9,8 @@ void UdevEnumerate::addMatchProperty(const char *property) {
     udev_enumerate_add_match_property(enumerator_, property, "1");
 }
 
-void UdevEnumerate::addMatchProperty(const char *property,
-                                     const QString &value) {
-    udev_enumerate_add_match_property(
-        enumerator_, property, value.toLocal8Bit().constData());
+void UdevEnumerate::addMatchProperty(const char *property, const QString &value) {
+    udev_enumerate_add_match_property(enumerator_, property, value.toLocal8Bit().constData());
 }
 
 UdevEnumerate::~UdevEnumerate() {

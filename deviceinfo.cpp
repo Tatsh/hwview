@@ -17,22 +17,15 @@ DeviceInfo::DeviceInfo(udev *ctx, const char *syspath) : ctx(ctx) {
     const char *idModelFromDatabase =
         udev_device_get_property_value(dev, props::ID_MODEL_FROM_DATABASE);
     setName();
-    devPath_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::DEVPATH));
-    hidID_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::HID_ID));
-    hidPhysicalMac_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::HID_PHYS));
-    hidUniq_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::HID_UNIQ));
-    modAlias_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::MODALIAS));
-    subsystem_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::SUBSYSTEM));
-    driver_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::DRIVER));
-    idVendorFromDatabase_ = QString::fromLocal8Bit(
-        udev_device_get_property_value(dev, props::ID_VENDOR_FROM_DATABASE));
+    devPath_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::DEVPATH));
+    hidID_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::HID_ID));
+    hidPhysicalMac_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::HID_PHYS));
+    hidUniq_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::HID_UNIQ));
+    modAlias_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::MODALIAS));
+    subsystem_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::SUBSYSTEM));
+    driver_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::DRIVER));
+    idVendorFromDatabase_ =
+        QString::fromLocal8Bit(udev_device_get_property_value(dev, props::ID_VENDOR_FROM_DATABASE));
 }
 
 static const QRegularExpression quoteAtBeginning(QStringLiteral("^\""));
@@ -40,15 +33,12 @@ static const QRegularExpression quoteAtEnd(QStringLiteral("\"$"));
 
 void DeviceInfo::setName() {
     QVector<const char *> keys;
-    keys << props::HID_NAME << props::NAME << props::ID_FS_LABEL
-         << props::ID_PART_TABLE_UUID << props::ID_MODEL
-         << props::ID_MODEL_FROM_DATABASE << props::DEVNAME << props::DM_NAME
-         << props::ID_PART_ENTRY_NAME << props::ID_PCI_SUBCLASS_FROM_DATABASE
-         << props::DRIVER;
+    keys << props::HID_NAME << props::NAME << props::ID_FS_LABEL << props::ID_PART_TABLE_UUID
+         << props::ID_MODEL << props::ID_MODEL_FROM_DATABASE << props::DEVNAME << props::DM_NAME
+         << props::ID_PART_ENTRY_NAME << props::ID_PCI_SUBCLASS_FROM_DATABASE << props::DRIVER;
     for (const char *key : keys) {
         const char *prop;
-        if ((prop = udev_device_get_property_value(dev, key)) &&
-            qstrlen(prop) > 0) {
+        if ((prop = udev_device_get_property_value(dev, key)) && qstrlen(prop) > 0) {
             name_ = QString::fromLocal8Bit(prop)
                         .replace(quoteAtBeginning, s::empty)
                         .replace(quoteAtEnd, s::empty)

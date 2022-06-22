@@ -10,8 +10,7 @@ namespace s = strings;
 namespace us = strings::udev;
 
 DevicesByTypeModel::DevicesByTypeModel(QObject *parent)
-    : QAbstractItemModel(parent), manager(UdevManager()),
-      rootItem(new Node({strings::empty})),
+    : QAbstractItemModel(parent), manager(UdevManager()), rootItem(new Node({strings::empty})),
       hostnameItem(new Node({QHostInfo::localHostName()}, rootItem)) {
     hostnameItem->setIconFromTheme(s::categoryIcons::computer);
     rootItem->appendChild(hostnameItem);
@@ -43,14 +42,12 @@ DevicesByTypeModel::~DevicesByTypeModel() {
 }
 
 void DevicesByTypeModel::addAudio() {
-    hostnameItem->appendChild(
-        audioInputsAndOutputsItem =
-            new Node({tr("Audio inputs and outputs")}, hostnameItem));
+    hostnameItem->appendChild(audioInputsAndOutputsItem =
+                                  new Node({tr("Audio inputs and outputs")}, hostnameItem));
     audioInputsAndOutputsItem->setIconFromTheme(s::categoryIcons::audioInputs);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(
-        us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE,
-        us::propertyValues::idPciSubclassFromDatabase::audioDevice);
+    enumerator->addMatchProperty(us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE,
+                                 us::propertyValues::idPciSubclassFromDatabase::audioDevice);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
@@ -58,15 +55,12 @@ void DevicesByTypeModel::addAudio() {
             qDebug() << "END\n";
         }
         audioInputsAndOutputsItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     audioInputsAndOutputsItem,
-                     NodeType::Device));
+            new Node({info.name(), info.driver()}, audioInputsAndOutputsItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addBatteries() {
-    hostnameItem->appendChild(batteriesItem =
-                                  new Node({tr("Batteries")}, hostnameItem));
+    hostnameItem->appendChild(batteriesItem = new Node({tr("Batteries")}, hostnameItem));
     batteriesItem->setIconFromTheme(s::categoryIcons::batteries);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_MODEL_FROM_DATABASE,
@@ -78,21 +72,18 @@ void DevicesByTypeModel::addBatteries() {
             info.dump();
             qDebug() << "END\n";
         }
-        devInfoVec << new Node(
-            {info.name(), info.driver()}, batteriesItem, NodeType::Device);
+        devInfoVec << new Node({info.name(), info.driver()}, batteriesItem, NodeType::Device);
     }
     enumerator.reset(nullptr);
     enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(us::propertyNames::DRIVER,
-                                 us::propertyValues::driver::battery);
+    enumerator->addMatchProperty(us::propertyNames::DRIVER, us::propertyValues::driver::battery);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        devInfoVec << new Node(
-            {info.name(), info.driver()}, batteriesItem, NodeType::Device);
+        devInfoVec << new Node({info.name(), info.driver()}, batteriesItem, NodeType::Device);
     }
     std::sort(devInfoVec.begin(), devInfoVec.end(), [](Node *a, Node *b) {
         return a->data(0).toString() < b->data(0).toString();
@@ -103,24 +94,20 @@ void DevicesByTypeModel::addBatteries() {
 }
 
 void DevicesByTypeModel::addComputer() {
-    hostnameItem->appendChild(computerItem =
-                                  new Node({tr("Computer")}, hostnameItem));
+    hostnameItem->appendChild(computerItem = new Node({tr("Computer")}, hostnameItem));
     computerItem->setIconFromTheme(s::categoryIcons::computer);
     DeviceInfo info(manager.context(), "/sys/devices/virtual/dmi/id");
-    computerItem->appendChild(
-        new Node({QStringLiteral("%1 %2")
-                      .arg(info.propertyValue("ID_VENDOR"))
-                      .arg(info.propertyValue("ID_MODEL"))},
-                 computerItem,
-                 NodeType::Device));
+    computerItem->appendChild(new Node({QStringLiteral("%1 %2")
+                                            .arg(info.propertyValue("ID_VENDOR"))
+                                            .arg(info.propertyValue("ID_MODEL"))},
+                                       computerItem,
+                                       NodeType::Device));
 }
 
 void DevicesByTypeModel::addDiskDrives() {
-    hostnameItem->appendChild(diskDrivesItem =
-                                  new Node({tr("Disk drives")}, hostnameItem));
+    hostnameItem->appendChild(diskDrivesItem = new Node({tr("Disk drives")}, hostnameItem));
     diskDrivesItem->setIconFromTheme(s::categoryIcons::diskDrives);
-    for (DeviceInfo info :
-         manager.iterDevicesSubsystem(us::subsystems::block)) {
+    for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::block)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
@@ -133,34 +120,32 @@ void DevicesByTypeModel::addDiskDrives() {
                 .startsWith(QStringLiteral("/devices/virtual/"))) {
             continue;
         }
-        diskDrivesItem->appendChild(new Node(
-            {info.name(), info.driver()}, diskDrivesItem, NodeType::Device));
+        diskDrivesItem->appendChild(
+            new Node({info.name(), info.driver()}, diskDrivesItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addDisplayAdapters() {
-    hostnameItem->appendChild(displayAdaptersItem = new Node(
-                                  {tr("Display adapters")}, hostnameItem));
+    hostnameItem->appendChild(displayAdaptersItem =
+                                  new Node({tr("Display adapters")}, hostnameItem));
     displayAdaptersItem->setIconFromTheme(s::categoryIcons::displayAdapters);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(
-        us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
-        us::propertyValues::idPciClassFromDatabase::displayController);
+    enumerator->addMatchProperty(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
+                                 us::propertyValues::idPciClassFromDatabase::displayController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        displayAdaptersItem->appendChild(new Node({info.name(), info.driver()},
-                                                  displayAdaptersItem,
-                                                  NodeType::Device));
+        displayAdaptersItem->appendChild(
+            new Node({info.name(), info.driver()}, displayAdaptersItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addOptical() {
-    hostnameItem->appendChild(dvdCdromDrivesItem = new Node(
-                                  {tr("DVD/CD-ROM drives")}, hostnameItem));
+    hostnameItem->appendChild(dvdCdromDrivesItem =
+                                  new Node({tr("DVD/CD-ROM drives")}, hostnameItem));
     dvdCdromDrivesItem->setIconFromTheme(s::categoryIcons::dvdCdromDrives);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_CDROM);
@@ -170,16 +155,14 @@ void DevicesByTypeModel::addOptical() {
             info.dump();
             qDebug() << "END\n";
         }
-        dvdCdromDrivesItem->appendChild(new Node({info.name(), info.driver()},
-                                                 dvdCdromDrivesItem,
-                                                 NodeType::Device));
+        dvdCdromDrivesItem->appendChild(
+            new Node({info.name(), info.driver()}, dvdCdromDrivesItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addHid() {
-    hostnameItem->appendChild(
-        humanInterfaceDevicesItem =
-            new Node({tr("Human Interface Devices")}, hostnameItem));
+    hostnameItem->appendChild(humanInterfaceDevicesItem =
+                                  new Node({tr("Human Interface Devices")}, hostnameItem));
     humanInterfaceDevicesItem->setIconFromTheme(s::categoryIcons::hid);
     for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::hid)) {
         if (info.name().isEmpty()) {
@@ -188,23 +171,18 @@ void DevicesByTypeModel::addHid() {
             qDebug() << "END\n";
         }
         humanInterfaceDevicesItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     humanInterfaceDevicesItem,
-                     NodeType::Device));
+            new Node({info.name(), info.driver()}, humanInterfaceDevicesItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addIdeAtapi() {
-    hostnameItem->appendChild(
-        ideAtaAtapiControllersItem =
-            new Node({tr("IDE ATA/ATAPI controllers")}, hostnameItem));
-    ideAtaAtapiControllersItem->setIconFromTheme(
-        s::categoryIcons::ideAtapiControllers);
+    hostnameItem->appendChild(ideAtaAtapiControllersItem =
+                                  new Node({tr("IDE ATA/ATAPI controllers")}, hostnameItem));
+    ideAtaAtapiControllersItem->setIconFromTheme(s::categoryIcons::ideAtapiControllers);
 }
 
 void DevicesByTypeModel::addKeyboards() {
-    hostnameItem->appendChild(keyboardsItem =
-                                  new Node({tr("Keyboards")}, hostnameItem));
+    hostnameItem->appendChild(keyboardsItem = new Node({tr("Keyboards")}, hostnameItem));
     keyboardsItem->setIconFromTheme(s::categoryIcons::keyboards);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_INPUT_KEYBOARD);
@@ -214,15 +192,14 @@ void DevicesByTypeModel::addKeyboards() {
             info.dump();
             qDebug() << "END\n";
         }
-        keyboardsItem->appendChild(new Node(
-            {info.name(), info.driver()}, keyboardsItem, NodeType::Device));
+        keyboardsItem->appendChild(
+            new Node({info.name(), info.driver()}, keyboardsItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addMice() {
-    hostnameItem->appendChild(
-        miceAndOtherPointingDevicesItem =
-            new Node({tr("Mice and other pointing devices")}, hostnameItem));
+    hostnameItem->appendChild(miceAndOtherPointingDevicesItem =
+                                  new Node({tr("Mice and other pointing devices")}, hostnameItem));
     miceAndOtherPointingDevicesItem->setIconFromTheme(s::categoryIcons::mice);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::ID_INPUT_MOUSE);
@@ -232,109 +209,93 @@ void DevicesByTypeModel::addMice() {
             info.dump();
             qDebug() << "END\n";
         }
-        miceAndOtherPointingDevicesItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     miceAndOtherPointingDevicesItem,
-                     NodeType::Device));
+        miceAndOtherPointingDevicesItem->appendChild(new Node(
+            {info.name(), info.driver()}, miceAndOtherPointingDevicesItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addMonitors() {
-    hostnameItem->appendChild(monitorsItem =
-                                  new Node({tr("Monitors")}, hostnameItem));
+    hostnameItem->appendChild(monitorsItem = new Node({tr("Monitors")}, hostnameItem));
     monitorsItem->setIconFromTheme(s::categoryIcons::monitor);
 }
 
 void DevicesByTypeModel::addNetwork() {
-    hostnameItem->appendChild(networkAdaptersItem = new Node(
-                                  {tr("Network adapters")}, hostnameItem));
+    hostnameItem->appendChild(networkAdaptersItem =
+                                  new Node({tr("Network adapters")}, hostnameItem));
     networkAdaptersItem->setIconFromTheme(s::categoryIcons::networkAdapters);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(
-        us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
-        us::propertyValues::idPciClassFromDatabase::networkController);
+    enumerator->addMatchProperty(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
+                                 us::propertyValues::idPciClassFromDatabase::networkController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        networkAdaptersItem->appendChild(new Node({info.name(), info.driver()},
-                                                  networkAdaptersItem,
-                                                  NodeType::Device));
+        networkAdaptersItem->appendChild(
+            new Node({info.name(), info.driver()}, networkAdaptersItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addPrintQueues() {
-    hostnameItem->appendChild(
-        printQueuesItem = new Node({tr("Print queues")}, hostnameItem));
+    hostnameItem->appendChild(printQueuesItem = new Node({tr("Print queues")}, hostnameItem));
     printQueuesItem->setIconFromTheme(s::categoryIcons::printer);
 }
 
 void DevicesByTypeModel::addProcessors() {
-    hostnameItem->appendChild(processorsItem =
-                                  new Node({tr("Processors")}, hostnameItem));
+    hostnameItem->appendChild(processorsItem = new Node({tr("Processors")}, hostnameItem));
     processorsItem->setIconFromTheme(s::categoryIcons::processors);
 }
 
 void DevicesByTypeModel::addSoftwareComponents() {
-    hostnameItem->appendChild(softwareComponentsItem = new Node(
-                                  {tr("Software components")}, hostnameItem));
+    hostnameItem->appendChild(softwareComponentsItem =
+                                  new Node({tr("Software components")}, hostnameItem));
     softwareComponentsItem->setIconFromTheme(s::categoryIcons::other);
 }
 
 const QRegularExpression kBeginningWithSlashDevRe(QStringLiteral("^/dev/"));
 
 void DevicesByTypeModel::addSoftwareDevices() {
-    hostnameItem->appendChild(softwareDevicesItem = new Node(
-                                  {tr("Software devices")}, hostnameItem));
+    hostnameItem->appendChild(softwareDevicesItem =
+                                  new Node({tr("Software devices")}, hostnameItem));
     softwareDevicesItem->setIconFromTheme(s::categoryIcons::other);
-    for (DeviceInfo info :
-         manager.iterDevicesSubsystem(us::subsystems::misc)) {
+    for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::misc)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        softwareDevicesItem->appendChild(new Node(
-            {info.name().replace(kBeginningWithSlashDevRe, strings::empty),
-             info.driver()},
-            softwareDevicesItem,
-            NodeType::Device));
+        softwareDevicesItem->appendChild(
+            new Node({info.name().replace(kBeginningWithSlashDevRe, strings::empty), info.driver()},
+                     softwareDevicesItem,
+                     NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addSoundVideoAndGameControllers() {
-    hostnameItem->appendChild(
-        soundVideoAndGameControllersItem =
-            new Node({tr("Sound, video and game controllers")}, hostnameItem));
-    soundVideoAndGameControllersItem->setIconFromTheme(
-        s::categoryIcons::soundVideoGameControllers);
+    hostnameItem->appendChild(soundVideoAndGameControllersItem = new Node(
+                                  {tr("Sound, video and game controllers")}, hostnameItem));
+    soundVideoAndGameControllersItem->setIconFromTheme(s::categoryIcons::soundVideoGameControllers);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(us::propertyNames::ID_TYPE,
-                                 us::propertyValues::idType::audio);
+    enumerator->addMatchProperty(us::propertyNames::ID_TYPE, us::propertyValues::idType::audio);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        soundVideoAndGameControllersItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     soundVideoAndGameControllersItem,
-                     NodeType::Device));
+        soundVideoAndGameControllersItem->appendChild(new Node(
+            {info.name(), info.driver()}, soundVideoAndGameControllersItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addStorageControllers() {
-    hostnameItem->appendChild(storageControllersItem = new Node(
-                                  {tr("Storage controllers")}, hostnameItem));
-    storageControllersItem->setIconFromTheme(
-        s::categoryIcons::storageControllers);
+    hostnameItem->appendChild(storageControllersItem =
+                                  new Node({tr("Storage controllers")}, hostnameItem));
+    storageControllersItem->setIconFromTheme(s::categoryIcons::storageControllers);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(
-        us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
-        us::propertyValues::idPciClassFromDatabase::massStorageController);
+    enumerator->addMatchProperty(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE,
+                                 us::propertyValues::idPciClassFromDatabase::massStorageController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
@@ -342,15 +303,12 @@ void DevicesByTypeModel::addStorageControllers() {
             qDebug() << "END\n";
         }
         storageControllersItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     storageControllersItem,
-                     NodeType::Device));
+            new Node({info.name(), info.driver()}, storageControllersItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addStorageVolumes() {
-    hostnameItem->appendChild(
-        storageVolumesItem = new Node({tr("Storage volumes")}, hostnameItem));
+    hostnameItem->appendChild(storageVolumesItem = new Node({tr("Storage volumes")}, hostnameItem));
     storageVolumesItem->setIconFromTheme(s::categoryIcons::storageVolumes);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
     enumerator->addMatchProperty(us::propertyNames::DEVTYPE,
@@ -361,15 +319,13 @@ void DevicesByTypeModel::addStorageVolumes() {
             info.dump();
             qDebug() << "END\n";
         }
-        storageVolumesItem->appendChild(new Node({info.name(), info.driver()},
-                                                 storageVolumesItem,
-                                                 NodeType::Device));
+        storageVolumesItem->appendChild(
+            new Node({info.name(), info.driver()}, storageVolumesItem, NodeType::Device));
     }
 }
 
 void DevicesByTypeModel::addSystemDevices() {
-    hostnameItem->appendChild(
-        systemDevicesItem = new Node({tr("System devices")}, hostnameItem));
+    hostnameItem->appendChild(systemDevicesItem = new Node({tr("System devices")}, hostnameItem));
     systemDevicesItem->setIconFromTheme(s::categoryIcons::systemDevices);
     for (DeviceInfo info : manager.iterDevicesSubsystem(us::subsystems::pci)) {
         if (info.name().isEmpty()) {
@@ -377,36 +333,24 @@ void DevicesByTypeModel::addSystemDevices() {
             info.dump();
             qDebug() << "END\n";
         }
-        if (info.propertyValue(
-                us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
-                us::propertyValues::idPciClassFromDatabase::
-                    displayController ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
+        if (info.propertyValue(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
+                us::propertyValues::idPciClassFromDatabase::displayController ||
+            info.propertyValue(us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
                 us::propertyValues::idPciSubclassFromDatabase::audioDevice ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_INTERFACE_FROM_DATABASE) ==
+            info.propertyValue(us::propertyNames::ID_PCI_INTERFACE_FROM_DATABASE) ==
                 us::propertyValues::idPciInterfaceFromDatabase::nvmExpress ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
+            info.propertyValue(us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
                 us::propertyValues::idPciSubclassFromDatabase::usbController ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
-                us::propertyValues::idPciSubclassFromDatabase::
-                    sataController ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
-                us::propertyValues::idPciClassFromDatabase::
-                    networkController ||
-            info.propertyValue(
-                us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
-                us::propertyValues::idPciClassFromDatabase::
-                    multimediaController) {
+            info.propertyValue(us::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE) ==
+                us::propertyValues::idPciSubclassFromDatabase::sataController ||
+            info.propertyValue(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
+                us::propertyValues::idPciClassFromDatabase::networkController ||
+            info.propertyValue(us::propertyNames::ID_PCI_CLASS_FROM_DATABASE) ==
+                us::propertyValues::idPciClassFromDatabase::multimediaController) {
             continue;
         }
-        systemDevicesItem->appendChild(new Node({info.name(), info.driver()},
-                                                systemDevicesItem,
-                                                NodeType::Device));
+        systemDevicesItem->appendChild(
+            new Node({info.name(), info.driver()}, systemDevicesItem, NodeType::Device));
     }
     // for (DeviceInfo info : manager.iterDevicesSubsystem("mem")) {
     //     systemDevicesItem->appendChild(new Node({info.name(),
@@ -417,31 +361,24 @@ void DevicesByTypeModel::addSystemDevices() {
 }
 
 void DevicesByTypeModel::addUsbControllers() {
-    hostnameItem->appendChild(
-        universalSerialBusControllersItem =
-            new Node({tr("Universal Serial Bus controllers")}, hostnameItem));
-    universalSerialBusControllersItem->setIconFromTheme(
-        s::categoryIcons::usbControllers);
+    hostnameItem->appendChild(universalSerialBusControllersItem =
+                                  new Node({tr("Universal Serial Bus controllers")}, hostnameItem));
+    universalSerialBusControllersItem->setIconFromTheme(s::categoryIcons::usbControllers);
     auto enumerator = std::make_unique<UdevEnumerate>(manager);
-    enumerator->addMatchProperty(
-        strings::udev::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE,
-        us::propertyValues::idPciSubclassFromDatabase::usbController);
+    enumerator->addMatchProperty(strings::udev::propertyNames::ID_PCI_SUBCLASS_FROM_DATABASE,
+                                 us::propertyValues::idPciSubclassFromDatabase::usbController);
     for (DeviceInfo info : manager.scanDevices(enumerator)) {
         if (info.name().isEmpty()) {
             qDebug() << "Empty name";
             info.dump();
             qDebug() << "END\n";
         }
-        universalSerialBusControllersItem->appendChild(
-            new Node({info.name(), info.driver()},
-                     universalSerialBusControllersItem,
-                     NodeType::Device));
+        universalSerialBusControllersItem->appendChild(new Node(
+            {info.name(), info.driver()}, universalSerialBusControllersItem, NodeType::Device));
     }
 }
 
-QModelIndex DevicesByTypeModel::index(int row,
-                                      int column,
-                                      const QModelIndex &parent) const {
+QModelIndex DevicesByTypeModel::index(int row, int column, const QModelIndex &parent) const {
     if (!hasIndex(row, column, parent)) {
         return QModelIndex();
     }

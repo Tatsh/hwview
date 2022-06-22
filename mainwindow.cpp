@@ -28,43 +28,27 @@ MainWindow::MainWindow() {
     connect(actionDevicesByType, &QAction::triggered, [this]() {
         switchToModel(new DevicesByTypeModel(this));
     });
-    connect(actionDevicesByConnection, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionDevicesByContainer, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionDevicesByDriver, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionDriversByType, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionDriversByDevice, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionResourcesByType, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
-    connect(actionResourcesByConnection, &QAction::triggered, [this]() {
-        switchToModel(nullptr);
-    });
+    connect(actionDevicesByConnection, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionDevicesByContainer, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionDevicesByDriver, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionDriversByType, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionDriversByDevice, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionResourcesByType, &QAction::triggered, [this]() { switchToModel(nullptr); });
+    connect(actionResourcesByConnection, &QAction::triggered, [this]() { switchToModel(nullptr); });
 
-    connect(treeView,
-            &QTreeView::doubleClicked,
-            [](const QModelIndex &modelIndex) {
-                auto node = static_cast<Node *>(modelIndex.internalPointer());
-                if (node->type() == NodeType::Device) {
-                    auto name = node->data(0).toString();
-                    auto driver = node->data(1).toString();
-                    PropertiesDialog dialog;
-                    dialog.setDeviceName(name);
-                    dialog.setDriverName(driver);
-                    dialog.setWindowModality(Qt::WindowModal);
-                    dialog.setWindowTitle(tr("%1 Properties").arg(name));
-                    dialog.exec();
-                }
-            });
+    connect(treeView, &QTreeView::doubleClicked, [](const QModelIndex &modelIndex) {
+        auto node = static_cast<Node *>(modelIndex.internalPointer());
+        if (node->type() == NodeType::Device) {
+            auto name = node->data(0).toString();
+            auto driver = node->data(1).toString();
+            PropertiesDialog dialog;
+            dialog.setDeviceName(name);
+            dialog.setDriverName(driver);
+            dialog.setWindowModality(Qt::WindowModal);
+            dialog.setWindowTitle(tr("%1 Properties").arg(name));
+            dialog.exec();
+        }
+    });
 }
 
 void MainWindow::switchToModel(QAbstractItemModel *model, int depth) {
