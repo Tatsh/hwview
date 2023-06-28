@@ -9,13 +9,13 @@
 namespace s = strings;
 namespace props = strings::udev::propertyNames;
 
-DeviceInfo::DeviceInfo(udev *ctx, const char *syspath) : ctx(ctx) {
+DeviceInfo::DeviceInfo(udev *ctx_, const char *syspath) : ctx(ctx_) {
     // udev_ref(ctx);
     dev = udev_device_new_from_syspath(ctx, syspath);
-    const char *hidName = udev_device_get_property_value(dev, props::HID_NAME);
-    const char *udevName = udev_device_get_property_value(dev, props::NAME);
-    const char *idModelFromDatabase =
-        udev_device_get_property_value(dev, props::ID_MODEL_FROM_DATABASE);
+    // const char *hidName = udev_device_get_property_value(dev, props::HID_NAME);
+    // const char *udevName = udev_device_get_property_value(dev, props::NAME);
+    // const char *idModelFromDatabase =
+    //     udev_device_get_property_value(dev, props::ID_MODEL_FROM_DATABASE);
     setName();
     devPath_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::DEVPATH));
     hidID_ = QString::fromLocal8Bit(udev_device_get_property_value(dev, props::HID_ID));

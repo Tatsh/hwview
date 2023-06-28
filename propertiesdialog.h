@@ -12,6 +12,10 @@ public:
     PropertiesDialog();
     void setDeviceName(QString &);
     void setDriverName(QString &);
+
+private:
+    QString driverName_;
+    QString deviceName_;
 };
 
 #endif // PROPERTIESDIALOG_H

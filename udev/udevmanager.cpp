@@ -14,7 +14,7 @@ struct udev *UdevManager::context() const {
 
 QVector<DeviceInfo> UdevManager::convertToDeviceInfo(struct udev_enumerate *enumerator) const {
     QVector<DeviceInfo> ret;
-    struct udev_list_entry *listEntry, *deviceProperty;
+    struct udev_list_entry *listEntry;
     udev_list_entry_foreach(listEntry, udev_enumerate_get_list_entry(enumerator)) {
         auto info = DeviceInfo(ctx, udev_list_entry_get_name(listEntry));
         ret.append(info);

@@ -30,11 +30,11 @@ public:
     NodeType type();
 
 private:
+    QVector<QVariant> itemData;
     Node *parentItem_;
+    NodeType type_;
     QVector<Node *> childItems;
     QIcon icon_;
-    QVector<QVariant> itemData;
-    NodeType type_;
 };
 
 #endif // NODE_H
