@@ -1,9 +1,8 @@
 {
-  "cSpell.words": ["CDROM", "qstrlen", "sata", "tatsh", "udev"],
+  "cmake.configureArgs": ["-DDEVMGMT_CXX_WARN_ERROR_ALL=ON"],
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.tabSize": 4,
-  "cmake.configureArgs": ["-DDEVMGMT_CXX_WARN_ERROR_ALL=ON"],
   "files.associations": {
     "**/bash-completion/completions/*": "shellscript",
     "*.json.dist": "json",
