@@ -7,6 +7,17 @@
 #include <QRegularExpression>
 #include <utility>
 
+#ifdef Q_OS_MACOS
+#include "iokit/iokitmanager.h"
+#include <IOKit/IOBSD.h>
+#include <IOKit/hid/IOHIDKeys.h>
+#include <IOKit/storage/IOMedia.h>
+#include <IOKit/usb/IOUSBLib.h>
+#elif defined(Q_OS_WIN)
+#include "setupapi/setupapimanager.h"
+#include "setupapi/devclass_guids.h"
+#endif
+
 namespace s = strings;
 namespace props = strings::udev::propertyNames;
 
@@ -78,12 +89,36 @@ void DeviceInfo::setName() {
 
 void DeviceInfo::calculateIsHidden() {
     // Hidden devices are:
-    // 1. Devices in /sys/devices/virtual/ paths (Linux-specific)
+    // 1. Devices in virtual paths (platform-specific)
     // 2. Devices without a driver
     // 3. Devices without a name
+    // 4. Low-level internal devices (macOS-specific)
 #ifdef Q_OS_LINUX
     if (devPath_.startsWith(QStringLiteral("/devices/virtual/"))) {
         isHidden_ = true;
+        return;
+    }
+#elif defined(Q_OS_MACOS)
+    // Hide low-level IOKit internal classes that aren't useful to display
+    static const QStringList hiddenClasses = {
+        QStringLiteral("IOService"),
+        QStringLiteral("IOResources"),
+        QStringLiteral("IOPMrootDomain"),
+        QStringLiteral("IORegistryEntry"),
+        QStringLiteral("IOPlatformDevice"),
+        QStringLiteral("AppleARMIODevice"),
+        QStringLiteral("IOInterruptController"),
+        QStringLiteral("IODTNVRAM"),
+        QStringLiteral("IOUserServer"),
+    };
+    if (hiddenClasses.contains(ioKitClassName_)) {
+        isHidden_ = true;
+        return;
+    }
+#elif defined(Q_OS_WIN)
+    // On Windows, isHidden_ is already set from the ConfigFlags during property extraction
+    // Just return if already marked as hidden
+    if (isHidden_) {
         return;
     }
 #endif
@@ -99,6 +134,156 @@ void DeviceInfo::calculateIsHidden() {
 }
 
 void DeviceInfo::calculateCategory() {
+#ifdef Q_OS_MACOS
+    // macOS: Classify based on IOKit class names
+    if (ioKitClassName_.isEmpty()) {
+        category_ = DeviceCategory::Unknown;
+        return;
+    }
+
+    // USB controllers and devices
+    if (ioKitClassName_.contains(QStringLiteral("USB")) ||
+        ioKitClassName_ == QStringLiteral("IOUSBHostDevice") ||
+        ioKitClassName_ == QStringLiteral("IOUSBDevice") ||
+        ioKitClassName_ == QStringLiteral("AppleUSBHostController")) {
+        category_ = DeviceCategory::UniversalSerialBusControllers;
+        return;
+    }
+
+    // HID devices
+    if (ioKitClassName_.contains(QStringLiteral("HID")) ||
+        ioKitClassName_ == QStringLiteral("IOHIDDevice") ||
+        ioKitClassName_ == QStringLiteral("IOHIDInterface")) {
+        // Check for specific HID types
+        if (name_.contains(QStringLiteral("Keyboard"), Qt::CaseInsensitive)) {
+            category_ = DeviceCategory::Keyboards;
+            return;
+        }
+        if (name_.contains(QStringLiteral("Mouse"), Qt::CaseInsensitive) ||
+            name_.contains(QStringLiteral("Trackpad"), Qt::CaseInsensitive) ||
+            name_.contains(QStringLiteral("Touchpad"), Qt::CaseInsensitive)) {
+            category_ = DeviceCategory::MiceAndOtherPointingDevices;
+            return;
+        }
+        category_ = DeviceCategory::HumanInterfaceDevices;
+        return;
+    }
+
+    // Storage devices
+    if (ioKitClassName_ == QStringLiteral("IOBlockStorageDevice") ||
+        ioKitClassName_ == QStringLiteral("IONVMeController") ||
+        ioKitClassName_ == QStringLiteral("IOAHCIBlockStorageDevice") ||
+        ioKitClassName_.contains(QStringLiteral("StorageDevice"))) {
+        category_ = DeviceCategory::DiskDrives;
+        return;
+    }
+
+    // Storage volumes (partitions)
+    if (ioKitClassName_ == QStringLiteral("IOMedia") ||
+        ioKitClassName_ == QStringLiteral("IOPartitionScheme") ||
+        ioKitClassName_.contains(QStringLiteral("Partition"))) {
+        category_ = DeviceCategory::StorageVolumes;
+        return;
+    }
+
+    // CD/DVD drives
+    if (ioKitClassName_.contains(QStringLiteral("CD")) ||
+        ioKitClassName_.contains(QStringLiteral("DVD")) ||
+        ioKitClassName_ == QStringLiteral("IOCDBlockStorageDevice") ||
+        ioKitClassName_ == QStringLiteral("IODVDBlockStorageDevice")) {
+        category_ = DeviceCategory::DvdCdromDrives;
+        return;
+    }
+
+    // Network adapters
+    if (ioKitClassName_.contains(QStringLiteral("Network")) ||
+        ioKitClassName_ == QStringLiteral("IONetworkInterface") ||
+        ioKitClassName_ == QStringLiteral("IOEthernetInterface") ||
+        ioKitClassName_.contains(QStringLiteral("Ethernet")) ||
+        ioKitClassName_.contains(QStringLiteral("WiFi")) ||
+        ioKitClassName_.contains(QStringLiteral("AirPort"))) {
+        category_ = DeviceCategory::NetworkAdapters;
+        return;
+    }
+
+    // Display adapters / GPU
+    if (ioKitClassName_.contains(QStringLiteral("GPU")) ||
+        ioKitClassName_.contains(QStringLiteral("Graphics")) ||
+        ioKitClassName_ == QStringLiteral("IOAccelerator") ||
+        ioKitClassName_ == QStringLiteral("AppleGPU") ||
+        ioKitClassName_ == QStringLiteral("AGXAccelerator") ||
+        ioKitClassName_.contains(QStringLiteral("Framebuffer"))) {
+        category_ = DeviceCategory::DisplayAdapters;
+        return;
+    }
+
+    // Audio devices
+    if (ioKitClassName_.contains(QStringLiteral("Audio")) ||
+        ioKitClassName_ == QStringLiteral("IOAudioDevice") ||
+        ioKitClassName_ == QStringLiteral("IOAudioEngine") ||
+        ioKitClassName_.contains(QStringLiteral("Sound"))) {
+        category_ = DeviceCategory::AudioInputsAndOutputs;
+        return;
+    }
+
+    // Batteries
+    if (ioKitClassName_.contains(QStringLiteral("Battery")) ||
+        ioKitClassName_ == QStringLiteral("AppleSmartBattery") ||
+        ioKitClassName_.contains(QStringLiteral("Power"))) {
+        category_ = DeviceCategory::Batteries;
+        return;
+    }
+
+    // PCI devices (system devices)
+    if (ioKitClassName_ == QStringLiteral("IOPCIDevice") ||
+        ioKitClassName_.contains(QStringLiteral("PCI"))) {
+        category_ = DeviceCategory::SystemDevices;
+        return;
+    }
+
+    // Storage controllers
+    if (ioKitClassName_.contains(QStringLiteral("AHCI")) ||
+        ioKitClassName_.contains(QStringLiteral("SATA")) ||
+        ioKitClassName_.contains(QStringLiteral("NVMe")) ||
+        ioKitClassName_.contains(QStringLiteral("StorageController"))) {
+        category_ = DeviceCategory::StorageControllers;
+        return;
+    }
+
+    // Thunderbolt
+    if (ioKitClassName_.contains(QStringLiteral("Thunderbolt"))) {
+        category_ = DeviceCategory::SystemDevices;
+        return;
+    }
+
+    category_ = DeviceCategory::Unknown;
+
+#elif defined(Q_OS_WIN)
+    // Windows: Category was already set from device class GUID during property extraction
+    // If it's still Unknown, try to determine from class name
+    if (category_ == DeviceCategory::Unknown && !deviceClassName_.isEmpty()) {
+        if (deviceClassName_.compare(QStringLiteral("USB"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::UniversalSerialBusControllers;
+        } else if (deviceClassName_.compare(QStringLiteral("DiskDrive"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::DiskDrives;
+        } else if (deviceClassName_.compare(QStringLiteral("Display"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::DisplayAdapters;
+        } else if (deviceClassName_.compare(QStringLiteral("Net"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::NetworkAdapters;
+        } else if (deviceClassName_.compare(QStringLiteral("Keyboard"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::Keyboards;
+        } else if (deviceClassName_.compare(QStringLiteral("Mouse"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::MiceAndOtherPointingDevices;
+        } else if (deviceClassName_.compare(QStringLiteral("HIDClass"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::HumanInterfaceDevices;
+        } else if (deviceClassName_.compare(QStringLiteral("Volume"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::StorageVolumes;
+        } else if (deviceClassName_.compare(QStringLiteral("System"), Qt::CaseInsensitive) == 0) {
+            category_ = DeviceCategory::SystemDevices;
+        }
+    }
+
+#else // Q_OS_LINUX
     namespace us = strings::udev;
 
     // Audio inputs and outputs
@@ -194,6 +379,7 @@ void DeviceInfo::calculateCategory() {
     }
 
     category_ = DeviceCategory::Unknown;
+#endif
 }
 
 DeviceCategory DeviceInfo::category() const {
@@ -219,6 +405,152 @@ void DeviceInfo::dump() {
         qDebug() << name << udev_device_get_property_value(dev, name);
     }
 }
+#elif defined(Q_OS_MACOS)
+
+DeviceInfo::DeviceInfo(io_service_t service) {
+    if (!service) {
+        isHidden_ = true;
+        return;
+    }
+
+    extractIOKitProperties(service);
+    setNameFromIOKit(service);
+    calculateIsHidden();
+    calculateCategory();
+}
+
+void DeviceInfo::extractIOKitProperties(io_service_t service) {
+    // Get IORegistry path (equivalent to syspath)
+    syspath_ = IOKitManager::getRegistryPath(service);
+
+    // Get parent path
+    io_service_t parent = IOKitManager::getParent(service);
+    if (parent) {
+        parentSyspath_ = IOKitManager::getRegistryPath(parent);
+        IOObjectRelease(parent);
+    }
+
+    // Get IOKit class name (used for subsystem/category classification)
+    ioKitClassName_ = IOKitManager::getClassName(service);
+    subsystem_ = ioKitClassName_;
+
+    // Get driver (matched kext bundle identifier)
+    driver_ = IOKitManager::getMatchedDriver(service);
+
+    // Get BSD name (e.g., "disk0", "en0")
+    QString bsdName = IOKitManager::getBSDName(service);
+    if (!bsdName.isEmpty()) {
+        devnode_ = QStringLiteral("/dev/") + bsdName;
+    }
+
+    // Get vendor information
+    idVendorFromDatabase_ = IOKitManager::getVendorName(service);
+
+    // Get device path (for hidden device detection)
+    devPath_ = syspath_;
+}
+
+void DeviceInfo::setNameFromIOKit(io_service_t service) {
+    // Try to get a meaningful name from various IOKit properties
+    name_ = IOKitManager::getProductName(service);
+
+    if (name_.isEmpty()) {
+        // Fallback to vendor + class name
+        QString vendor = IOKitManager::getVendorName(service);
+        if (!vendor.isEmpty()) {
+            name_ = vendor + QStringLiteral(" ") + ioKitClassName_;
+        } else {
+            name_ = ioKitClassName_;
+        }
+    }
+
+    // Clean up the name
+    name_ = name_.replace(QLatin1Char('_'), QLatin1Char(' ')).trimmed();
+}
+
+QString DeviceInfo::propertyValue([[maybe_unused]] const char *prop) const {
+    // On macOS, we cache all needed properties at construction time
+    // This method is mainly used for Linux udev properties
+    // Return empty for now - macOS code should use the cached accessors
+    return {};
+}
+
+void DeviceInfo::dump() {
+    qDebug() << "DeviceInfo (macOS):";
+    qDebug() << "  syspath:" << syspath_;
+    qDebug() << "  name:" << name_;
+    qDebug() << "  driver:" << driver_;
+    qDebug() << "  subsystem:" << subsystem_;
+    qDebug() << "  devnode:" << devnode_;
+    qDebug() << "  ioKitClass:" << ioKitClassName_;
+    qDebug() << "  category:" << static_cast<int>(category_);
+    qDebug() << "  isHidden:" << isHidden_;
+}
+
+#elif defined(Q_OS_WIN)
+
+DeviceInfo::DeviceInfo(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
+    if (!devInfo || devInfo == INVALID_HANDLE_VALUE || !devInfoData) {
+        isHidden_ = true;
+        return;
+    }
+
+    extractWindowsProperties(devInfo, devInfoData);
+    calculateIsHidden();
+    calculateCategory();
+}
+
+void DeviceInfo::extractWindowsProperties(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
+    // Get device instance ID (equivalent to syspath)
+    syspath_ = SetupApiManager::getDeviceInstanceId(devInfo, devInfoData);
+
+    // Get parent device ID
+    parentSyspath_ = SetupApiManager::getParentDeviceInstanceId(devInfoData);
+
+    // Get device class name (equivalent to subsystem)
+    deviceClassName_ = SetupApiManager::getDeviceClassName(devInfo, devInfoData);
+    subsystem_ = deviceClassName_;
+
+    // Get driver key name
+    driver_ = SetupApiManager::getDriverKeyName(devInfo, devInfoData);
+
+    // Get friendly name or description
+    name_ = SetupApiManager::getDeviceFriendlyName(devInfo, devInfoData);
+
+    // Get manufacturer
+    idVendorFromDatabase_ = SetupApiManager::getManufacturer(devInfo, devInfoData);
+
+    // Get physical device object name
+    devnode_ = SetupApiManager::getPhysicalDeviceObjectName(devInfo, devInfoData);
+
+    // Use instance ID as device path
+    devPath_ = syspath_;
+
+    // Get device class GUID for category classification
+    GUID classGuid = SetupApiManager::getDeviceClassGuid(devInfo, devInfoData);
+    category_ = setupapi::classGuidToCategory(classGuid);
+
+    // Check if device is marked as hidden
+    isHidden_ = SetupApiManager::isDeviceHidden(devInfo, devInfoData);
+}
+
+QString DeviceInfo::propertyValue([[maybe_unused]] const char *prop) const {
+    // On Windows, we cache all needed properties at construction time
+    return {};
+}
+
+void DeviceInfo::dump() {
+    qDebug() << "DeviceInfo (Windows):";
+    qDebug() << "  syspath:" << syspath_;
+    qDebug() << "  name:" << name_;
+    qDebug() << "  driver:" << driver_;
+    qDebug() << "  subsystem:" << subsystem_;
+    qDebug() << "  devnode:" << devnode_;
+    qDebug() << "  deviceClass:" << deviceClassName_;
+    qDebug() << "  category:" << static_cast<int>(category_);
+    qDebug() << "  isHidden:" << isHidden_;
+}
+
 #else
 QString DeviceInfo::propertyValue([[maybe_unused]] const char *prop) const {
     return QString();
@@ -418,6 +750,10 @@ bool DeviceInfo::isHidden() const {
 }
 
 bool DeviceInfo::isValidForDisplay() const {
+#if defined(Q_OS_MACOS) || defined(Q_OS_WIN)
+    // On macOS and Windows, use the category to determine if device is valid for display
+    return category_ != DeviceCategory::Unknown;
+#else
     namespace us = strings::udev;
 
     // Audio devices
@@ -487,4 +823,5 @@ bool DeviceInfo::isValidForDisplay() const {
     }
 
     return false;
+#endif
 }

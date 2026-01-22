@@ -6,11 +6,15 @@
 #include <QObject>
 
 #include "deviceinfo.h"
-#include "udev/udevmanager.h"
 
 #ifdef Q_OS_LINUX
+#include "udev/udevmanager.h"
 // Forward declaration for udev context
 struct udev;
+#elif defined(Q_OS_MACOS)
+#include "iokit/iokitmanager.h"
+#elif defined(Q_OS_WIN)
+#include "setupapi/setupapimanager.h"
 #endif
 
 // Singleton cache that holds all device information.
@@ -50,7 +54,13 @@ private:
 
     void enumerate();
 
+#ifdef Q_OS_LINUX
     UdevManager manager_;
+#elif defined(Q_OS_MACOS)
+    IOKitManager manager_;
+#elif defined(Q_OS_WIN)
+    SetupApiManager manager_;
+#endif
     QList<DeviceInfo> devices_;
     QHash<QString, int> syspathIndex_; // Maps syspath to index in devices_
     mutable QMutex mutex_;             // Protects devices_ and syspathIndex_

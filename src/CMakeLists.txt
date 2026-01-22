@@ -1,6 +1,10 @@
 add_subdirectory(models)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   add_subdirectory(udev)
+elseif(APPLE)
+  add_subdirectory(iokit)
+elseif(WIN32)
+  add_subdirectory(setupapi)
 endif()
 
 add_executable(
@@ -23,9 +27,20 @@ target_link_libraries(
           Qt6::Network
           Qt6::Widgets)
 
-# Link udev library only on Linux
+# Link platform-specific device enumeration library
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   target_link_libraries(devmgmt PRIVATE devmgmt_udev)
+elseif(APPLE)
+  target_link_libraries(devmgmt PRIVATE
+    devmgmt_iokit
+    ${IOKIT_FRAMEWORK}
+    ${COREFOUNDATION_FRAMEWORK}
+    ${DISKARBITRATION_FRAMEWORK})
+elseif(WIN32)
+  target_link_libraries(devmgmt PRIVATE
+    devmgmt_setupapi
+    setupapi
+    cfgmgr32)
 endif()
 
 if(DEVMGMT_USE_KDE)

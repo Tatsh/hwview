@@ -29,6 +29,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
 endif()
 
+# macOS frameworks for IOKit device enumeration
+if(APPLE)
+  find_library(IOKIT_FRAMEWORK IOKit REQUIRED)
+  find_library(COREFOUNDATION_FRAMEWORK CoreFoundation REQUIRED)
+  find_library(DISKARBITRATION_FRAMEWORK DiskArbitration REQUIRED)
+endif()
+
 # Optional KDE Frameworks support
 if(DEVMGMT_USE_KDE)
   find_package(ECM REQUIRED NO_MODULE)

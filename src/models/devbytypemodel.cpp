@@ -1,5 +1,10 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
+#ifdef Q_OS_MACOS
+#include <QtCore/QProcess>
+#elif defined(Q_OS_WIN)
+#include <windows.h>
+#endif
 
 #include "const_strings.h"
 #include "devicecache.h"
@@ -103,6 +108,7 @@ void DevicesByTypeModel::buildTree() {
 
     // Add computer info - determine system type based on firmware
     QString computerName;
+    QString computerSyspath;
 #ifdef Q_OS_LINUX
     QFileInfo acpiInfo(QStringLiteral("/sys/firmware/acpi"));
     QFileInfo dtInfo(QStringLiteral("/sys/firmware/devicetree"));
@@ -124,14 +130,84 @@ void DevicesByTypeModel::buildTree() {
     } else {
         computerName = tr("Standard PC");
     }
+    computerSyspath = QStringLiteral("/sys/devices/virtual/dmi/id");
+#elif defined(Q_OS_MACOS)
+    // macOS: Detect Mac model
+#if defined(Q_PROCESSOR_ARM_64)
+    computerName = tr("Apple Silicon Mac");
+#elif defined(Q_PROCESSOR_X86_64)
+    computerName = tr("Intel-based Mac");
+#else
+    computerName = tr("Mac");
+#endif
+    // Try to get more specific model name using sysctl
+    QProcess sysctl;
+    sysctl.start(QStringLiteral("sysctl"), {QStringLiteral("-n"), QStringLiteral("hw.model")});
+    if (sysctl.waitForFinished(1000)) {
+        QString model = QString::fromUtf8(sysctl.readAllStandardOutput()).trimmed();
+        if (!model.isEmpty()) {
+            // Convert model identifier to friendly name
+            if (model.startsWith(QStringLiteral("Mac"))) {
+                if (model.contains(QStringLiteral("BookPro"))) {
+                    computerName = tr("MacBook Pro");
+                } else if (model.contains(QStringLiteral("BookAir"))) {
+                    computerName = tr("MacBook Air");
+                } else if (model.contains(QStringLiteral("Book"))) {
+                    computerName = tr("MacBook");
+                } else if (model.contains(QStringLiteral("Pro"))) {
+                    computerName = tr("Mac Pro");
+                } else if (model.contains(QStringLiteral("mini"))) {
+                    computerName = tr("Mac mini");
+                } else if (model.contains(QStringLiteral("Studio"))) {
+                    computerName = tr("Mac Studio");
+                } else {
+                    computerName = tr("Mac (%1)").arg(model);
+                }
+            } else if (model.startsWith(QStringLiteral("iMac"))) {
+                computerName = tr("iMac");
+            } else {
+                computerName = model;
+            }
+        }
+    }
+    computerSyspath = QStringLiteral("IOService:/");
+#elif defined(Q_OS_WIN)
+    // Windows: Detect system type using GetNativeSystemInfo
+    SYSTEM_INFO sysInfo;
+    GetNativeSystemInfo(&sysInfo);
+
+    switch (sysInfo.wProcessorArchitecture) {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        computerName = tr("x64-based PC");
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM64:
+        computerName = tr("ARM64-based PC");
+        break;
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        computerName = tr("x86-based PC");
+        break;
+    case PROCESSOR_ARCHITECTURE_ARM:
+        computerName = tr("ARM-based PC");
+        break;
+    case PROCESSOR_ARCHITECTURE_IA64:
+        computerName = tr("Itanium-based PC");
+        break;
+    default:
+        computerName = tr("Standard PC");
+        break;
+    }
+
+    // Check for ACPI (all modern Windows PCs are ACPI)
+    computerName = tr("ACPI %1").arg(computerName);
+    computerSyspath = QStringLiteral("ACPI_HAL\\PNP0C08\\0");
 #else
     computerName = tr("Standard PC");
 #endif
 
     auto *acpiNode = new Node({computerName, s::empty()}, computerItem, NodeType::Device);
-#ifdef Q_OS_LINUX
-    acpiNode->setSyspath(QStringLiteral("/sys/devices/virtual/dmi/id"));
-#endif
+    if (!computerSyspath.isEmpty()) {
+        acpiNode->setSyspath(computerSyspath);
+    }
     acpiNode->setIcon(computerItem->icon());
     computerItem->appendChild(acpiNode);
 

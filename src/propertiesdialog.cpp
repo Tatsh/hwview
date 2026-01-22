@@ -54,6 +54,9 @@ namespace {
         return QString::fromUtf8(buffer).trimmed();
     }
 } // namespace
+#elif defined(Q_OS_WIN)
+#include <windows.h>
+#include <versionhelpers.h>
 #endif
 
 namespace props = strings::udev::propertyNames;
@@ -529,6 +532,127 @@ void PropertiesDialog::populateDriverTab() {
         labelDigitalSignerValue->setText(driverSigner);
         labelDriverDateValue->setText(getKernelBuildDate());
         buttonDriverDetails->setEnabled(hasDriverFiles);
+#elif defined(Q_OS_MACOS)
+        // macOS: Get driver info from kext
+        QString driverProvider = QStringLiteral("Apple Inc.");
+        QString driverVersion = getKernelVersion();
+        QString driverSigner = QStringLiteral("Apple Inc.");
+        bool hasDriverDetails = false;
+
+        if (!driver.isEmpty()) {
+            // Check if this is a kext bundle identifier
+            if (driver.contains(QLatin1Char('.'))) {
+                // Try to get kext info using kextstat
+                QProcess kextstat;
+                kextstat.start(QStringLiteral("kextstat"), {QStringLiteral("-b"), driver});
+                if (kextstat.waitForFinished(3000)) {
+                    QString output = QString::fromUtf8(kextstat.readAllStandardOutput());
+                    if (!output.isEmpty() && output.contains(driver)) {
+                        hasDriverDetails = true;
+
+                        // Parse version from kextstat output (format: Index Refs Address Size Wired Name (Version))
+                        QRegularExpression versionRe(QStringLiteral("\\(([^)]+)\\)$"));
+                        QRegularExpressionMatch match = versionRe.match(output.trimmed());
+                        if (match.hasMatch()) {
+                            driverVersion = match.captured(1);
+                        }
+
+                        // Determine provider based on bundle identifier
+                        if (driver.startsWith(QStringLiteral("com.apple."))) {
+                            driverProvider = QStringLiteral("Apple Inc.");
+                            driverSigner = QStringLiteral("Apple Inc.");
+                        } else {
+                            // Third-party kext - extract vendor from bundle ID
+                            QStringList parts = driver.split(QLatin1Char('.'));
+                            if (parts.size() >= 2) {
+                                driverProvider = parts.at(1);
+                                driverProvider[0] = driverProvider[0].toUpper();
+                            }
+                            driverSigner = driverProvider;
+                        }
+                    }
+                }
+            } else {
+                // Just an IOKit class name, use as-is
+                driverProvider = QStringLiteral("Apple Inc.");
+                hasDriverDetails = false;
+            }
+        }
+
+        labelDriverProviderValue->setText(driverProvider);
+        labelDriverVersionValue->setText(driverVersion);
+        labelDigitalSignerValue->setText(driverSigner);
+        labelDriverDateValue->setText(getKernelBuildDate());
+        buttonDriverDetails->setEnabled(hasDriverDetails);
+#elif defined(Q_OS_WIN)
+        // Windows: Get driver info from the registry
+        QString driverProvider = QStringLiteral("Microsoft");
+        QString driverVersion = getKernelVersion();
+        QString driverSigner = QStringLiteral("Microsoft Windows");
+        bool hasDriverDetails = false;
+
+        // The driver key points to the registry location
+        // Format: {GUID}\NNNN
+        if (!driver.isEmpty()) {
+            QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+            HKEY hKey;
+            std::wstring keyPath = driverKeyPath.toStdWString();
+
+            if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, keyPath.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+                wchar_t value[256];
+                DWORD valueSize = sizeof(value);
+                DWORD type;
+
+                // Get provider name
+                if (RegQueryValueExW(hKey, L"ProviderName", nullptr, &type,
+                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                    if (type == REG_SZ) {
+                        driverProvider = QString::fromWCharArray(value);
+                        hasDriverDetails = true;
+                    }
+                }
+
+                // Get driver version
+                valueSize = sizeof(value);
+                if (RegQueryValueExW(hKey, L"DriverVersion", nullptr, &type,
+                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                    if (type == REG_SZ) {
+                        driverVersion = QString::fromWCharArray(value);
+                    }
+                }
+
+                // Get driver date
+                valueSize = sizeof(value);
+                if (RegQueryValueExW(hKey, L"DriverDate", nullptr, &type,
+                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                    if (type == REG_SZ) {
+                        labelDriverDateValue->setText(QString::fromWCharArray(value));
+                    }
+                }
+
+                // Get digital signer (InfPath can give clues about signing)
+                valueSize = sizeof(value);
+                if (RegQueryValueExW(hKey, L"InfPath", nullptr, &type,
+                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                    if (type == REG_SZ) {
+                        QString infPath = QString::fromWCharArray(value);
+                        // If it's in the Windows\INF folder, it's likely Microsoft signed
+                        if (infPath.startsWith(QStringLiteral("oem"), Qt::CaseInsensitive)) {
+                            driverSigner = driverProvider;
+                        } else {
+                            driverSigner = QStringLiteral("Microsoft Windows");
+                        }
+                    }
+                }
+
+                RegCloseKey(hKey);
+            }
+        }
+
+        labelDriverProviderValue->setText(driverProvider);
+        labelDriverVersionValue->setText(driverVersion);
+        labelDigitalSignerValue->setText(driverSigner);
+        buttonDriverDetails->setEnabled(hasDriverDetails);
 #else
         labelDriverProviderValue->setText(driver);
         labelDigitalSignerValue->setText(tr("N/A"));
@@ -545,7 +669,7 @@ void PropertiesDialog::populateDriverTab() {
     }
 }
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
 QString PropertiesDialog::getKernelVersion() {
     struct utsname buffer;
     if (uname(&buffer) == 0) {
@@ -555,6 +679,7 @@ QString PropertiesDialog::getKernelVersion() {
 }
 
 QString PropertiesDialog::getKernelBuildDate() {
+#ifdef Q_OS_LINUX
     // Try to get kernel build date from /proc/version
     QFile versionFile(QStringLiteral("/proc/version"));
     if (versionFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -609,7 +734,90 @@ QString PropertiesDialog::getKernelBuildDate() {
             return QString::fromLocal8Bit(buffer.version);
         }
     }
+#elif defined(Q_OS_MACOS)
+    // macOS: Parse date from uname -v (version string contains build date)
+    struct utsname buffer;
+    if (uname(&buffer) == 0) {
+        QString version = QString::fromLocal8Bit(buffer.version);
+        // Format: "Darwin Kernel Version X.X.X: Day Mon DD HH:MM:SS TZ YYYY; root:xnu-..."
+        QRegularExpression dateRe(
+            QStringLiteral("(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\s+"
+                           "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+"
+                           "(\\d{1,2})\\s+"
+                           "(\\d{2}):(\\d{2}):(\\d{2})\\s+"
+                           "\\w+\\s+" // Timezone
+                           "(\\d{4})"));
+
+        QRegularExpressionMatch match = dateRe.match(version);
+        if (match.hasMatch()) {
+            QString monthStr = match.captured(2);
+            int day = match.captured(3).toInt();
+            int year = match.captured(7).toInt();
+
+            static const QStringList months = {
+                QStringLiteral("Jan"), QStringLiteral("Feb"), QStringLiteral("Mar"),
+                QStringLiteral("Apr"), QStringLiteral("May"), QStringLiteral("Jun"),
+                QStringLiteral("Jul"), QStringLiteral("Aug"), QStringLiteral("Sep"),
+                QStringLiteral("Oct"), QStringLiteral("Nov"), QStringLiteral("Dec")};
+            int month = months.indexOf(monthStr) + 1;
+
+            if (month > 0) {
+                QDate date(year, month, day);
+                if (date.isValid()) {
+                    return QLocale().toString(date, QLocale::ShortFormat);
+                }
+            }
+        }
+        return version;
+    }
+#endif
     return tr("Unknown");
+}
+#elif defined(Q_OS_WIN)
+QString PropertiesDialog::getKernelVersion() {
+    // Get Windows version using RtlGetVersion (works on Windows 8.1+)
+    // Fallback to reading from registry if needed
+    OSVERSIONINFOEXW osvi;
+    ZeroMemory(&osvi, sizeof(osvi));
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+
+    // Try to get version via ntdll
+    typedef NTSTATUS(WINAPI * RtlGetVersionFunc)(PRTL_OSVERSIONINFOW);
+    HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+    if (ntdll) {
+        auto rtlGetVersion = reinterpret_cast<RtlGetVersionFunc>(
+            GetProcAddress(ntdll, "RtlGetVersion"));
+        if (rtlGetVersion) {
+            rtlGetVersion(reinterpret_cast<PRTL_OSVERSIONINFOW>(&osvi));
+            return QStringLiteral("%1.%2.%3")
+                .arg(osvi.dwMajorVersion)
+                .arg(osvi.dwMinorVersion)
+                .arg(osvi.dwBuildNumber);
+        }
+    }
+
+    return tr("Unknown");
+}
+
+QString PropertiesDialog::getKernelBuildDate() {
+    // Windows doesn't have a simple kernel build date
+    // Return the OS install date or a generic message
+    HKEY hKey;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+                      L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
+                      0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+        DWORD installDate = 0;
+        DWORD size = sizeof(installDate);
+        if (RegQueryValueExW(hKey, L"InstallDate", nullptr, nullptr,
+                             reinterpret_cast<LPBYTE>(&installDate), &size) == ERROR_SUCCESS) {
+            RegCloseKey(hKey);
+            // InstallDate is a Unix timestamp
+            QDateTime dt = QDateTime::fromSecsSinceEpoch(installDate);
+            return QLocale().toString(dt.date(), QLocale::ShortFormat);
+        }
+        RegCloseKey(hKey);
+    }
+    return tr("N/A");
 }
 #else
 QString PropertiesDialog::getKernelVersion() {
@@ -629,10 +837,19 @@ QString PropertiesDialog::lookupUsbVendor(const QString &vendorId) {
     if (!initialized) {
         initialized = true;
 
-        static const QStringList usbIdsLocations = {QStringLiteral("/usr/share/hwdata/usb.ids"),
-                                                    QStringLiteral("/usr/share/misc/usb.ids"),
-                                                    QStringLiteral("/usr/share/usb.ids"),
-                                                    QStringLiteral("/var/lib/usbutils/usb.ids")};
+        static const QStringList usbIdsLocations = {
+            // Linux locations
+            QStringLiteral("/usr/share/hwdata/usb.ids"),
+            QStringLiteral("/usr/share/misc/usb.ids"),
+            QStringLiteral("/usr/share/usb.ids"),
+            QStringLiteral("/var/lib/usbutils/usb.ids"),
+#ifdef Q_OS_MACOS
+            // macOS Homebrew locations (Apple Silicon and Intel)
+            QStringLiteral("/opt/homebrew/share/hwdata/usb.ids"),
+            QStringLiteral("/usr/local/share/hwdata/usb.ids"),
+            QStringLiteral("/opt/homebrew/Cellar/hwdata/*/share/hwdata/usb.ids"),
+#endif
+        };
 
         for (const QString &path : usbIdsLocations) {
             QFile file(path);
@@ -672,6 +889,110 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
         return tr("Unknown");
     }
 
+#ifdef Q_OS_MACOS
+    // macOS: Parse IORegistry paths
+    // Format: IOService:/AppleARMPE/arm-io@10F00000/AppleT810xIO/usb-drd1@2280000/...
+
+    // Check for USB device
+    if (devpath.contains(QStringLiteral("USB")) || devpath.contains(QStringLiteral("usb"))) {
+        // Try to extract USB location from path
+        static const QRegularExpression usbLocationRe(
+            QStringLiteral("usb[^/]*/([^@/]+)@([0-9a-fA-F]+)"));
+        auto match = usbLocationRe.match(devpath);
+        if (match.hasMatch()) {
+            return tr("On USB bus");
+        }
+        return tr("On USB bus");
+    }
+
+    // Check for PCI device
+    if (devpath.contains(QStringLiteral("PCI")) || devpath.contains(QStringLiteral("pci"))) {
+        return tr("On PCI bus");
+    }
+
+    // Check for Thunderbolt
+    if (devpath.contains(QStringLiteral("Thunderbolt"))) {
+        return tr("On Thunderbolt bus");
+    }
+
+    // Check for built-in devices
+    if (devpath.contains(QStringLiteral("AppleARMPE")) ||
+        devpath.contains(QStringLiteral("arm-io"))) {
+        return tr("On system board");
+    }
+
+    // Check for AppleInternal / built-in
+    if (devpath.contains(QStringLiteral("Apple"))) {
+        return tr("Built-in");
+    }
+
+    return tr("Unknown");
+
+#elif defined(Q_OS_WIN)
+    // Windows: Parse device instance ID paths
+    // Format: BUS\VEN_XXXX&DEV_YYYY&SUBSYS_ZZZZ&REV_WW\Instance
+
+    // Check for PCI device
+    if (devpath.startsWith(QStringLiteral("PCI\\"), Qt::CaseInsensitive)) {
+        // Extract PCI location from instance ID if available
+        // Format: PCI\VEN_8086&DEV_A348&SUBSYS_...
+        QRegularExpression pciVenDevRe(QStringLiteral("VEN_([0-9A-Fa-f]{4})&DEV_([0-9A-Fa-f]{4})"));
+        auto match = pciVenDevRe.match(devpath);
+        if (match.hasMatch()) {
+            return tr("On PCI bus");
+        }
+        return tr("PCI device");
+    }
+
+    // Check for USB device
+    if (devpath.startsWith(QStringLiteral("USB\\"), Qt::CaseInsensitive)) {
+        // Extract USB location
+        // Format: USB\VID_XXXX&PID_YYYY\Serial
+        QRegularExpression usbVidPidRe(QStringLiteral("VID_([0-9A-Fa-f]{4})&PID_([0-9A-Fa-f]{4})"));
+        auto match = usbVidPidRe.match(devpath);
+        if (match.hasMatch()) {
+            return tr("On USB bus");
+        }
+        return tr("USB device");
+    }
+
+    // Check for HID device
+    if (devpath.startsWith(QStringLiteral("HID\\"), Qt::CaseInsensitive)) {
+        return tr("HID-compliant device");
+    }
+
+    // Check for ACPI device
+    if (devpath.startsWith(QStringLiteral("ACPI\\"), Qt::CaseInsensitive) ||
+        devpath.startsWith(QStringLiteral("ACPI_HAL\\"), Qt::CaseInsensitive)) {
+        return tr("On ACPI-compliant system");
+    }
+
+    // Check for root-enumerated device
+    if (devpath.startsWith(QStringLiteral("ROOT\\"), Qt::CaseInsensitive)) {
+        return tr("On system board");
+    }
+
+    // Check for storage device
+    if (devpath.contains(QStringLiteral("SCSI\\"), Qt::CaseInsensitive) ||
+        devpath.contains(QStringLiteral("IDE\\"), Qt::CaseInsensitive) ||
+        devpath.contains(QStringLiteral("STORAGE\\"), Qt::CaseInsensitive)) {
+        return tr("On storage controller");
+    }
+
+    // Check for display device
+    if (devpath.startsWith(QStringLiteral("DISPLAY\\"), Qt::CaseInsensitive)) {
+        return tr("On display adapter");
+    }
+
+    // Check for software device
+    if (devpath.startsWith(QStringLiteral("SWD\\"), Qt::CaseInsensitive) ||
+        devpath.startsWith(QStringLiteral("SW\\"), Qt::CaseInsensitive)) {
+        return tr("Software device");
+    }
+
+    return tr("Unknown");
+
+#else // Linux
     // Check for PCI device: extract bus, device, function from patterns like 0000:00:1f.3
     static const QRegularExpression pciRe(
         QStringLiteral("([0-9a-fA-F]{4}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\\.([0-9a-fA-F])"));
@@ -741,6 +1062,7 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
 
     // Fallback
     return tr("Unknown");
+#endif
 }
 
 QString PropertiesDialog::getDeviceCategory() {
@@ -748,6 +1070,85 @@ QString PropertiesDialog::getDeviceCategory() {
         return {};
     }
 
+#ifdef Q_OS_MACOS
+    // macOS: Use pre-computed category from DeviceInfo
+    switch (deviceInfo_->category()) {
+    case DeviceCategory::AudioInputsAndOutputs:
+        return tr("Audio inputs and outputs");
+    case DeviceCategory::Batteries:
+        return tr("Batteries");
+    case DeviceCategory::Computer:
+        return tr("Computer");
+    case DeviceCategory::DiskDrives:
+        return tr("Disk drives");
+    case DeviceCategory::DisplayAdapters:
+        return tr("Display adapters");
+    case DeviceCategory::DvdCdromDrives:
+        return tr("DVD/CD-ROM drives");
+    case DeviceCategory::HumanInterfaceDevices:
+        return tr("Human Interface Devices");
+    case DeviceCategory::Keyboards:
+        return tr("Keyboards");
+    case DeviceCategory::MiceAndOtherPointingDevices:
+        return tr("Mice and other pointing devices");
+    case DeviceCategory::NetworkAdapters:
+        return tr("Network adapters");
+    case DeviceCategory::SoftwareDevices:
+        return tr("Software devices");
+    case DeviceCategory::SoundVideoAndGameControllers:
+        return tr("Sound, video and game controllers");
+    case DeviceCategory::StorageControllers:
+        return tr("Storage controllers");
+    case DeviceCategory::StorageVolumes:
+        return tr("Storage volumes");
+    case DeviceCategory::SystemDevices:
+        return tr("System devices");
+    case DeviceCategory::UniversalSerialBusControllers:
+        return tr("Universal Serial Bus controllers");
+    case DeviceCategory::Unknown:
+    default:
+        return deviceInfo_->subsystem();
+    }
+#elif defined(Q_OS_WIN)
+    // Windows: Use pre-computed category from DeviceInfo (same as macOS)
+    switch (deviceInfo_->category()) {
+    case DeviceCategory::AudioInputsAndOutputs:
+        return tr("Audio inputs and outputs");
+    case DeviceCategory::Batteries:
+        return tr("Batteries");
+    case DeviceCategory::Computer:
+        return tr("Computer");
+    case DeviceCategory::DiskDrives:
+        return tr("Disk drives");
+    case DeviceCategory::DisplayAdapters:
+        return tr("Display adapters");
+    case DeviceCategory::DvdCdromDrives:
+        return tr("DVD/CD-ROM drives");
+    case DeviceCategory::HumanInterfaceDevices:
+        return tr("Human Interface Devices");
+    case DeviceCategory::Keyboards:
+        return tr("Keyboards");
+    case DeviceCategory::MiceAndOtherPointingDevices:
+        return tr("Mice and other pointing devices");
+    case DeviceCategory::NetworkAdapters:
+        return tr("Network adapters");
+    case DeviceCategory::SoftwareDevices:
+        return tr("Software devices");
+    case DeviceCategory::SoundVideoAndGameControllers:
+        return tr("Sound, video and game controllers");
+    case DeviceCategory::StorageControllers:
+        return tr("Storage controllers");
+    case DeviceCategory::StorageVolumes:
+        return tr("Storage volumes");
+    case DeviceCategory::SystemDevices:
+        return tr("System devices");
+    case DeviceCategory::UniversalSerialBusControllers:
+        return tr("Universal Serial Bus controllers");
+    case DeviceCategory::Unknown:
+    default:
+        return deviceInfo_->subsystem();
+    }
+#else
     namespace us = strings::udev;
 
     QString subsystem = deviceInfo_->subsystem();
@@ -838,6 +1239,7 @@ QString PropertiesDialog::getDeviceCategory() {
     if (!subsystem.isEmpty()) {
         return subsystem;
     }
+#endif
 
     return tr("Unknown");
 }
@@ -1001,7 +1403,7 @@ QString PropertiesDialog::getBlockDeviceManufacturer() {
 }
 #endif
 
-#ifdef Q_OS_LINUX
+#if defined(Q_OS_LINUX)
 QString PropertiesDialog::getMountPoint() {
     if (!deviceInfo_) {
         return {};
@@ -1061,6 +1463,107 @@ QString PropertiesDialog::getMountPoint() {
         }
     }
 
+    return {};
+}
+#elif defined(Q_OS_MACOS)
+#include <sys/mount.h>
+
+QString PropertiesDialog::getMountPoint() {
+    if (!deviceInfo_) {
+        return {};
+    }
+
+    QString devnode = deviceInfo_->devnode();
+    if (devnode.isEmpty()) {
+        return {};
+    }
+
+    // Get canonical path for the device node
+    QFileInfo devnodeInfo(devnode);
+    QString canonicalDevnode = devnodeInfo.canonicalFilePath();
+    if (canonicalDevnode.isEmpty()) {
+        canonicalDevnode = devnode;
+    }
+
+    // Use getmntinfo to get mounted filesystems
+    struct statfs *mounts;
+    int numMounts = getmntinfo(&mounts, MNT_NOWAIT);
+
+    for (int i = 0; i < numMounts; ++i) {
+        QString mountDevice = QString::fromUtf8(mounts[i].f_mntfromname);
+        QString mountPoint = QString::fromUtf8(mounts[i].f_mntonname);
+
+        // Get canonical path for comparison
+        QFileInfo mountDevInfo(mountDevice);
+        QString canonicalMountDev = mountDevInfo.canonicalFilePath();
+        if (canonicalMountDev.isEmpty()) {
+            canonicalMountDev = mountDevice;
+        }
+
+        if (mountDevice == devnode || mountDevice == canonicalDevnode ||
+            canonicalMountDev == devnode || canonicalMountDev == canonicalDevnode) {
+            return mountPoint;
+        }
+    }
+
+    return {};
+}
+#elif defined(Q_OS_WIN)
+QString PropertiesDialog::getMountPoint() {
+    if (!deviceInfo_) {
+        return {};
+    }
+
+    // On Windows, volumes have mount points like "C:\" or volume GUIDs
+    // The device instance ID for volumes typically contains the volume GUID
+    QString syspath = deviceInfo_->syspath();
+
+    // Check if this is a volume device
+    if (!syspath.contains(QStringLiteral("STORAGE\\VOLUME"), Qt::CaseInsensitive) &&
+        !syspath.contains(QStringLiteral("Volume{"), Qt::CaseInsensitive)) {
+        return {};
+    }
+
+    // Try to find the mount point using the device name
+    QString devnode = deviceInfo_->devnode();
+    if (devnode.isEmpty()) {
+        devnode = deviceInfo_->name();
+    }
+
+    // For volumes with drive letters, return the drive letter
+    wchar_t volumeName[MAX_PATH];
+    wchar_t pathNames[MAX_PATH];
+    DWORD charCount = MAX_PATH;
+
+    HANDLE findHandle = FindFirstVolumeW(volumeName, MAX_PATH);
+    if (findHandle == INVALID_HANDLE_VALUE) {
+        return {};
+    }
+
+    QString result;
+    do {
+        // Remove trailing backslash for QueryDosDevice
+        size_t len = wcslen(volumeName);
+        if (len > 0 && volumeName[len - 1] == L'\\') {
+            volumeName[len - 1] = L'\0';
+        }
+
+        // Get the mount points for this volume
+        volumeName[len - 1] = L'\\';  // Restore backslash
+        if (GetVolumePathNamesForVolumeNameW(volumeName, pathNames, charCount, &charCount)) {
+            // pathNames is a multi-string
+            if (pathNames[0] != L'\0') {
+                result = QString::fromWCharArray(pathNames);
+                // Check if this matches our device (simplified check)
+                if (syspath.contains(QString::fromWCharArray(volumeName).mid(10, 38), Qt::CaseInsensitive)) {
+                    FindVolumeClose(findHandle);
+                    return result;
+                }
+            }
+        }
+    } while (FindNextVolumeW(findHandle, volumeName, MAX_PATH));
+
+    FindVolumeClose(findHandle);
     return {};
 }
 #else
@@ -1151,10 +1654,71 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
 }
 
 static void parseEventLine(const QString &event, QString &timestamp, QString &message) {
-    // Parse journalctl output with -o short-iso format
-    // Format: "YYYY-MM-DDTHH:MM:SS+ZZZZ hostname kernel: message"
     timestamp.clear();
     message.clear();
+
+#ifdef Q_OS_MACOS
+    // macOS 'log show --style compact' format:
+    // "YYYY-MM-DD HH:MM:SS.mmm Df subsystem[pid]: message"
+    // or "YYYY-MM-DD HH:MM:SS.mmm Df category: message"
+    QRegularExpression macLogRe(
+        QStringLiteral("^(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}\\.\\d+)\\s+\\w+\\s+"));
+    QRegularExpressionMatch match = macLogRe.match(event);
+
+    if (match.hasMatch()) {
+        QString dateTimeStr = match.captured(1);
+        QString remainder = event.mid(match.capturedEnd());
+
+        // Parse timestamp
+        QDateTime dateTime = QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
+        if (dateTime.isValid()) {
+            timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
+        } else {
+            timestamp = dateTimeStr;
+        }
+
+        // Extract message after the process/subsystem name
+        int colonIdx = remainder.indexOf(QStringLiteral(": "));
+        if (colonIdx != -1) {
+            message = remainder.mid(colonIdx + 2).trimmed();
+        } else {
+            message = remainder.trimmed();
+        }
+    } else {
+        // Fallback for unexpected format
+        message = event;
+    }
+#elif defined(Q_OS_WIN)
+    // Windows wevtutil text output format varies by event type
+    // Common patterns: "Event[...]: description" or "Date: YYYY-MM-DD HH:MM:SS"
+
+    // Try to extract timestamp from "Date:" line or embedded timestamp
+    QRegularExpression winDateRe(
+        QStringLiteral("Date:\\s*(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})"));
+    QRegularExpressionMatch match = winDateRe.match(event);
+
+    if (match.hasMatch()) {
+        QString dateTimeStr = match.captured(1);
+        QDateTime dateTime = QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss"));
+        if (dateTime.isValid()) {
+            timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
+        } else {
+            timestamp = dateTimeStr;
+        }
+        message = event;
+    } else {
+        // Check for message content
+        QRegularExpression winMsgRe(QStringLiteral("(?:Message|Description):\\s*(.+)"));
+        QRegularExpressionMatch msgMatch = winMsgRe.match(event);
+        if (msgMatch.hasMatch()) {
+            message = msgMatch.captured(1).trimmed();
+        } else {
+            message = event;
+        }
+    }
+#else
+    // Parse journalctl output with -o short-iso format
+    // Format: "YYYY-MM-DDTHH:MM:SS+ZZZZ hostname kernel: message"
 
     // Find the ISO timestamp at the start (ends at first space after timezone)
     // Timezone can be +/-HH:MM or +/-HHMM format
@@ -1190,6 +1754,7 @@ static void parseEventLine(const QString &event, QString &timestamp, QString &me
         // Fallback for unexpected format
         message = event;
     }
+#endif
 }
 
 void PropertiesDialog::populateEventsTab() {
@@ -1255,7 +1820,7 @@ void PropertiesDialog::populateEventsTab() {
                 }
             }
 
-            // Extract PCI address
+            // Extract PCI address (Linux) or IORegistry path component (macOS)
             QRegularExpression pciRe(
                 QStringLiteral("([0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\\.[0-9a-f])"));
             QRegularExpressionMatch pciMatch = pciRe.match(syspath);
@@ -1267,7 +1832,73 @@ void PropertiesDialog::populateEventsTab() {
                 return events;
             }
 
-            // Query journalctl for kernel messages about this device
+#ifdef Q_OS_MACOS
+            // macOS: Use 'log show' to query system logs
+            QProcess logShow;
+            QStringList args;
+            args << QStringLiteral("show")
+                 << QStringLiteral("--predicate")
+                 << QStringLiteral("subsystem == 'com.apple.iokit' OR "
+                                   "subsystem == 'com.apple.kernel' OR "
+                                   "category == 'IOKit'")
+                 << QStringLiteral("--last") << QStringLiteral("1h")
+                 << QStringLiteral("--style") << QStringLiteral("compact");
+
+            logShow.start(QStringLiteral("log"), args);
+            if (logShow.waitForFinished(10000)) {
+                QString output = QString::fromUtf8(logShow.readAllStandardOutput());
+                QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+
+                for (const QString &line : lines) {
+                    bool matches = false;
+                    for (const QString &term : searchTerms) {
+                        if (line.contains(term, Qt::CaseInsensitive)) {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        events << line;
+                    }
+                    if (events.size() >= 50) {
+                        break;
+                    }
+                }
+            }
+#elif defined(Q_OS_WIN)
+            // Windows: Query Windows Event Log using wevtutil
+            // We look for events from the System and Application logs
+            QProcess wevtutil;
+            QStringList args;
+            // Query System log for device-related events
+            args << QStringLiteral("qe") << QStringLiteral("System")
+                 << QStringLiteral("/c:100")
+                 << QStringLiteral("/rd:true")
+                 << QStringLiteral("/f:text");
+
+            wevtutil.start(QStringLiteral("wevtutil"), args);
+            if (wevtutil.waitForFinished(10000)) {
+                QString output = QString::fromUtf8(wevtutil.readAllStandardOutput());
+                QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+
+                for (const QString &line : lines) {
+                    bool matches = false;
+                    for (const QString &term : searchTerms) {
+                        if (line.contains(term, Qt::CaseInsensitive)) {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    if (matches) {
+                        events << line;
+                    }
+                    if (events.size() >= 50) {
+                        break;
+                    }
+                }
+            }
+#else
+            // Linux: Query journalctl for kernel messages about this device
             QProcess journalctl;
             QStringList args;
             args << QStringLiteral("-k") << QStringLiteral("-n") << QStringLiteral("500")
@@ -1295,6 +1926,7 @@ void PropertiesDialog::populateEventsTab() {
                     }
                 }
             }
+#endif
 
             return events;
         });

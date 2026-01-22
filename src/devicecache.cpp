@@ -38,6 +38,22 @@ void DeviceCache::enumerate() {
         syspathIndex_.insert(devices_.last().syspath(), devices_.size() - 1);
     }
     udev_enumerate_unref(enumerator);
+#elif defined(Q_OS_MACOS)
+    manager_.enumerateAllDevices([this](io_service_t service) {
+        devices_.emplaceBack(service);
+        const QString &syspath = devices_.last().syspath();
+        if (!syspath.isEmpty()) {
+            syspathIndex_.insert(syspath, devices_.size() - 1);
+        }
+    });
+#elif defined(Q_OS_WIN)
+    manager_.enumerateAllDevices([this](HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
+        devices_.emplaceBack(devInfo, devInfoData);
+        const QString &syspath = devices_.last().syspath();
+        if (!syspath.isEmpty()) {
+            syspathIndex_.insert(syspath, devices_.size() - 1);
+        }
+    });
 #endif
 }
 

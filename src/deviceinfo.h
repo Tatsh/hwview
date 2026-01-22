@@ -4,8 +4,13 @@
 
 #ifdef Q_OS_LINUX
 #include <libudev.h>
+#elif defined(Q_OS_MACOS)
+#include <IOKit/IOKitLib.h>
+#elif defined(Q_OS_WIN)
+#include <windows.h>
+#include <setupapi.h>
 #else
-// Stub types for non-Linux platforms
+// Stub types for unsupported platforms
 struct udev;
 struct udev_device;
 #endif
@@ -35,6 +40,10 @@ class DeviceInfo {
 public:
 #ifdef Q_OS_LINUX
     DeviceInfo(udev *, const char *);
+#elif defined(Q_OS_MACOS)
+    explicit DeviceInfo(io_service_t service);
+#elif defined(Q_OS_WIN)
+    DeviceInfo(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData);
 #endif
     ~DeviceInfo();
 
@@ -85,6 +94,15 @@ private:
 
     udev *ctx;
     udev_device *dev;
+#elif defined(Q_OS_MACOS)
+    void setNameFromIOKit(io_service_t service);
+    void extractIOKitProperties(io_service_t service);
+
+    QString ioKitClassName_;  // IOKit class name for category classification
+#elif defined(Q_OS_WIN)
+    void extractWindowsProperties(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData);
+
+    QString deviceClassName_;  // Windows device class for category classification
 #endif
     void calculateIsHidden();
     void calculateCategory();
