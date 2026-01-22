@@ -232,6 +232,7 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::Batteries:
+            displayName = s::acpiDeviceNiceName(info.devPath(), info.name());
             parentNode = batteriesItem;
             break;
 

@@ -185,10 +185,15 @@ void PropertiesDialog::setDeviceSyspath(const QString &syspath) {
         }
     } else {
         deviceName = deviceInfo_->name();
-        // Apply nice name mapping for software and input devices
+        // Apply nice name mapping for software, input, and HID devices
         if (deviceInfo_->subsystem() == strings::udev::subsystems::misc() ||
-            deviceInfo_->subsystem() == strings::udev::subsystems::input()) {
+            deviceInfo_->subsystem() == strings::udev::subsystems::input() ||
+            deviceInfo_->subsystem() == strings::udev::subsystems::hid()) {
             deviceName = strings::softwareDeviceNiceName(deviceName);
+        }
+        // Apply nice name mapping for ACPI/battery devices
+        if (deviceInfo_->category() == DeviceCategory::Batteries) {
+            deviceName = strings::acpiDeviceNiceName(deviceInfo_->devPath(), deviceName);
         }
         // For storage volumes, try partition label or filesystem label
         if (deviceInfo_->subsystem() == strings::udev::subsystems::block() &&
@@ -322,6 +327,21 @@ void PropertiesDialog::populateGeneralTab() {
             match = usbDevRe.match(syspath);
             if (match.hasMatch()) {
                 vendorId = match.captured(1).toLower();
+            }
+        }
+
+        // Try HID device ID format anywhere in path (I2C HID, USB HID, etc.)
+        // e.g., /devices/pci0000:00/0000:00:15.0/i2c_designware.0/i2c-13/i2c-PNP0C50:00/0018:06CB:7E7E.0005
+        if (vendorId.isEmpty()) {
+            auto hidId = strings::parseHidDeviceId(syspath);
+            if (hidId.valid) {
+                vendorId = hidId.vendorId.toLower();
+                // First try our built-in HID vendor lookup
+                QString hidVendor = strings::hidVendorName(vendorId);
+                if (!hidVendor.isEmpty()) {
+                    manufacturer = hidVendor;
+                    vendorId.clear(); // Don't lookup again
+                }
             }
         }
 
@@ -993,6 +1013,8 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
     return tr("Unknown");
 
 #else // Linux
+    namespace s = strings;
+
     // Check for PCI device: extract bus, device, function from patterns like 0000:00:1f.3
     static const QRegularExpression pciRe(
         QStringLiteral("([0-9a-fA-F]{4}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\\.([0-9a-fA-F])"));
@@ -1000,15 +1022,44 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
     // Find all PCI addresses in the path
     QRegularExpressionMatchIterator it = pciRe.globalMatch(devpath);
     QString lastPciMatch;
-    int bus = -1, device = -1, function = -1;
+    int pciBus = -1, pciDevice = -1, pciFunction = -1;
 
     while (it.hasNext()) {
         QRegularExpressionMatch match = it.next();
         bool ok;
-        bus = match.captured(2).toInt(&ok, 16);
-        device = match.captured(3).toInt(&ok, 16);
-        function = match.captured(4).toInt(&ok, 16);
+        pciBus = match.captured(2).toInt(&ok, 16);
+        pciDevice = match.captured(3).toInt(&ok, 16);
+        pciFunction = match.captured(4).toInt(&ok, 16);
         lastPciMatch = match.captured(0);
+    }
+
+    // Check for HID device ID (format: XXXX:VVVV:PPPP.IIII)
+    auto hidId = s::parseHidDeviceId(devpath);
+    if (hidId.valid) {
+        QString busName = s::hidBusTypeName(hidId.busType);
+        int i2cBus = s::parseI2cBusNumber(devpath);
+
+        if (hidId.busType == s::hidBusTypes::BUS_I2C && i2cBus >= 0) {
+            // I2C HID device - include I2C bus number and PCI location if available
+            if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
+                return tr("On I2C bus %1 at PCI bus %2, device %3, function %4")
+                    .arg(i2cBus)
+                    .arg(pciBus)
+                    .arg(pciDevice)
+                    .arg(pciFunction);
+            }
+            return tr("On I2C bus %1").arg(i2cBus);
+        } else if (hidId.busType == s::hidBusTypes::BUS_USB) {
+            // USB HID - check for USB port info
+            static const QRegularExpression usbReHid(QStringLiteral("/usb(\\d+)/(\\d+)-([\\d.]+)"));
+            auto usbMatch = usbReHid.match(devpath);
+            if (usbMatch.hasMatch()) {
+                return tr("On USB bus %1, port %2").arg(usbMatch.captured(1), usbMatch.captured(3));
+            }
+            return tr("On USB bus");
+        } else if (!busName.isEmpty()) {
+            return tr("On %1 bus").arg(busName);
+        }
     }
 
     // Check for USB device
@@ -1019,6 +1070,19 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
         QString usbBus = usbMatch.captured(1);
         QString usbPort = usbMatch.captured(3); // Just the port part after "bus-"
         return tr("On USB bus %1, port %2").arg(usbBus, usbPort);
+    }
+
+    // Check for I2C device without HID ID
+    int i2cBus = s::parseI2cBusNumber(devpath);
+    if (i2cBus >= 0) {
+        if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
+            return tr("On I2C bus %1 at PCI bus %2, device %3, function %4")
+                .arg(i2cBus)
+                .arg(pciBus)
+                .arg(pciDevice)
+                .arg(pciFunction);
+        }
+        return tr("On I2C bus %1").arg(i2cBus);
     }
 
     // Check for SCSI device: host, channel, target, lun
@@ -1032,8 +1096,28 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
         return tr("Bus number %1, target ID %2, LUN %3").arg(busNum, targetId, lun);
     }
 
-    // Check for ACPI device
-    if (devpath.contains(QStringLiteral("/ACPI")) || devpath.contains(QStringLiteral("/acpi"))) {
+    // Check for ACPI device - extract the PNP ID for more specific info
+    static const QRegularExpression acpiPnpRe(QStringLiteral("/(PNP[0-9A-Fa-f]{4}|LNX[A-Z]+|ACPI[0-9A-Fa-f]{4}):([0-9]+)"));
+    auto acpiMatch = acpiPnpRe.match(devpath);
+    if (acpiMatch.hasMatch()) {
+        QString pnpId = acpiMatch.captured(1);
+        QString instance = acpiMatch.captured(2);
+        // Map common PNP IDs to more descriptive locations
+        if (pnpId == QStringLiteral("PNP0C0A") || pnpId == QStringLiteral("ACPI0003")) {
+            return tr("On ACPI-compliant system");
+        }
+        if (pnpId == QStringLiteral("PNP0C50")) {
+            // I2C HID device
+            if (i2cBus >= 0) {
+                return tr("On I2C HID bus %1").arg(i2cBus);
+            }
+            return tr("On I2C HID bus");
+        }
+        return tr("On ACPI-compliant system");
+    }
+
+    if (devpath.contains(QStringLiteral("/ACPI")) || devpath.contains(QStringLiteral("/acpi")) ||
+        devpath.contains(QStringLiteral("/LNXSYSTM")) || devpath.contains(QStringLiteral("/PNP"))) {
         return tr("On ACPI-compliant system");
     }
 
@@ -1048,14 +1132,19 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
     }
 
     // If we found a PCI address, format it
-    if (bus >= 0 && device >= 0 && function >= 0) {
-        return tr("PCI bus %1, device %2, function %3").arg(bus).arg(device).arg(function);
+    if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
+        return tr("PCI bus %1, device %2, function %3").arg(pciBus).arg(pciDevice).arg(pciFunction);
+    }
+
+    // Check for PS/2 devices (i8042 controller)
+    if (devpath.contains(QStringLiteral("/i8042/"))) {
+        return tr("Connected to PS/2 port");
     }
 
     // Check for input devices
     if (devpath.contains(QStringLiteral("/input/"))) {
         if (devpath.contains(QStringLiteral("/serio"))) {
-            return tr("Plugged into keyboard port");
+            return tr("Connected to PS/2 port");
         }
         return tr("On input device");
     }
