@@ -33,6 +33,7 @@ ehthumbs.db
 Thumbs.db
 
 /build/
+/compile_commands.json
 /reference/
 /.cache/
 *.log

@@ -1,0 +1,6 @@
+<!DOCTYPE gui SYSTEM "kpartgui.dtd">
+<gui name="devmgmt" version="4">
+    <MenuBar>
+        <!-- Settings and Help menus are auto-created by KDE -->
+    </MenuBar>
+</gui>

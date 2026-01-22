@@ -1,0 +1,76 @@
+#include "devicecache.h"
+#include "viewsettings.h"
+
+#include <QHostInfo>
+#include <QMutexLocker>
+
+#ifdef Q_OS_LINUX
+#include <libudev.h>
+#endif
+
+DeviceCache &DeviceCache::instance() {
+    static DeviceCache cache;
+    return cache;
+}
+
+const QString &DeviceCache::hostname() {
+    static QString cachedHostname = QHostInfo::localHostName();
+    return cachedHostname;
+}
+
+DeviceCache::DeviceCache() : QObject(nullptr) {
+    enumerate();
+}
+
+DeviceCache::~DeviceCache() = default;
+
+void DeviceCache::enumerate() {
+    devices_.clear();
+    syspathIndex_.clear();
+
+#ifdef Q_OS_LINUX
+    auto *enumerator = udev_enumerate_new(manager_.context());
+    udev_enumerate_scan_devices(enumerator);
+    struct udev_list_entry *listEntry;
+    udev_list_entry_foreach(listEntry, udev_enumerate_get_list_entry(enumerator)) {
+        auto *syspath = udev_list_entry_get_name(listEntry);
+        devices_.emplaceBack(manager_.context(), syspath);
+        syspathIndex_.insert(devices_.last().syspath(), devices_.size() - 1);
+    }
+    udev_enumerate_unref(enumerator);
+#endif
+}
+
+QList<DeviceInfo> DeviceCache::allDevices() const {
+    QMutexLocker locker(&mutex_);
+    return devices_; // Returns a copy for thread safety
+}
+
+const DeviceInfo *DeviceCache::deviceBySyspath(const QString &syspath) const {
+    QMutexLocker locker(&mutex_);
+    auto it = syspathIndex_.find(syspath);
+    if (it != syspathIndex_.end()) {
+        return &devices_.at(it.value());
+    }
+    return nullptr;
+}
+
+#ifdef Q_OS_LINUX
+struct udev *DeviceCache::context() const {
+    return manager_.context();
+}
+#endif
+
+void DeviceCache::refresh() {
+    QMutexLocker locker(&mutex_);
+    enumerate();
+}
+
+bool DeviceCache::showHiddenDevices() const {
+    return ViewSettings::instance().showHiddenDevices();
+}
+
+void DeviceCache::setShowHiddenDevices(bool show) {
+    ViewSettings::instance().setShowHiddenDevices(show);
+    ViewSettings::instance().save();
+}

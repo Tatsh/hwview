@@ -1,0 +1,17 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file>icons/icon_16.png</file>
+        <file>icons/icon_16@2x.png</file>
+        <file>icons/icon_32.png</file>
+        <file>icons/icon_32@2x.png</file>
+        <file>icons/icon_64.png</file>
+        <file>icons/icon_64@2x.png</file>
+        <file>icons/icon_128.png</file>
+        <file>icons/icon_128@2x.png</file>
+        <file>icons/icon_256.png</file>
+        <file>icons/icon_256@2x.png</file>
+        <file>icons/icon_512.png</file>
+        <file>icons/icon_512@2x.png</file>
+    </qresource>
+</RCC>

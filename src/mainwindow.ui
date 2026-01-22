@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>765</width>
+                <height>639</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Device Manager</string>
+        </property>
+        <widget class="QWidget" name="centralwidget">
+            <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                    <widget class="QTreeView" name="treeView">
+                        <property name="animated">
+                            <bool>true</bool>
+                        </property>
+                        <attribute name="headerVisible">
+                            <bool>false</bool>
+                        </attribute>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>765</width>
+                    <height>22</height>
+                </rect>
+            </property>
+            <widget class="QMenu" name="menuFile">
+                <property name="title">
+                    <string>&amp;File</string>
+                </property>
+                <addaction name="actionOptions" />
+                <addaction name="actionExit" />
+            </widget>
+            <widget class="QMenu" name="menuAction">
+                <property name="title">
+                    <string>&amp;Action</string>
+                </property>
+                <addaction name="actionUpdateDriver" />
+                <addaction name="separator" />
+                <addaction name="actionScanForHardwareChanges" />
+                <addaction name="separator" />
+                <addaction name="actionDevicesAndPrinters" />
+                <addaction name="actionHelp" />
+            </widget>
+            <widget class="QMenu" name="menuView">
+                <property name="title">
+                    <string>&amp;View</string>
+                </property>
+                <addaction name="actionDevicesByType" />
+                <addaction name="actionDevicesByConnection" />
+                <addaction name="actionDevicesByDriver" />
+                <addaction name="actionDriversByType" />
+                <addaction name="actionDriversByDevice" />
+                <addaction name="actionResourcesByType" />
+                <addaction name="actionResourcesByConnection" />
+                <addaction name="separator" />
+                <addaction name="actionShowHiddenDevices" />
+                <addaction name="actionCustomize" />
+            </widget>
+            <widget class="QMenu" name="menuHelp">
+                <property name="title">
+                    <string>&amp;Help</string>
+                </property>
+                <addaction name="actionHelpTopics" />
+                <addaction name="actionWebsite" />
+                <addaction name="separator" />
+                <addaction name="actionAbout" />
+            </widget>
+            <addaction name="menuFile" />
+            <addaction name="menuAction" />
+            <addaction name="menuView" />
+            <addaction name="menuHelp" />
+        </widget>
+        <widget class="QStatusBar" name="statusbar" />
+        <action name="actionExit">
+            <property name="text">
+                <string>Exit</string>
+            </property>
+        </action>
+        <action name="actionOptions">
+            <property name="text">
+                <string>Options...</string>
+            </property>
+        </action>
+        <action name="actionUpdateDriver">
+            <property name="text">
+                <string>Update driver</string>
+            </property>
+            <property name="visible">
+                <bool>false</bool>
+            </property>
+        </action>
+        <action name="actionScanForHardwareChanges">
+            <property name="text">
+                <string>Scan for hardware changes</string>
+            </property>
+            <property name="shortcut">
+                <string>F5</string>
+            </property>
+        </action>
+        <action name="actionDevicesAndPrinters">
+            <property name="text">
+                <string>Devices and Printers</string>
+            </property>
+        </action>
+        <action name="actionHelp">
+            <property name="text">
+                <string>Help</string>
+            </property>
+        </action>
+        <action name="actionDevicesByType">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="checked">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>D&amp;evices by type</string>
+            </property>
+        </action>
+        <action name="actionDevicesByConnection">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>De&amp;vices by connection</string>
+            </property>
+        </action>
+        <action name="actionDevicesByDriver">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Dev&amp;ices by driver</string>
+            </property>
+        </action>
+        <action name="actionDriversByType">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Drive&amp;rs by type</string>
+            </property>
+        </action>
+        <action name="actionDriversByDevice">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Driver&amp;s by device</string>
+            </property>
+        </action>
+        <action name="actionResourcesByType">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Resources by t&amp;ype</string>
+            </property>
+        </action>
+        <action name="actionResourcesByConnection">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Resources by co&amp;nnection</string>
+            </property>
+        </action>
+        <action name="actionShowHiddenDevices">
+            <property name="checkable">
+                <bool>true</bool>
+            </property>
+            <property name="text">
+                <string>Sho&amp;w hidden devices</string>
+            </property>
+        </action>
+        <action name="actionCustomize">
+            <property name="text">
+                <string>C&amp;ustomize...</string>
+            </property>
+        </action>
+        <action name="actionHelpTopics">
+            <property name="text">
+                <string>Help Topics</string>
+            </property>
+        </action>
+        <action name="actionWebsite">
+            <property name="text">
+                <string>Website</string>
+            </property>
+        </action>
+        <action name="actionAbout">
+            <property name="text">
+                <string>About Device Manager...</string>
+            </property>
+            <property name="toolTip">
+                <string>About Device Manager</string>
+            </property>
+            <property name="statusTip">
+                <string>Show the application's About box</string>
+            </property>
+        </action>
+    </widget>
+    <resources />
+    <connections>
+        <connection>
+            <sender>actionExit</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>close()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>463</x>
+                    <y>359</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+</ui>

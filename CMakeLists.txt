@@ -6,25 +6,52 @@ include(FindPkgConfig)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Configurable website URL
+set(DEVMGMT_WEBSITE_URL "https://github.com/Tatsh/devmgmt" CACHE STRING "Project website URL")
+
+# KDE Plasma integration option
+option(DEVMGMT_USE_KDE "Build with KDE Frameworks integration" OFF)
+
+# Enable all Clang warnings (for development)
+option(DEVMGMT_CXX_WARN_ERROR_ALL "Enable all warnings with Clang (requires Debug build)" OFF)
 
 find_package(
-  Qt5
-  COMPONENTS Network Widgets
+  Qt6
+  COMPONENTS Concurrent Network Widgets
   REQUIRED)
-pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
+
+# libudev is only available on Linux
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
+endif()
+
+# Optional KDE Frameworks support
+if(DEVMGMT_USE_KDE)
+  find_package(ECM REQUIRED NO_MODULE)
+  set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
+  find_package(
+    KF6
+    COMPONENTS ConfigWidgets CoreAddons I18n XmlGui
+    REQUIRED)
+endif()
+
+# Pass website URL to code
+add_compile_definitions(DEVMGMT_WEBSITE_URL="${DEVMGMT_WEBSITE_URL}")
 
 # Sane flags from Kate project
-add_definitions(
-  -DQT_NO_CAST_FROM_ASCII
-  -DQT_NO_CAST_FROM_BYTEARRAY
-  -DQT_NO_CAST_TO_ASCII
-  -DQT_NO_SIGNALS_SLOTS_KEYWORDS
-  -DQT_NO_URL_CAST_FROM_STRING
-  -DQT_STRICT_ITERATORS
-  -DQT_USE_FAST_OPERATOR_PLUS
-  -DQT_USE_QSTRINGBUILDER)
+add_compile_definitions(
+  QT_NO_CAST_FROM_ASCII
+  QT_NO_CAST_FROM_BYTEARRAY
+  QT_NO_CAST_TO_ASCII
+  QT_NO_SIGNALS_SLOTS_KEYWORDS
+  QT_NO_URL_CAST_FROM_STRING
+  QT_STRICT_ITERATORS
+  QT_USE_FAST_OPERATOR_PLUS
+  QT_USE_QSTRINGBUILDER)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
@@ -42,15 +69,4 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   endif()
 endif()
 
-include_directories(.)
-add_executable(
-  devmgmt
-  deviceinfo.cpp
-  main.cpp
-  mainwindow.cpp
-  models/devbytypemodel.cpp
-  models/node.cpp
-  propertiesdialog.cpp
-  udev/udevenumerate.cpp
-  udev/udevmanager.cpp)
-target_link_libraries(devmgmt PkgConfig::UDEV Qt5::Network Qt5::Widgets)
+add_subdirectory(src)
