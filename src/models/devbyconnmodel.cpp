@@ -16,10 +16,13 @@ DevicesByConnectionModel::DevicesByConnectionModel(QObject *parent)
     buildTree();
 }
 
-QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info) const {
+QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *rawName) const {
     QString name = info.name();
+    QString subsystem = info.subsystem();
+    bool addSubsystemPrefix = false;
+
     if (name.isEmpty()) {
-        // Fall back to subsystem:syspath basename
+        // Fall back to syspath basename
         QString syspath = info.syspath();
         auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
         if (lastSlash >= 0) {
@@ -27,10 +30,28 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info) const {
         } else {
             name = syspath;
         }
-        QString subsystem = info.subsystem();
-        if (!subsystem.isEmpty()) {
-            name = QStringLiteral("[%1] %2").arg(subsystem, name);
-        }
+        // Only add prefix for subsystems without dedicated nice name handling
+        addSubsystemPrefix =
+            !subsystem.isEmpty() && subsystem != QStringLiteral("acpi") &&
+            subsystem != QStringLiteral("scsi_host") && subsystem != QStringLiteral("scsi") &&
+            subsystem != QStringLiteral("i2c");
+    }
+
+    // Store raw name before transformation
+    if (rawName) {
+        *rawName = addSubsystemPrefix ? QStringLiteral("[%1] %2").arg(subsystem, name) : name;
+    }
+
+    // Apply nice name transformations
+    if (subsystem == QStringLiteral("acpi")) {
+        name = s::acpiDeviceNiceName(info.devPath(), name);
+    } else {
+        name = s::softwareDeviceNiceName(name);
+    }
+
+    // Add subsystem prefix if name was empty and subsystem lacks nice name handling
+    if (addSubsystemPrefix) {
+        name = QStringLiteral("[%1] %2").arg(subsystem, name);
     }
     return name;
 }
@@ -115,10 +136,12 @@ void DevicesByConnectionModel::buildTree() {
         }
 
         // Create node for this device
-        QString name = getNodeName(info);
+        QString rawName;
+        QString name = getNodeName(info, &rawName);
         auto *node = new Node({name, info.driver()}, parentNode, NodeType::Device);
         node->setSyspath(info.syspath());
         node->setIsHidden(info.isHidden());
+        node->setRawName(rawName);
 
         // Set appropriate icon based on subsystem
         node->setIcon(s::categoryIcons::forSubsystem(info.subsystem()));

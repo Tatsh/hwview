@@ -51,7 +51,7 @@ void DevicesByDriverModel::buildTree() {
 
         // Create driver category node
         auto *driverNode = new Node({driverName}, hostnameItem);
-        driverNode->setIcon(s::categoryIcons::other());
+        driverNode->setIcon(s::categoryIcons::forDriver(driverName));
         hostnameItem->appendChild(driverNode);
 
         // Sort device indices by name
@@ -63,21 +63,24 @@ void DevicesByDriverModel::buildTree() {
         // Add devices under this driver
         for (int idx : sortedIndices) {
             const DeviceInfo &info = allDevices.at(idx);
-            QString name = info.name();
-            if (name.isEmpty()) {
+            QString rawName = info.name();
+            if (rawName.isEmpty()) {
                 // Fall back to syspath basename
                 const QString &syspath = info.syspath();
                 auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
                 if (lastSlash >= 0) {
-                    name = syspath.mid(lastSlash + 1);
+                    rawName = syspath.mid(lastSlash + 1);
                 } else {
-                    name = syspath;
+                    rawName = syspath;
                 }
             }
+            // Convert to nice name if available
+            QString name = s::softwareDeviceNiceName(rawName);
 
             auto *deviceNode = new Node({name}, driverNode, NodeType::Device);
             deviceNode->setSyspath(info.syspath());
             deviceNode->setIsHidden(info.isHidden());
+            deviceNode->setRawName(rawName);
             deviceNode->setIcon(s::categoryIcons::forSubsystem(info.subsystem()));
             driverNode->appendChild(deviceNode);
         }

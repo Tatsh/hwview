@@ -23,7 +23,8 @@ CustomizeDialog::CustomizeDialog(QWidget *parent) : QDialog(parent) {
     expandAllCheckBox->setChecked(false);
     viewLayout->addWidget(expandAllCheckBox);
 
-    showDriverColumnCheckBox = new QCheckBox(tr("Show driver column"), viewGroup);
+    showDriverColumnCheckBox =
+        new QCheckBox(tr("Show driver column (Devices by type view only)"), viewGroup);
     showDriverColumnCheckBox->setChecked(false);
     viewLayout->addWidget(showDriverColumnCheckBox);
 

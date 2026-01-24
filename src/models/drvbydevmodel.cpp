@@ -45,7 +45,7 @@ void DriversByDeviceModel::buildTree() {
         const QVector<int> &deviceIndices = it.value();
 
         auto *driverNode = new Node({driverName}, hostnameItem);
-        driverNode->setIcon(s::categoryIcons::other());
+        driverNode->setIcon(s::categoryIcons::forDriver(driverName));
 
         // Sort device indices by name
         QVector<int> sortedIndices = deviceIndices;
@@ -56,20 +56,28 @@ void DriversByDeviceModel::buildTree() {
         // Add devices under this driver
         for (int idx : sortedIndices) {
             const DeviceInfo &info = allDevices.at(idx);
-            QString name = info.name();
-            if (name.isEmpty()) {
+            QString rawName = info.name();
+            if (rawName.isEmpty()) {
                 const QString &syspath = info.syspath();
                 auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
                 if (lastSlash >= 0) {
-                    name = syspath.mid(lastSlash + 1);
+                    rawName = syspath.mid(lastSlash + 1);
                 } else {
-                    name = syspath;
+                    rawName = syspath;
                 }
+            }
+            // Apply nice name transformations
+            QString name;
+            if (info.subsystem() == QStringLiteral("acpi")) {
+                name = s::acpiDeviceNiceName(info.devPath(), rawName);
+            } else {
+                name = s::softwareDeviceNiceName(rawName);
             }
 
             auto *deviceNode = new Node({name}, driverNode, NodeType::Device);
             deviceNode->setSyspath(info.syspath());
             deviceNode->setIsHidden(info.isHidden());
+            deviceNode->setRawName(rawName);
             deviceNode->setIcon(s::categoryIcons::forSubsystem(info.subsystem()));
             driverNode->appendChild(deviceNode);
         }

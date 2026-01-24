@@ -223,7 +223,8 @@ void DevicesByTypeModel::buildTree() {
         }
 
         Node *parentNode = nullptr;
-        QString displayName = info.name();
+        QString rawName = info.name();
+        QString displayName = rawName;
 
         // Use pre-computed category for O(1) classification
         switch (info.category()) {
@@ -232,7 +233,7 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::Batteries:
-            displayName = s::acpiDeviceNiceName(info.devPath(), info.name());
+            displayName = s::acpiDeviceNiceName(info.devPath(), rawName);
             parentNode = batteriesItem;
             break;
 
@@ -274,17 +275,17 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::HumanInterfaceDevices:
-            displayName = s::softwareDeviceNiceName(info.name());
+            displayName = s::softwareDeviceNiceName(rawName);
             parentNode = humanInterfaceDevicesItem;
             break;
 
         case DeviceCategory::Keyboards:
-            displayName = s::softwareDeviceNiceName(info.name());
+            displayName = s::softwareDeviceNiceName(rawName);
             parentNode = keyboardsItem;
             break;
 
         case DeviceCategory::MiceAndOtherPointingDevices:
-            displayName = s::softwareDeviceNiceName(info.name());
+            displayName = s::softwareDeviceNiceName(rawName);
             parentNode = miceAndOtherPointingDevicesItem;
             break;
 
@@ -293,9 +294,9 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::SoftwareDevices: {
-            QString name = info.name();
-            name.replace(kBeginningWithSlashDevRe, s::empty());
-            displayName = s::softwareDeviceNiceName(name);
+            rawName = info.name();
+            rawName.replace(kBeginningWithSlashDevRe, s::empty());
+            displayName = s::softwareDeviceNiceName(rawName);
             parentNode = softwareDevicesItem;
             break;
         }
@@ -315,6 +316,7 @@ void DevicesByTypeModel::buildTree() {
             auto *node = new Node({displayName, info.driver()}, parentNode, NodeType::Device);
             node->setSyspath(info.syspath());
             node->setIsHidden(info.isHidden());
+            node->setRawName(rawName);
             node->setIcon(parentNode->icon());
             parentNode->appendChild(node);
         }

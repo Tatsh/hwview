@@ -75,6 +75,14 @@ void Node::setIsHidden(bool hidden) {
     isHidden_ = hidden;
 }
 
+QString Node::rawName() const {
+    return rawName_;
+}
+
+void Node::setRawName(const QString &name) {
+    rawName_ = name;
+}
+
 void Node::sortChildren() {
     std::sort(childItems.begin(), childItems.end(), [](const Node *a, const Node *b) {
         // Sort alphabetically by the first column (name)

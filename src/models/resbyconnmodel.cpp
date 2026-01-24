@@ -40,7 +40,7 @@ void ResourcesByConnectionModel::buildTree() {
 #ifdef Q_OS_LINUX
 void ResourcesByConnectionModel::addDma() {
     dmaItem = new Node({tr("Direct memory access (DMA)"), s::empty()}, hostnameItem);
-    dmaItem->setIcon(s::categoryIcons::other());
+    dmaItem->setIcon(s::categoryIcons::dma());
 
     static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
     for (const auto &line : readProcFile(QStringLiteral("/proc/dma"))) {
@@ -53,7 +53,7 @@ void ResourcesByConnectionModel::addDma() {
             auto name = match.captured(2);
             auto displayText = QStringLiteral("[%1] %2").arg(channel, name);
             auto *node = new Node({displayText, s::empty()}, dmaItem);
-            node->setIcon(s::categoryIcons::other());
+            node->setIcon(s::categoryIcons::dma());
             dmaItem->appendChild(node);
         }
     }
@@ -67,7 +67,8 @@ void ResourcesByConnectionModel::addDma() {
 }
 
 void ResourcesByConnectionModel::parseHierarchicalResource(const QString &filePath,
-                                                           Node *categoryNode) {
+                                                           Node *categoryNode,
+                                                           const QIcon &itemIcon) {
     static const QRegularExpression resourceRe(
         QStringLiteral("^(\\s*)([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
 
@@ -104,7 +105,7 @@ void ResourcesByConnectionModel::parseHierarchicalResource(const QString &filePa
 
         auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
         auto *node = new Node({displayText, s::empty()}, parentNode);
-        node->setIcon(s::categoryIcons::other());
+        node->setIcon(itemIcon);
         parentNode->appendChild(node);
 
         // Push this node as potential parent for more indented entries
@@ -114,9 +115,9 @@ void ResourcesByConnectionModel::parseHierarchicalResource(const QString &filePa
 
 void ResourcesByConnectionModel::addIoPorts() {
     ioItem = new Node({tr("Input/output (IO)"), s::empty()}, hostnameItem);
-    ioItem->setIcon(s::categoryIcons::other());
+    ioItem->setIcon(s::categoryIcons::ioPorts());
 
-    parseHierarchicalResource(QStringLiteral("/proc/ioports"), ioItem);
+    parseHierarchicalResource(QStringLiteral("/proc/ioports"), ioItem, s::categoryIcons::ioPorts());
 
     if (ioItem->childCount() > 0) {
         hostnameItem->appendChild(ioItem);
@@ -128,7 +129,7 @@ void ResourcesByConnectionModel::addIoPorts() {
 
 void ResourcesByConnectionModel::addIrq() {
     irqItem = new Node({tr("Interrupt request (IRQ)"), s::empty()}, hostnameItem);
-    irqItem->setIcon(s::categoryIcons::other());
+    irqItem->setIcon(s::categoryIcons::irq());
 
     auto lines = readProcFile(QStringLiteral("/proc/interrupts"));
     if (!lines.isEmpty()) {
@@ -187,7 +188,7 @@ void ResourcesByConnectionModel::addIrq() {
             displayText = QStringLiteral("%1 %2").arg(irqNum, deviceName);
         }
         auto *node = new Node({displayText, s::empty()}, irqItem);
-        node->setIcon(s::categoryIcons::other());
+        node->setIcon(s::categoryIcons::irq());
         irqItem->appendChild(node);
     }
 
@@ -201,9 +202,9 @@ void ResourcesByConnectionModel::addIrq() {
 
 void ResourcesByConnectionModel::addMemory() {
     memoryItem = new Node({tr("Memory"), s::empty()}, hostnameItem);
-    memoryItem->setIcon(s::categoryIcons::other());
+    memoryItem->setIcon(s::categoryIcons::memory());
 
-    parseHierarchicalResource(QStringLiteral("/proc/iomem"), memoryItem);
+    parseHierarchicalResource(QStringLiteral("/proc/iomem"), memoryItem, s::categoryIcons::memory());
 
     if (memoryItem->childCount() > 0) {
         hostnameItem->appendChild(memoryItem);
@@ -215,7 +216,7 @@ void ResourcesByConnectionModel::addMemory() {
 #endif
 
 int ResourcesByConnectionModel::columnCount([[maybe_unused]] const QModelIndex &parent) const {
-    return ViewSettings::instance().showDriverColumn() ? 2 : 1;
+    return 1;
 }
 
 QVariant

@@ -104,7 +104,7 @@ void DriversByTypeModel::buildTree() {
         const QSet<QString> &drivers = it.value();
 
         auto *categoryNode = new Node({categoryName}, hostnameItem);
-        categoryNode->setIcon(s::categoryIcons::other());
+        categoryNode->setIcon(s::categoryIcons::forCategory(categoryName));
 
         // Sort drivers
         QStringList sortedDrivers = drivers.values();
@@ -112,7 +112,7 @@ void DriversByTypeModel::buildTree() {
 
         for (const QString &driver : sortedDrivers) {
             auto *driverNode = new Node({driver}, categoryNode, NodeType::Label);
-            driverNode->setIcon(s::categoryIcons::other());
+            driverNode->setIcon(s::categoryIcons::forDriver(driver));
             categoryNode->appendChild(driverNode);
         }
 

@@ -82,6 +82,15 @@ QVariant BaseTreeModel::data(const QModelIndex &index, int role) const {
         return decorationData(item, index.column());
     case Qt::DisplayRole:
         return item->data(index.column());
+    case Qt::ToolTipRole:
+        // Show raw name as tooltip if it differs from display name
+        if (index.column() == 0 && !item->rawName().isEmpty()) {
+            QString displayName = item->data(0).toString();
+            if (item->rawName() != displayName) {
+                return item->rawName();
+            }
+        }
+        return {};
     default:
         return {};
     }

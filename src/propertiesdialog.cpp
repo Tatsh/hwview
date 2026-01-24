@@ -377,6 +377,10 @@ void PropertiesDialog::populateGeneralTab() {
         shortNode.startsWith(QStringLiteral("vbox"), Qt::CaseInsensitive)) {
         manufacturer = QStringLiteral("Oracle Corporation");
     }
+    // Intel Corporation devices
+    else if (shortName == QStringLiteral("i8042")) {
+        manufacturer = QStringLiteral("Intel Corporation");
+    }
     // Linux Foundation devices (misc/software devices and input devices)
     else if (shortName == QStringLiteral("autofs") ||
              shortName == QStringLiteral("cpu dma latency") ||
@@ -1071,15 +1075,15 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
         int i2cBus = s::parseI2cBusNumber(devpath);
 
         if (hidId.busType == s::hidBusTypes::BUS_I2C && i2cBus >= 0) {
-            // I2C HID device - include I2C bus number and PCI location if available
+            // I²C HID device - include I²C bus number and PCI location if available
             if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
-                return tr("On I2C bus %1 at PCI bus %2, device %3, function %4")
+                return tr("On I²C bus %1 at PCI bus %2, device %3, function %4")
                     .arg(i2cBus)
                     .arg(pciBus)
                     .arg(pciDevice)
                     .arg(pciFunction);
             }
-            return tr("On I2C bus %1").arg(i2cBus);
+            return tr("On I²C bus %1").arg(i2cBus);
         } else if (hidId.busType == s::hidBusTypes::BUS_USB) {
             // USB HID - check for USB port info
             static const QRegularExpression usbReHid(QStringLiteral("/usb(\\d+)/(\\d+)-([\\d.]+)"));
@@ -1103,17 +1107,17 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
         return tr("On USB bus %1, port %2").arg(usbBus, usbPort);
     }
 
-    // Check for I2C device without HID ID
+    // Check for I²C device without HID ID
     int i2cBus = s::parseI2cBusNumber(devpath);
     if (i2cBus >= 0) {
         if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
-            return tr("On I2C bus %1 at PCI bus %2, device %3, function %4")
+            return tr("On I²C bus %1 at PCI bus %2, device %3, function %4")
                 .arg(i2cBus)
                 .arg(pciBus)
                 .arg(pciDevice)
                 .arg(pciFunction);
         }
-        return tr("On I2C bus %1").arg(i2cBus);
+        return tr("On I²C bus %1").arg(i2cBus);
     }
 
     // Check for SCSI device: host, channel, target, lun
@@ -1773,6 +1777,62 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
             listWidgetDetailsPropertyValue->addItem(value);
         }
     }
+
+#ifndef Q_OS_WIN
+    // For Hardware IDs (MODALIAS), add Windows-style hardware ID if applicable
+    if (propertyKey == QStringLiteral("MODALIAS") && !value.isEmpty()) {
+        // Parse PCI modalias: pci:vXXXXXXXXdXXXXXXXXsvXXXXXXXXsdXXXXXXXXbcXXscXXiXX
+        static const QRegularExpression pciRe(
+            QStringLiteral("^pci:v([0-9A-Fa-f]{8})d([0-9A-Fa-f]{8})"
+                           "sv([0-9A-Fa-f]{8})sd([0-9A-Fa-f]{8})"));
+        auto pciMatch = pciRe.match(value);
+        if (pciMatch.hasMatch()) {
+            QString vendorId = pciMatch.captured(1).right(4).toUpper();
+            QString deviceId = pciMatch.captured(2).right(4).toUpper();
+            QString subVendor = pciMatch.captured(3).right(4).toUpper();
+            QString subDevice = pciMatch.captured(4).right(4).toUpper();
+            QString subsys = subVendor + subDevice;
+            QString winId = QStringLiteral("PCI\\VEN_%1&DEV_%2&SUBSYS_%3")
+                                .arg(vendorId, deviceId, subsys);
+            listWidgetDetailsPropertyValue->addItem(winId);
+        }
+
+        // Parse USB modalias: usb:vXXXXpXXXXdXXXX...
+        static const QRegularExpression usbRe(
+            QStringLiteral("^usb:v([0-9A-Fa-f]{4})p([0-9A-Fa-f]{4})"));
+        auto usbMatch = usbRe.match(value);
+        if (usbMatch.hasMatch()) {
+            QString vendorId = usbMatch.captured(1).toUpper();
+            QString productId = usbMatch.captured(2).toUpper();
+            QString winId =
+                QStringLiteral("USB\\VID_%1&PID_%2").arg(vendorId, productId);
+            listWidgetDetailsPropertyValue->addItem(winId);
+        }
+
+        // Parse ACPI modalias: acpi:PNPXXXX: or acpi:ACPIXXXX:
+        static const QRegularExpression acpiRe(
+            QStringLiteral("^acpi:([A-Za-z0-9]+):"));
+        auto acpiMatch = acpiRe.match(value);
+        if (acpiMatch.hasMatch()) {
+            QString acpiId = acpiMatch.captured(1).toUpper();
+            QString winId = QStringLiteral("ACPI\\%1").arg(acpiId);
+            listWidgetDetailsPropertyValue->addItem(winId);
+        }
+
+        // Parse HID modalias: hid:bXXXXgXXXXvXXXXXXXXpXXXXXXXX
+        static const QRegularExpression hidRe(
+            QStringLiteral("^hid:b([0-9A-Fa-f]{4})g[0-9A-Fa-f]{4}"
+                           "v([0-9A-Fa-f]{8})p([0-9A-Fa-f]{8})"));
+        auto hidMatch = hidRe.match(value);
+        if (hidMatch.hasMatch()) {
+            QString vendorId = hidMatch.captured(2).right(4).toUpper();
+            QString productId = hidMatch.captured(3).right(4).toUpper();
+            QString winId =
+                QStringLiteral("HID\\VID_%1&PID_%2").arg(vendorId, productId);
+            listWidgetDetailsPropertyValue->addItem(winId);
+        }
+    }
+#endif
 }
 
 static void parseEventLine(const QString &event, QString &timestamp, QString &message) {

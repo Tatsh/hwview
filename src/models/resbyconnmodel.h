@@ -32,7 +32,8 @@ private:
     void addIoPorts();
     void addIrq();
     void addMemory();
-    void parseHierarchicalResource(const QString &filePath, Node *categoryNode);
+    void parseHierarchicalResource(const QString &filePath, Node *categoryNode,
+                                    const QIcon &itemIcon);
 #endif
 
     Node *hostnameItem;

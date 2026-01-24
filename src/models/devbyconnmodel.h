@@ -29,7 +29,7 @@ private:
     void buildTree();
     void collectAncestorSyspaths(const QSet<QString> &deviceSyspaths,
                                  QSet<QString> &allSyspaths) const;
-    QString getNodeName(const DeviceInfo &info) const;
+    QString getNodeName(const DeviceInfo &info, QString *rawName = nullptr) const;
 
     Node *hostnameItem;
 };

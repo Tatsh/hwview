@@ -136,6 +136,18 @@ public:
     void setIsHidden(bool hidden);
 
     /**
+     * @brief Returns the raw/original name before nice name conversion.
+     * @returns The raw name, or empty if not set.
+     */
+    QString rawName() const;
+
+    /**
+     * @brief Sets the raw/original name before nice name conversion.
+     * @param name The original name.
+     */
+    void setRawName(const QString &name);
+
+    /**
      * @brief Returns a cached disabled (grayed out) pixmap of the icon.
      * @param size The desired icon size in pixels.
      * @returns The disabled pixmap.
@@ -149,6 +161,7 @@ private:
     QList<Node *> childItems;
     QIcon icon_;
     QString syspath_;
+    QString rawName_;
     bool isHidden_ = false;
     int row_ = 0;
     mutable QPixmap disabledPixmap_;

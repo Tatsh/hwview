@@ -82,6 +82,25 @@ namespace strings {
             QString num = shortName.mid(11);
             return QStringLiteral("Input mouse %1").arg(num);
         }
+        // Handle i2c-N devices
+        if (shortName.startsWith(QStringLiteral("i2c-"))) {
+            QString num = shortName.mid(4);
+            return QStringLiteral("I²C Adapter %1").arg(num);
+        }
+        // Handle SCSI host adapters (hostN)
+        if (shortName.startsWith(QStringLiteral("host"))) {
+            QString num = shortName.mid(4);
+            bool ok = false;
+            num.toInt(&ok);
+            if (ok) {
+                return QStringLiteral("SCSI Host Adapter %1").arg(num);
+            }
+        }
+        // Handle SCSI targets (targetX:Y:Z)
+        if (shortName.startsWith(QStringLiteral("target"))) {
+            QString target = shortName.mid(6);
+            return QStringLiteral("SCSI Target %1").arg(target);
+        }
 
         // Parse HID device names like "PNP0C50:00 06CB:7E7E Mouse"
         static const QRegularExpression hidNameRe(
@@ -110,7 +129,7 @@ namespace strings {
             return niceName;
         }
 
-        return name;
+        return shortName;
     }
 
     /**

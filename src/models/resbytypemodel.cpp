@@ -39,7 +39,7 @@ void ResourcesByTypeModel::buildTree() {
 #ifdef Q_OS_LINUX
 void ResourcesByTypeModel::addDma() {
     dmaItem = new Node({tr("Direct memory access (DMA)"), s::empty()}, hostnameItem);
-    dmaItem->setIcon(s::categoryIcons::other());
+    dmaItem->setIcon(s::categoryIcons::dma());
 
     static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
     for (const auto &line : readProcFile(QStringLiteral("/proc/dma"))) {
@@ -53,7 +53,7 @@ void ResourcesByTypeModel::addDma() {
             auto name = match.captured(2);
             auto displayText = QStringLiteral("[%1] %2").arg(channel, name);
             auto *node = new Node({displayText, s::empty()}, dmaItem);
-            node->setIcon(s::categoryIcons::other());
+            node->setIcon(s::categoryIcons::dma());
             dmaItem->appendChild(node);
         }
     }
@@ -68,7 +68,7 @@ void ResourcesByTypeModel::addDma() {
 
 void ResourcesByTypeModel::addIoPorts() {
     ioItem = new Node({tr("Input/output (IO)"), s::empty()}, hostnameItem);
-    ioItem->setIcon(s::categoryIcons::other());
+    ioItem->setIcon(s::categoryIcons::ioPorts());
 
     static const QRegularExpression ioRe(
         QStringLiteral("^\\s*([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
@@ -89,7 +89,7 @@ void ResourcesByTypeModel::addIoPorts() {
             }
             auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
             auto *node = new Node({displayText, s::empty()}, ioItem);
-            node->setIcon(s::categoryIcons::other());
+            node->setIcon(s::categoryIcons::ioPorts());
             ioItem->appendChild(node);
         }
     }
@@ -104,7 +104,7 @@ void ResourcesByTypeModel::addIoPorts() {
 
 void ResourcesByTypeModel::addIrq() {
     irqItem = new Node({tr("Interrupt request (IRQ)"), s::empty()}, hostnameItem);
-    irqItem->setIcon(s::categoryIcons::other());
+    irqItem->setIcon(s::categoryIcons::irq());
 
     static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
 
@@ -168,7 +168,7 @@ void ResourcesByTypeModel::addIrq() {
             displayText = QStringLiteral("%1 %2").arg(irqNum, deviceName);
         }
         auto *node = new Node({displayText, s::empty()}, irqItem);
-        node->setIcon(s::categoryIcons::other());
+        node->setIcon(s::categoryIcons::irq());
         irqItem->appendChild(node);
     }
 
@@ -182,7 +182,7 @@ void ResourcesByTypeModel::addIrq() {
 
 void ResourcesByTypeModel::addMemory() {
     memoryItem = new Node({tr("Memory"), s::empty()}, hostnameItem);
-    memoryItem->setIcon(s::categoryIcons::other());
+    memoryItem->setIcon(s::categoryIcons::memory());
 
     static const QRegularExpression memRe(
         QStringLiteral("^\\s*([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
@@ -207,7 +207,7 @@ void ResourcesByTypeModel::addMemory() {
             }
             auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
             auto *node = new Node({displayText, s::empty()}, memoryItem);
-            node->setIcon(s::categoryIcons::other());
+            node->setIcon(s::categoryIcons::memory());
             memoryItem->appendChild(node);
         }
     }
@@ -222,7 +222,7 @@ void ResourcesByTypeModel::addMemory() {
 #endif
 
 int ResourcesByTypeModel::columnCount([[maybe_unused]] const QModelIndex &parent) const {
-    return ViewSettings::instance().showDriverColumn() ? 2 : 1;
+    return 1;
 }
 
 QVariant

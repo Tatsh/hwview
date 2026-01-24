@@ -416,7 +416,7 @@ void MainWindow::applyViewSettings() {
     if (showDriverColumn) {
         treeView->header()->setVisible(true);
         treeView->setHeaderHidden(false);
-        // Make Name column stretch to fill space, Driver column interactive with min width
+        // Name column interactive, Driver column with fixed width
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
         treeView->header()->setSectionResizeMode(1, QHeaderView::Interactive);
@@ -425,9 +425,13 @@ void MainWindow::applyViewSettings() {
     } else {
         treeView->header()->setVisible(false);
         treeView->setHeaderHidden(true);
-        // Single column mode - stretch to fill parent width
-        treeView->header()->setStretchLastSection(true);
+        // Single column mode - stretch to fill 100% of parent width
+        treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+        // Hide any additional columns that may exist
+        for (int i = 1; i < treeView->header()->count(); ++i) {
+            treeView->setColumnHidden(i, true);
+        }
     }
 }
 
