@@ -27,12 +27,12 @@
 #include "customizedialog.h"
 #include "devicecache.h"
 #include "mainwindow.h"
-#include "models/node.h"
 #include "models/devbyconnmodel.h"
 #include "models/devbydrivermodel.h"
 #include "models/devbytypemodel.h"
 #include "models/drvbydevmodel.h"
 #include "models/drvbytypemodel.h"
+#include "models/node.h"
 #include "models/resbyconnmodel.h"
 #include "models/resbytypemodel.h"
 #include "propertiesdialog.h"
@@ -448,7 +448,8 @@ QSet<QString> MainWindow::saveExpandedState() const {
     return expandedPaths;
 }
 
-void MainWindow::collectExpandedPaths(const QModelIndex &parent, const QString &parentPath,
+void MainWindow::collectExpandedPaths(const QModelIndex &parent,
+                                      const QString &parentPath,
                                       QSet<QString> &expandedPaths) const {
     auto *model = treeView->model();
     if (!model) {
@@ -481,7 +482,8 @@ void MainWindow::restoreExpandedState(const QSet<QString> &expandedPaths) {
     expandMatchingPaths(QModelIndex(), QString(), expandedPaths);
 }
 
-void MainWindow::expandMatchingPaths(const QModelIndex &parent, const QString &parentPath,
+void MainWindow::expandMatchingPaths(const QModelIndex &parent,
+                                     const QString &parentPath,
                                      const QSet<QString> &expandedPaths) {
     auto *model = treeView->model();
     if (!model) {

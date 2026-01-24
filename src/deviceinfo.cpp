@@ -14,8 +14,8 @@
 #include <IOKit/storage/IOMedia.h>
 #include <IOKit/usb/IOUSBLib.h>
 #elif defined(Q_OS_WIN)
-#include "setupapi/setupapimanager.h"
 #include "setupapi/devclass_guids.h"
+#include "setupapi/setupapimanager.h"
 #endif
 
 namespace s = strings;
@@ -264,7 +264,8 @@ void DeviceInfo::calculateCategory() {
     if (category_ == DeviceCategory::Unknown && !deviceClassName_.isEmpty()) {
         if (deviceClassName_.compare(QStringLiteral("USB"), Qt::CaseInsensitive) == 0) {
             category_ = DeviceCategory::UniversalSerialBusControllers;
-        } else if (deviceClassName_.compare(QStringLiteral("DiskDrive"), Qt::CaseInsensitive) == 0) {
+        } else if (deviceClassName_.compare(QStringLiteral("DiskDrive"), Qt::CaseInsensitive) ==
+                   0) {
             category_ = DeviceCategory::DiskDrives;
         } else if (deviceClassName_.compare(QStringLiteral("Display"), Qt::CaseInsensitive) == 0) {
             category_ = DeviceCategory::DisplayAdapters;

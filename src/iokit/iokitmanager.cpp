@@ -33,8 +33,8 @@ QString IOKitManager::cfStringToQString(CFStringRef cfStr) {
 
 CFMutableDictionaryRef IOKitManager::getAllProperties(io_service_t service) {
     CFMutableDictionaryRef properties = nullptr;
-    kern_return_t result = IORegistryEntryCreateCFProperties(service, &properties,
-                                                             kCFAllocatorDefault, 0);
+    kern_return_t result =
+        IORegistryEntryCreateCFProperties(service, &properties, kCFAllocatorDefault, 0);
     if (result != KERN_SUCCESS) {
         return nullptr;
     }
@@ -115,9 +115,8 @@ QString IOKitManager::getMatchedDriver(io_service_t service) {
     QString driver = getStringProperty(service, CFSTR("IOMatchedPersonality"));
     if (driver.isEmpty()) {
         // Try CFBundleIdentifier from the matched personality
-        CFTypeRef personality =
-            IORegistryEntryCreateCFProperty(service, CFSTR("IOMatchedPersonality"),
-                                            kCFAllocatorDefault, 0);
+        CFTypeRef personality = IORegistryEntryCreateCFProperty(
+            service, CFSTR("IOMatchedPersonality"), kCFAllocatorDefault, 0);
         if (personality && CFGetTypeID(personality) == CFDictionaryGetTypeID()) {
             auto dict = static_cast<CFDictionaryRef>(personality);
             CFStringRef bundleId =

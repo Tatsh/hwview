@@ -16,6 +16,7 @@ add_executable(
   devmgmt.qrc
   main.cpp
   mainwindow.cpp
+  namemappings.cpp
   propertiesdialog.cpp
   viewsettings.cpp)
 
@@ -51,3 +52,9 @@ if(DEVMGMT_USE_KDE)
   include(KDEInstallDirs)
   install(FILES devmgmtui.rc DESTINATION ${KDE_INSTALL_KXMLGUIDIR}/devmgmt)
 endif()
+
+# Install data files
+include(GNUInstallDirs)
+install(
+  FILES ${CMAKE_SOURCE_DIR}/data/name-mappings.json
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/devmgmt)

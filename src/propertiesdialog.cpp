@@ -55,8 +55,8 @@ namespace {
     }
 } // namespace
 #elif defined(Q_OS_WIN)
-#include <windows.h>
 #include <versionhelpers.h>
+#include <windows.h>
 #endif
 
 namespace props = strings::udev::propertyNames;
@@ -614,18 +614,24 @@ void PropertiesDialog::populateDriverTab() {
         // The driver key points to the registry location
         // Format: {GUID}\NNNN
         if (!driver.isEmpty()) {
-            QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+            QString driverKeyPath =
+                QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
             HKEY hKey;
             std::wstring keyPath = driverKeyPath.toStdWString();
 
-            if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, keyPath.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+            if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, keyPath.c_str(), 0, KEY_READ, &hKey) ==
+                ERROR_SUCCESS) {
                 wchar_t value[256];
                 DWORD valueSize = sizeof(value);
                 DWORD type;
 
                 // Get provider name
-                if (RegQueryValueExW(hKey, L"ProviderName", nullptr, &type,
-                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                if (RegQueryValueExW(hKey,
+                                     L"ProviderName",
+                                     nullptr,
+                                     &type,
+                                     reinterpret_cast<LPBYTE>(value),
+                                     &valueSize) == ERROR_SUCCESS) {
                     if (type == REG_SZ) {
                         driverProvider = QString::fromWCharArray(value);
                         hasDriverDetails = true;
@@ -634,8 +640,12 @@ void PropertiesDialog::populateDriverTab() {
 
                 // Get driver version
                 valueSize = sizeof(value);
-                if (RegQueryValueExW(hKey, L"DriverVersion", nullptr, &type,
-                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                if (RegQueryValueExW(hKey,
+                                     L"DriverVersion",
+                                     nullptr,
+                                     &type,
+                                     reinterpret_cast<LPBYTE>(value),
+                                     &valueSize) == ERROR_SUCCESS) {
                     if (type == REG_SZ) {
                         driverVersion = QString::fromWCharArray(value);
                     }
@@ -643,8 +653,12 @@ void PropertiesDialog::populateDriverTab() {
 
                 // Get driver date
                 valueSize = sizeof(value);
-                if (RegQueryValueExW(hKey, L"DriverDate", nullptr, &type,
-                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                if (RegQueryValueExW(hKey,
+                                     L"DriverDate",
+                                     nullptr,
+                                     &type,
+                                     reinterpret_cast<LPBYTE>(value),
+                                     &valueSize) == ERROR_SUCCESS) {
                     if (type == REG_SZ) {
                         labelDriverDateValue->setText(QString::fromWCharArray(value));
                     }
@@ -652,8 +666,12 @@ void PropertiesDialog::populateDriverTab() {
 
                 // Get digital signer (InfPath can give clues about signing)
                 valueSize = sizeof(value);
-                if (RegQueryValueExW(hKey, L"InfPath", nullptr, &type,
-                                     reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+                if (RegQueryValueExW(hKey,
+                                     L"InfPath",
+                                     nullptr,
+                                     &type,
+                                     reinterpret_cast<LPBYTE>(value),
+                                     &valueSize) == ERROR_SUCCESS) {
                     if (type == REG_SZ) {
                         QString infPath = QString::fromWCharArray(value);
                         // If it's in the Windows\INF folder, it's likely Microsoft signed
@@ -774,11 +792,18 @@ QString PropertiesDialog::getKernelBuildDate() {
             int day = match.captured(3).toInt();
             int year = match.captured(7).toInt();
 
-            static const QStringList months = {
-                QStringLiteral("Jan"), QStringLiteral("Feb"), QStringLiteral("Mar"),
-                QStringLiteral("Apr"), QStringLiteral("May"), QStringLiteral("Jun"),
-                QStringLiteral("Jul"), QStringLiteral("Aug"), QStringLiteral("Sep"),
-                QStringLiteral("Oct"), QStringLiteral("Nov"), QStringLiteral("Dec")};
+            static const QStringList months = {QStringLiteral("Jan"),
+                                               QStringLiteral("Feb"),
+                                               QStringLiteral("Mar"),
+                                               QStringLiteral("Apr"),
+                                               QStringLiteral("May"),
+                                               QStringLiteral("Jun"),
+                                               QStringLiteral("Jul"),
+                                               QStringLiteral("Aug"),
+                                               QStringLiteral("Sep"),
+                                               QStringLiteral("Oct"),
+                                               QStringLiteral("Nov"),
+                                               QStringLiteral("Dec")};
             int month = months.indexOf(monthStr) + 1;
 
             if (month > 0) {
@@ -805,8 +830,8 @@ QString PropertiesDialog::getKernelVersion() {
     typedef NTSTATUS(WINAPI * RtlGetVersionFunc)(PRTL_OSVERSIONINFOW);
     HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
     if (ntdll) {
-        auto rtlGetVersion = reinterpret_cast<RtlGetVersionFunc>(
-            GetProcAddress(ntdll, "RtlGetVersion"));
+        auto rtlGetVersion =
+            reinterpret_cast<RtlGetVersionFunc>(GetProcAddress(ntdll, "RtlGetVersion"));
         if (rtlGetVersion) {
             rtlGetVersion(reinterpret_cast<PRTL_OSVERSIONINFOW>(&osvi));
             return QStringLiteral("%1.%2.%3")
@@ -825,11 +850,17 @@ QString PropertiesDialog::getKernelBuildDate() {
     HKEY hKey;
     if (RegOpenKeyExW(HKEY_LOCAL_MACHINE,
                       L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion",
-                      0, KEY_READ, &hKey) == ERROR_SUCCESS) {
+                      0,
+                      KEY_READ,
+                      &hKey) == ERROR_SUCCESS) {
         DWORD installDate = 0;
         DWORD size = sizeof(installDate);
-        if (RegQueryValueExW(hKey, L"InstallDate", nullptr, nullptr,
-                             reinterpret_cast<LPBYTE>(&installDate), &size) == ERROR_SUCCESS) {
+        if (RegQueryValueExW(hKey,
+                             L"InstallDate",
+                             nullptr,
+                             nullptr,
+                             reinterpret_cast<LPBYTE>(&installDate),
+                             &size) == ERROR_SUCCESS) {
             RegCloseKey(hKey);
             // InstallDate is a Unix timestamp
             QDateTime dt = QDateTime::fromSecsSinceEpoch(installDate);
@@ -1097,7 +1128,8 @@ QString PropertiesDialog::translateLocation(const QString &devpath) {
     }
 
     // Check for ACPI device - extract the PNP ID for more specific info
-    static const QRegularExpression acpiPnpRe(QStringLiteral("/(PNP[0-9A-Fa-f]{4}|LNX[A-Z]+|ACPI[0-9A-Fa-f]{4}):([0-9]+)"));
+    static const QRegularExpression acpiPnpRe(
+        QStringLiteral("/(PNP[0-9A-Fa-f]{4}|LNX[A-Z]+|ACPI[0-9A-Fa-f]{4}):([0-9]+)"));
     auto acpiMatch = acpiPnpRe.match(devpath);
     if (acpiMatch.hasMatch()) {
         QString pnpId = acpiMatch.captured(1);
@@ -1638,13 +1670,14 @@ QString PropertiesDialog::getMountPoint() {
         }
 
         // Get the mount points for this volume
-        volumeName[len - 1] = L'\\';  // Restore backslash
+        volumeName[len - 1] = L'\\'; // Restore backslash
         if (GetVolumePathNamesForVolumeNameW(volumeName, pathNames, charCount, &charCount)) {
             // pathNames is a multi-string
             if (pathNames[0] != L'\0') {
                 result = QString::fromWCharArray(pathNames);
                 // Check if this matches our device (simplified check)
-                if (syspath.contains(QString::fromWCharArray(volumeName).mid(10, 38), Qt::CaseInsensitive)) {
+                if (syspath.contains(QString::fromWCharArray(volumeName).mid(10, 38),
+                                     Qt::CaseInsensitive)) {
                     FindVolumeClose(findHandle);
                     return result;
                 }
@@ -1759,7 +1792,8 @@ static void parseEventLine(const QString &event, QString &timestamp, QString &me
         QString remainder = event.mid(match.capturedEnd());
 
         // Parse timestamp
-        QDateTime dateTime = QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
+        QDateTime dateTime =
+            QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss.zzz"));
         if (dateTime.isValid()) {
             timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
         } else {
@@ -1788,7 +1822,8 @@ static void parseEventLine(const QString &event, QString &timestamp, QString &me
 
     if (match.hasMatch()) {
         QString dateTimeStr = match.captured(1);
-        QDateTime dateTime = QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss"));
+        QDateTime dateTime =
+            QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss"));
         if (dateTime.isValid()) {
             timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
         } else {
@@ -1925,13 +1960,12 @@ void PropertiesDialog::populateEventsTab() {
             // macOS: Use 'log show' to query system logs
             QProcess logShow;
             QStringList args;
-            args << QStringLiteral("show")
-                 << QStringLiteral("--predicate")
+            args << QStringLiteral("show") << QStringLiteral("--predicate")
                  << QStringLiteral("subsystem == 'com.apple.iokit' OR "
                                    "subsystem == 'com.apple.kernel' OR "
                                    "category == 'IOKit'")
-                 << QStringLiteral("--last") << QStringLiteral("1h")
-                 << QStringLiteral("--style") << QStringLiteral("compact");
+                 << QStringLiteral("--last") << QStringLiteral("1h") << QStringLiteral("--style")
+                 << QStringLiteral("compact");
 
             logShow.start(QStringLiteral("log"), args);
             if (logShow.waitForFinished(10000)) {
@@ -1960,10 +1994,8 @@ void PropertiesDialog::populateEventsTab() {
             QProcess wevtutil;
             QStringList args;
             // Query System log for device-related events
-            args << QStringLiteral("qe") << QStringLiteral("System")
-                 << QStringLiteral("/c:100")
-                 << QStringLiteral("/rd:true")
-                 << QStringLiteral("/f:text");
+            args << QStringLiteral("qe") << QStringLiteral("System") << QStringLiteral("/c:100")
+                 << QStringLiteral("/rd:true") << QStringLiteral("/f:text");
 
             wevtutil.start(QStringLiteral("wevtutil"), args);
             if (wevtutil.waitForFinished(10000)) {
