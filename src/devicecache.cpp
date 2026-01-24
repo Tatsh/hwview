@@ -8,6 +8,10 @@
 #ifdef Q_OS_LINUX
 #include "udev/udevmonitor.h"
 #include <libudev.h>
+#elif defined(Q_OS_MACOS)
+#include "iokit/iokitmonitor.h"
+#elif defined(Q_OS_WIN)
+#include "setupapi/setupapimonitor.h"
 #endif
 
 DeviceCache &DeviceCache::instance() {
@@ -103,10 +107,15 @@ void DeviceCache::setShowHiddenDevices(bool show) {
 void DeviceCache::startMonitoring() {
 #ifdef Q_OS_LINUX
     monitor_ = new UdevMonitor(manager_.context(), this);
-    connect(monitor_, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
-    monitor_->start();
+#elif defined(Q_OS_MACOS)
+    monitor_ = new IOKitMonitor(this);
+#elif defined(Q_OS_WIN)
+    monitor_ = new SetupApiMonitor(this);
 #endif
-    // Other platforms don't have monitoring support yet
+    if (monitor_) {
+        connect(monitor_, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
+        monitor_->start();
+    }
 }
 
 void DeviceCache::onDeviceChanged() {

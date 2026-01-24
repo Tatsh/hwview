@@ -29,7 +29,7 @@ QT_END_NAMESPACE
  *
  * Key features:
  * - Multiple device view modes
- * - Automatic refresh on device changes (Linux)
+ * - Automatic refresh on device changes (Linux, macOS, Windows)
  * - Tree state preservation during refresh
  * - Device properties dialog
  * - Hardware scan functionality

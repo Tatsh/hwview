@@ -2,6 +2,26 @@
 
 #include <QObject>
 
+#include <expected>
+
+/**
+ * @brief Error codes for device monitor operations.
+ */
+enum class DeviceMonitorError {
+    None,                        ///< No error
+    NotificationPortFailed,      ///< Failed to create notification port (macOS)
+    RunLoopSourceFailed,         ///< Failed to get run loop source (macOS)
+    MatchingDictionaryFailed,    ///< Failed to create matching dictionary (macOS)
+    AddNotificationFailed,       ///< Failed to register for add notifications (macOS)
+    RemoveNotificationFailed,    ///< Failed to register for remove notifications (macOS)
+    MonitorCreationFailed,       ///< Failed to create udev monitor (Linux)
+    MonitorEnableFailed,         ///< Failed to enable udev monitor receiving (Linux)
+    FileDescriptorFailed,        ///< Failed to get file descriptor (Linux)
+    WindowClassRegisterFailed,   ///< Failed to register window class (Windows)
+    WindowCreationFailed,        ///< Failed to create message window (Windows)
+    DeviceNotificationFailed,    ///< Failed to register device notification (Windows)
+};
+
 /**
  * @brief Abstract interface for platform-specific device monitoring.
  *
@@ -26,9 +46,9 @@ public:
 
     /**
      * @brief Starts monitoring for device events.
-     * @returns @c true if monitoring was started successfully, @c false otherwise.
+     * @returns @c std::expected<void, DeviceMonitorError> with the error code on failure.
      */
-    virtual bool start() = 0;
+    virtual std::expected<void, DeviceMonitorError> start() = 0;
 
     /**
      * @brief Stops monitoring for device events.

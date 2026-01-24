@@ -9,7 +9,7 @@ class QSocketNotifier;
 QT_END_NAMESPACE
 
 /**
- * @brief Monitors dev events for device add/remove notifications.
+ * @brief Monitors udev events for device add/remove notifications.
  *
  * This class uses the udev netlink interface to receive device events from the kernel. It
  * integrates with Qt's event loop using @c QSocketNotifier for non-blocking operation.
@@ -18,7 +18,9 @@ QT_END_NAMESPACE
  * @code
  * UdevMonitor monitor(udevContext);
  * connect(&monitor, &UdevMonitor::deviceChanged, this, &MyClass::onDeviceChanged);
- * monitor.start();
+ * if (auto result = monitor.start(); !result) {
+ *     // Handle error
+ * }
  * @endcode
  */
 class UdevMonitor : public DeviceMonitor {
@@ -27,7 +29,7 @@ class UdevMonitor : public DeviceMonitor {
 public:
     /**
      * @brief Constructs a @c UdevMonitor.
-     * @param ctx The @c udev context to use for monitoring. Must remain valid for the lifetime of
+     * @param ctx The udev context to use for monitoring. Must remain valid for the lifetime of
      *            this object.
      * @param parent Optional parent @c QObject for memory management.
      */
@@ -40,9 +42,9 @@ public:
      * Creates a udev monitor, enables receiving, and sets up a @c QSocketNotifier to watch the
      * monitor's file descriptor.
      *
-     * @returns @c true if monitoring was started successfully, @c false otherwise.
+     * @returns @c std::expected<void, DeviceMonitorError> with the error code on failure.
      */
-    bool start() override;
+    std::expected<void, DeviceMonitorError> start() override;
 
     /**
      * @brief Stops monitoring for device events.

@@ -9,22 +9,22 @@ UdevMonitor::~UdevMonitor() {
     stop();
 }
 
-bool UdevMonitor::start() {
+std::expected<void, DeviceMonitorError> UdevMonitor::start() {
     if (running_) {
-        return true;
+        return {};
     }
 
     // Create a udev monitor for kernel events
     monitor_ = udev_monitor_new_from_netlink(ctx_, "udev");
     if (!monitor_) {
-        return false;
+        return std::unexpected(DeviceMonitorError::MonitorCreationFailed);
     }
 
     // Enable receiving of events
     if (udev_monitor_enable_receiving(monitor_) < 0) {
         udev_monitor_unref(monitor_);
         monitor_ = nullptr;
-        return false;
+        return std::unexpected(DeviceMonitorError::MonitorEnableFailed);
     }
 
     // Get the file descriptor for the monitor
@@ -32,7 +32,7 @@ bool UdevMonitor::start() {
     if (fd < 0) {
         udev_monitor_unref(monitor_);
         monitor_ = nullptr;
-        return false;
+        return std::unexpected(DeviceMonitorError::FileDescriptorFailed);
     }
 
     // Create a socket notifier to watch the file descriptor
@@ -40,7 +40,7 @@ bool UdevMonitor::start() {
     connect(notifier_, &QSocketNotifier::activated, this, &UdevMonitor::onUdevEvent);
 
     running_ = true;
-    return true;
+    return {};
 }
 
 void UdevMonitor::stop() {
