@@ -6,13 +6,16 @@
 /**
  * @brief Manages device name mappings loaded from JSON files.
  *
- * This singleton class loads name mappings from JSON files in standard locations. Mappings are
+ * This singleton class loads name mappings from JSON files from multiple locations. Mappings are
  * loaded in the following order, with later files overriding earlier ones at the key level:
  *
- * 1. System default file (@c name-mappings.json or @c name-mappings.en-US.json)
- * 2. System locale-specific file (@c name-mappings.{locale}.json)
- * 3. User default file
- * 4. User locale-specific file
+ * 1. Adjacent @c data/ directory (relative to executable, for development/portable use)
+ * 2. System locations (@c /usr/share/devmgmt, etc.)
+ * 3. User location (@c ~/.local/share/devmgmt, etc.)
+ *
+ * Within each location, files are loaded in this order:
+ * - Default file (@c name-mappings.json or @c name-mappings.en-US.json)
+ * - Locale-specific file (@c name-mappings.{locale}.json)
  *
  * Locale-specific files only need to define the keys they want to override. Keys not present in
  * locale-specific files retain their values from the default file.

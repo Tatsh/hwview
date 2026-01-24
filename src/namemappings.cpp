@@ -33,6 +33,14 @@ void NameMappings::reload() {
 
     QString locale = systemLocale();
 
+    // Load from data/ directory adjacent to the executable first (lowest priority)
+    // This allows running the application without installation during development
+    QString appDir = QCoreApplication::applicationDirPath();
+    loadFromDirectory(appDir + QStringLiteral("/data"), locale);
+    // Also check parent directory (for when binary is in build/src/)
+    loadFromDirectory(appDir + QStringLiteral("/../data"), locale);
+    loadFromDirectory(appDir + QStringLiteral("/../../data"), locale);
+
     // Get standard data locations
     // On Linux: /usr/share, /usr/local/share, etc.
     // On Windows: C:/ProgramData, etc.
@@ -40,7 +48,7 @@ void NameMappings::reload() {
     QStringList systemPaths =
         QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 
-    // Load from system locations first (in reverse order so higher priority paths override)
+    // Load from system locations (in reverse order so higher priority paths override)
     for (auto i = systemPaths.size() - 1; i >= 0; --i) {
         QString dirPath = systemPaths.at(i) + QStringLiteral("/devmgmt");
         loadFromDirectory(dirPath, locale);

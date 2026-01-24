@@ -81,7 +81,7 @@
         "Metadot_-_Das_Keyboard_Das_Keyboard": "Das Keyboard"
     },
     "acpi-device": {
-        "PNP0C0A": "Microsoft ACPI-Compliant Control Method Battery",
+        "PNP0C0A": "ACPI-Compliant Control Method Battery",
         "PNP0C0D": "ACPI Lid",
         "PNP0C0E": "ACPI Sleep Button",
         "PNP0C0F": "ACPI PCI Interrupt Link",
@@ -99,6 +99,6 @@
         "LNXSYBUS": "ACPI System Bus",
         "LNXCPU": "ACPI Processor",
         "LNXTHERM": "ACPI Thermal Zone",
-        "ACPI0003": "Microsoft AC Adapter"
+        "ACPI0003": "AC Adapter"
     }
 }
