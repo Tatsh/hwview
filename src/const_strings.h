@@ -199,13 +199,13 @@ namespace strings {
      * @returns A user-friendly name for the ACPI device.
      */
     inline QString acpiDeviceNiceName(const QString &devPath, const QString &fallbackName) {
-        int lastSlash = devPath.lastIndexOf(QLatin1Char('/'));
+        auto lastSlash = devPath.lastIndexOf(QLatin1Char('/'));
         if (lastSlash < 0) {
             return fallbackName;
         }
         QString lastComponent = devPath.mid(lastSlash + 1);
 
-        int colonPos = lastComponent.indexOf(QLatin1Char(':'));
+        auto colonPos = lastComponent.indexOf(QLatin1Char(':'));
         QString pnpId = colonPos > 0 ? lastComponent.left(colonPos) : lastComponent;
 
         // Look up in JSON mappings

@@ -488,7 +488,7 @@ void PropertiesDialog::populateDriverTab() {
                 QString signer;
 
                 for (const QString &line : lines) {
-                    int colonIdx = line.indexOf(QLatin1Char(':'));
+                    auto colonIdx = line.indexOf(QLatin1Char(':'));
                     if (colonIdx < 0)
                         continue;
 
@@ -755,7 +755,7 @@ QString PropertiesDialog::getKernelBuildDate() {
                                                QStringLiteral("Oct"),
                                                QStringLiteral("Nov"),
                                                QStringLiteral("Dec")};
-            int month = months.indexOf(monthStr) + 1;
+            int month = static_cast<int>(months.indexOf(monthStr)) + 1;
 
             if (month > 0) {
                 QDate date(year, month, day);
@@ -804,7 +804,7 @@ QString PropertiesDialog::getKernelBuildDate() {
                                                QStringLiteral("Oct"),
                                                QStringLiteral("Nov"),
                                                QStringLiteral("Dec")};
-            int month = months.indexOf(monthStr) + 1;
+            int month = static_cast<int>(months.indexOf(monthStr)) + 1;
 
             if (month > 0) {
                 QDate date(year, month, day);
@@ -1863,11 +1863,11 @@ static void parseEventLine(const QString &event, QString &timestamp, QString &me
         }
 
         // Extract message after "kernel:" or similar
-        int kernelIdx = remainder.indexOf(QStringLiteral("kernel:"));
+        auto kernelIdx = remainder.indexOf(QStringLiteral("kernel:"));
         if (kernelIdx != -1) {
             message = remainder.mid(kernelIdx + 7).trimmed();
         } else {
-            int colonIdx = remainder.indexOf(QStringLiteral(": "));
+            auto colonIdx = remainder.indexOf(QStringLiteral(": "));
             if (colonIdx != -1) {
                 message = remainder.mid(colonIdx + 2).trimmed();
             } else {
@@ -1926,7 +1926,7 @@ void PropertiesDialog::populateEventsTab() {
             // Use a significant part of the device name if available (at least 8 chars)
             if (!deviceName.isEmpty() && deviceName.length() >= 8) {
                 QString nameSearch = deviceName.left(20).trimmed();
-                int lastSpace = nameSearch.lastIndexOf(QLatin1Char(' '));
+                auto lastSpace = nameSearch.lastIndexOf(QLatin1Char(' '));
                 if (lastSpace > 8) {
                     nameSearch = nameSearch.left(lastSpace);
                 }
@@ -2069,8 +2069,8 @@ void PropertiesDialog::onEventsLoaded() {
     }
 
     // Show only first 5 events in the table
-    int displayCount = qMin(5, allEvents_.size());
-    for (int i = 0; i < displayCount; ++i) {
+    auto displayCount = qMin(qsizetype{5}, allEvents_.size());
+    for (decltype(displayCount) i = 0; i < displayCount; ++i) {
         QString timestamp, message;
         parseEventLine(allEvents_.at(i), timestamp, message);
 
@@ -2094,7 +2094,7 @@ void PropertiesDialog::onEventsLoaded() {
 
 void PropertiesDialog::onEventSelectionChanged(const QModelIndex &current,
                                                const QModelIndex &previous) {
-    Q_UNUSED(previous);
+    Q_UNUSED(previous)
 
     if (!current.isValid()) {
         textEditEventsInfo->clear();

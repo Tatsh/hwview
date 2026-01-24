@@ -11,7 +11,7 @@ Node::~Node() {
 }
 
 void Node::appendChild(Node *item) {
-    item->row_ = childItems.size();
+    item->row_ = static_cast<int>(childItems.size());
     childItems.append(item);
 }
 
@@ -23,11 +23,11 @@ Node *Node::child(int row) {
 }
 
 int Node::childCount() const {
-    return childItems.count();
+    return static_cast<int>(childItems.count());
 }
 
 int Node::columnCount() const {
-    return itemData.count();
+    return static_cast<int>(itemData.count());
 }
 
 QVariant Node::data(int column) const {

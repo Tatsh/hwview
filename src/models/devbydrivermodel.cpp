@@ -67,7 +67,7 @@ void DevicesByDriverModel::buildTree() {
             if (name.isEmpty()) {
                 // Fall back to syspath basename
                 const QString &syspath = info.syspath();
-                int lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
+                auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
                 if (lastSlash >= 0) {
                     name = syspath.mid(lastSlash + 1);
                 } else {

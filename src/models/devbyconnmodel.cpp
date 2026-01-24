@@ -21,7 +21,7 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info) const {
     if (name.isEmpty()) {
         // Fall back to subsystem:syspath basename
         QString syspath = info.syspath();
-        int lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
+        auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
         if (lastSlash >= 0) {
             name = syspath.mid(lastSlash + 1);
         } else {
@@ -44,7 +44,7 @@ void DevicesByConnectionModel::collectAncestorSyspaths(const QSet<QString> &devi
         // Walk up the syspath to add ancestors
         QString current = syspath;
         while (true) {
-            int lastSlash = current.lastIndexOf(QLatin1Char('/'));
+            auto lastSlash = current.lastIndexOf(QLatin1Char('/'));
             if (lastSlash <= 0) {
                 break;
             }

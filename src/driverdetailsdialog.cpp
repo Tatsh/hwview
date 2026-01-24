@@ -205,7 +205,7 @@ void DriverDetailsDialog::onFileSelectionChanged() {
 void DriverDetailsDialog::updateFileDetails(const QString &modulePath) {
     // Extract module name from path
     QString moduleName = modulePath;
-    int lastSlash = moduleName.lastIndexOf(QLatin1Char('/'));
+    auto lastSlash = moduleName.lastIndexOf(QLatin1Char('/'));
     if (lastSlash >= 0) {
         moduleName = moduleName.mid(lastSlash + 1);
     }
@@ -272,7 +272,7 @@ DriverDetailsDialog::ModuleInfo DriverDetailsDialog::getModuleInfo(const QString
     QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
 
     for (const QString &line : lines) {
-        int colonIdx = line.indexOf(QLatin1Char(':'));
+        auto colonIdx = line.indexOf(QLatin1Char(':'));
         if (colonIdx < 0)
             continue;
 

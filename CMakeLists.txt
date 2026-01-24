@@ -67,12 +67,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       -Weverything
       -Wno-c++98-compat
       -Wno-c++98-compat-pedantic
+      -Wno-covered-switch-default # Conflicts with -Wswitch-default
+      -Wno-ctad-maybe-unsupported # Qt moc uses CTAD without deduction guides
       -Wno-deprecated-copy-with-user-provided-dtor
       -Wno-exit-time-destructors
       -Wno-global-constructors
       -Wno-inconsistent-missing-destructor-override
+      -Wno-nrvo # Conflicts with -Wpessimizing-move in some cases
       -Wno-padded
-      -Wno-redundant-parens)
+      -Wno-redundant-parens
+      -Wno-unsafe-buffer-usage # Qt moc uses strcmp
+      -Wno-unsafe-buffer-usage-in-libc-call) # Qt moc uses strcmp
   endif()
 endif()
 

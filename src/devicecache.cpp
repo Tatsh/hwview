@@ -48,7 +48,7 @@ void DeviceCache::enumerate() {
     udev_list_entry_foreach(listEntry, udev_enumerate_get_list_entry(enumerator)) {
         auto *syspath = udev_list_entry_get_name(listEntry);
         devices_.emplaceBack(manager_.context(), syspath);
-        syspathIndex_.insert(devices_.last().syspath(), devices_.size() - 1);
+        syspathIndex_.insert(devices_.last().syspath(), static_cast<int>(devices_.size() - 1));
     }
     udev_enumerate_unref(enumerator);
 #elif defined(Q_OS_MACOS)
@@ -56,7 +56,7 @@ void DeviceCache::enumerate() {
         devices_.emplaceBack(service);
         const QString &syspath = devices_.last().syspath();
         if (!syspath.isEmpty()) {
-            syspathIndex_.insert(syspath, devices_.size() - 1);
+            syspathIndex_.insert(syspath, static_cast<int>(devices_.size() - 1));
         }
     });
 #elif defined(Q_OS_WIN)
@@ -64,7 +64,7 @@ void DeviceCache::enumerate() {
         devices_.emplaceBack(devInfo, devInfoData);
         const QString &syspath = devices_.last().syspath();
         if (!syspath.isEmpty()) {
-            syspathIndex_.insert(syspath, devices_.size() - 1);
+            syspathIndex_.insert(syspath, static_cast<int>(devices_.size() - 1));
         }
     });
 #endif

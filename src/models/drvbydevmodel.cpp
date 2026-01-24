@@ -59,7 +59,7 @@ void DriversByDeviceModel::buildTree() {
             QString name = info.name();
             if (name.isEmpty()) {
                 const QString &syspath = info.syspath();
-                int lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
+                auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
                 if (lastSlash >= 0) {
                     name = syspath.mid(lastSlash + 1);
                 } else {
