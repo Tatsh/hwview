@@ -1,10 +1,12 @@
 add_subdirectory(backends)
 add_subdirectory(models)
+add_subdirectory(viewer)
 
 add_executable(
   devmgmt
   customizedialog.cpp
   devicecache.cpp
+  deviceexport.cpp
   deviceinfo.cpp
   devicemonitor.cpp
   driverdetailsdialog.cpp

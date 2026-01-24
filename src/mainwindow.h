@@ -62,6 +62,7 @@ private Q_SLOTS:
     void showCustomizeDialog();
     void applyViewSettings();
     void openPropertiesForIndex(const QModelIndex &index);
+    void exportDeviceData();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

@@ -1,6 +1,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QDesktopServices>
+#include <QFileDialog>
 #include <QHeaderView>
 #include <QIcon>
 #include <QKeyEvent>
@@ -10,6 +11,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QProgressDialog>
+#include <QStandardPaths>
 #include <QUrl>
 #include <QWhatsThis>
 #include <QtConcurrent>
@@ -26,6 +28,7 @@
 
 #include "customizedialog.h"
 #include "devicecache.h"
+#include "deviceexport.h"
 #include "mainwindow.h"
 #include "models/devbyconnmodel.h"
 #include "models/devbydrivermodel.h"
@@ -103,6 +106,9 @@ MainWindow::MainWindow() {
 
     // Apply initial view settings
     applyViewSettings();
+
+    // Export action
+    connect(actionExport, &QAction::triggered, this, &MainWindow::exportDeviceData);
 
 #ifdef DEVMGMT_USE_KDE
     // For KDE, register actions before setupGUI()
@@ -406,6 +412,61 @@ void MainWindow::showCustomizeDialog() {
     }
 }
 
+void MainWindow::exportDeviceData() {
+    // Generate default filename with hostname and timestamp
+    QString defaultName = QStringLiteral("%1_%2%3")
+                              .arg(DeviceCache::hostname())
+                              .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_HHmmss")))
+                              .arg(QLatin1String(DeviceExport::FILE_EXTENSION));
+
+    QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString defaultPath = defaultDir + QLatin1Char('/') + defaultName;
+
+    QString filePath = QFileDialog::getSaveFileName(
+        this,
+        tr("Export Device Data"),
+        defaultPath,
+        tr("Device Manager Export (*%1);;All Files (*)").arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
+
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    // Ensure the file has the correct extension
+    if (!filePath.endsWith(QLatin1String(DeviceExport::FILE_EXTENSION), Qt::CaseInsensitive)) {
+        filePath += QLatin1String(DeviceExport::FILE_EXTENSION);
+    }
+
+    // Show progress dialog
+    auto *progressDialog = new QProgressDialog(tr("Exporting device data..."), QString(), 0, 0, this);
+    progressDialog->setWindowTitle(tr("Device Manager"));
+    progressDialog->setWindowModality(Qt::WindowModal);
+    progressDialog->setCancelButton(nullptr);
+    progressDialog->setMinimumDuration(0);
+    progressDialog->show();
+
+    // Run export in background thread
+    auto *watcher = new QFutureWatcher<bool>(this);
+    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, progressDialog, filePath]() {
+        progressDialog->close();
+        progressDialog->deleteLater();
+
+        bool success = watcher->result();
+        watcher->deleteLater();
+
+        if (!success) {
+            QMessageBox::warning(this,
+                                 tr("Export Failed"),
+                                 tr("Failed to export device data to:\n%1").arg(filePath));
+        }
+    });
+
+    auto future = QtConcurrent::run([filePath]() {
+        return DeviceExport::exportToFile(filePath);
+    });
+    watcher->setFuture(future);
+}
+
 void MainWindow::applyViewSettings() {
     auto &settings = ViewSettings::instance();
 
@@ -535,9 +596,23 @@ void MainWindow::setupActions() {
 }
 
 void MainWindow::postSetupMenus() {
-    // Hide File menu (not used in KDE HIG)
+    // Rebuild File menu for KDE HIG - keep Export and add Quit
     if (menuFile) {
-        menuFile->menuAction()->setVisible(false);
+        menuFile->clear();
+
+        // Export action
+        auto *exportAction =
+            new QAction(QIcon::fromTheme(QStringLiteral("document-export")), i18n("&Export..."), this);
+        exportAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_E));
+        connect(exportAction, &QAction::triggered, this, &MainWindow::exportDeviceData);
+        menuFile->addAction(exportAction);
+
+        menuFile->addSeparator();
+
+        // Quit action
+        auto *quitAction = KStandardAction::quit(this, &MainWindow::close, this);
+        actionCollection()->addAction(KStandardAction::name(KStandardAction::Quit), quitAction);
+        menuFile->addAction(quitAction);
     }
 
     // Remove Help from Action menu (KDE HIG - help items go in Help menu)
