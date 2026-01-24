@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QLocale>
 #include <QStandardPaths>
 
 NameMappings &NameMappings::instance() {
@@ -16,6 +17,13 @@ NameMappings::NameMappings() {
     reload();
 }
 
+QString NameMappings::systemLocale() const {
+    // Get locale in format like "en-US", "de-DE", "ja-JP"
+    QString localeName = QLocale::system().name(); // Returns "en_US" format
+    localeName.replace(QLatin1Char('_'), QLatin1Char('-'));
+    return localeName;
+}
+
 void NameMappings::reload() {
     guidToCategory_.clear();
     hidVendor_.clear();
@@ -23,25 +31,58 @@ void NameMappings::reload() {
     softwareDevice_.clear();
     acpiDevice_.clear();
 
+    QString locale = systemLocale();
+
     // Get standard data locations
     // On Linux: /usr/share, /usr/local/share, etc.
     // On Windows: C:/ProgramData, etc.
     // On macOS: /Library/Application Support, etc.
-    QStringList systemPaths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    QStringList systemPaths =
+        QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 
     // Load from system locations first (in reverse order so higher priority paths override)
-    for (int i = systemPaths.size() - 1; i >= 0; --i) {
-        QString filePath = systemPaths.at(i) + QStringLiteral("/devmgmt/name-mappings.json");
-        loadFromFile(filePath);
+    for (auto i = systemPaths.size() - 1; i >= 0; --i) {
+        QString dirPath = systemPaths.at(i) + QStringLiteral("/devmgmt");
+        loadFromDirectory(dirPath, locale);
     }
 
     // Load from user-specific location last (highest priority, overrides system)
     // On Linux: ~/.local/share/devmgmt
     // On Windows: C:/Users/<USER>/AppData/Local/devmgmt
     // On macOS: ~/Library/Application Support/devmgmt
-    QString userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-                       QStringLiteral("/devmgmt/name-mappings.json");
-    loadFromFile(userPath);
+    QString userPath =
+        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+        QStringLiteral("/devmgmt");
+    loadFromDirectory(userPath, locale);
+}
+
+void NameMappings::loadFromDirectory(const QString &dirPath, const QString &locale) {
+    QDir dir(dirPath);
+    if (!dir.exists()) {
+        return;
+    }
+
+    // Load default file first (en-US)
+    // Try name-mappings.en-US.json first, fall back to name-mappings.json
+    QString defaultLocalePath =
+        dirPath + QStringLiteral("/name-mappings.") + QLatin1String(kDefaultLocale) +
+        QStringLiteral(".json");
+    QString defaultPath = dirPath + QStringLiteral("/name-mappings.json");
+
+    if (QFile::exists(defaultLocalePath)) {
+        loadFromFile(defaultLocalePath);
+    } else if (QFile::exists(defaultPath)) {
+        loadFromFile(defaultPath);
+    }
+
+    // Load locale-specific file if different from default
+    if (locale != QLatin1String(kDefaultLocale)) {
+        QString localePath =
+            dirPath + QStringLiteral("/name-mappings.") + locale + QStringLiteral(".json");
+        if (QFile::exists(localePath)) {
+            loadFromFile(localePath);
+        }
+    }
 }
 
 void NameMappings::loadFromFile(const QString &filePath) {

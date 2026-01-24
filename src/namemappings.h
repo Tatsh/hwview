@@ -6,9 +6,26 @@
 /**
  * @brief Manages device name mappings loaded from JSON files.
  *
- * This singleton class loads name mappings from JSON files in standard locations. User-specific
- * mappings in @c ~/.local/share/devmgmt (or equivalent) override system mappings in
- * @c /usr/share/devmgmt (or equivalent).
+ * This singleton class loads name mappings from JSON files in standard locations. Mappings are
+ * loaded in the following order, with later files overriding earlier ones at the key level:
+ *
+ * 1. System default file (@c name-mappings.json or @c name-mappings.en-US.json)
+ * 2. System locale-specific file (@c name-mappings.{locale}.json)
+ * 3. User default file
+ * 4. User locale-specific file
+ *
+ * Locale-specific files only need to define the keys they want to override. Keys not present in
+ * locale-specific files retain their values from the default file.
+ *
+ * System locations:
+ * - Linux: @c /usr/share/devmgmt, @c /usr/local/share/devmgmt
+ * - Windows: @c C:/ProgramData/devmgmt
+ * - macOS: @c /Library/Application Support/devmgmt
+ *
+ * User locations:
+ * - Linux: @c ~/.local/share/devmgmt
+ * - Windows: @c C:/Users/{USER}/AppData/Local/devmgmt
+ * - macOS: @c ~/Library/Application Support/devmgmt
  *
  * The JSON file format is:
  * @code
@@ -68,7 +85,7 @@ public:
     /**
      * @brief Reloads all mappings from JSON files.
      *
-     * Clears existing mappings and reloads from system and user locations.
+     * Clears existing mappings and reloads from system and user locations, respecting locale.
      */
     void reload();
 
@@ -79,10 +96,14 @@ private:
     NameMappings &operator=(const NameMappings &) = delete;
 
     void loadFromFile(const QString &filePath);
+    void loadFromDirectory(const QString &dirPath, const QString &locale);
+    QString systemLocale() const;
 
     QHash<QString, QString> guidToCategory_;
     QHash<QString, QString> hidVendor_;
     QHash<int, QString> hidBusType_;
     QHash<QString, QString> softwareDevice_;
     QHash<QString, QString> acpiDevice_;
+
+    static constexpr const char *kDefaultLocale = "en-US";
 };
