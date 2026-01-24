@@ -40,30 +40,30 @@ enum class DeviceCategory {
 /**
  * @brief Encapsulates information about a hardware device.
  *
- * This class provides a cross-platform abstraction for device information. On Linux, it wraps udev
- * device data. On macOS, it wraps IOKit data. On Windows, it wraps SetupAPI data.
+ * This class provides a cross-platform abstraction for device information. On Linux, it wraps
+ * @c udev device data. On macOS, it wraps @c IOKit data. On Windows, it wraps @c SetupAPI data.
  *
- * DeviceInfo objects are copyable and movable. On Linux, copying uses udev reference counting for
- * efficient memory management.
+ * @c DeviceInfo objects are copyable and movable. On Linux, copying uses @c udev reference
+ * counting for efficient memory management.
  */
 class DeviceInfo {
 public:
 #ifdef Q_OS_LINUX
     /**
-     * @brief Constructs a DeviceInfo from a udev device path.
-     * @param ctx The udev context.
+     * @brief Constructs a @c DeviceInfo from a @c udev device path.
+     * @param ctx The @c udev context.
      * @param syspath The system path to the device (e.g., "/sys/devices/...").
      */
     DeviceInfo(udev *ctx, const char *syspath);
 #elif defined(Q_OS_MACOS)
     /**
-     * @brief Constructs a DeviceInfo from an IOKit service.
-     * @param service The IOKit service object.
+     * @brief Constructs a @c DeviceInfo from an @c IOKit service.
+     * @param service The @c IOKit service object.
      */
     explicit DeviceInfo(io_service_t service);
 #elif defined(Q_OS_WIN)
     /**
-     * @brief Constructs a DeviceInfo from SetupAPI device info.
+     * @brief Constructs a @c DeviceInfo from @c SetupAPI device info.
      * @param devInfo The device information set handle.
      * @param devInfoData Pointer to the device info data structure.
      */
@@ -73,26 +73,26 @@ public:
 
     /**
      * @brief Copy constructor.
-     * @param other The DeviceInfo to copy from.
+     * @param other The @c DeviceInfo to copy from.
      */
     DeviceInfo(const DeviceInfo &other);
 
     /**
      * @brief Copy assignment operator.
-     * @param other The DeviceInfo to copy from.
+     * @param other The @c DeviceInfo to copy from.
      * @returns Reference to this object.
      */
     DeviceInfo &operator=(const DeviceInfo &other);
 
     /**
      * @brief Move constructor.
-     * @param other The DeviceInfo to move from.
+     * @param other The @c DeviceInfo to move from.
      */
     DeviceInfo(DeviceInfo &&other) noexcept;
 
     /**
      * @brief Move assignment operator.
-     * @param other The DeviceInfo to move from.
+     * @param other The @c DeviceInfo to move from.
      * @returns Reference to this object.
      */
     DeviceInfo &operator=(DeviceInfo &&other) noexcept;
@@ -110,7 +110,7 @@ public:
     const QString &name() const;
 
     /**
-     * @brief Returns a udev property value.
+     * @brief Returns a @c udev property value.
      * @param key The property key name.
      * @returns The property value, or empty string if not found.
      */
@@ -146,7 +146,7 @@ public:
     void dump();
 
     /**
-     * @brief Returns the cached DEVPATH property value.
+     * @brief Returns the cached @c DEVPATH property value.
      * @returns The device path.
      */
     const QString &devPath() const;
@@ -170,38 +170,38 @@ public:
     const QString &pciInterface() const;
 
     /**
-     * @brief Returns the cached ID_CDROM property.
+     * @brief Returns the cached @c ID_CDROM property.
      * @returns "1" if this is a CD-ROM device, empty otherwise.
      */
     const QString &idCdrom() const;
 
     /**
-     * @brief Returns the cached DEVTYPE property.
+     * @brief Returns the cached @c DEVTYPE property.
      * @returns The device type (e.g., "disk", "partition").
      */
     const QString &devType() const;
 
     /**
-     * @brief Returns the cached ID_INPUT_KEYBOARD property.
+     * @brief Returns the cached @c ID_INPUT_KEYBOARD property.
      * @returns "1" if this is a keyboard, empty otherwise.
      */
     const QString &idInputKeyboard() const;
 
     /**
-     * @brief Returns the cached ID_INPUT_MOUSE property.
+     * @brief Returns the cached @c ID_INPUT_MOUSE property.
      * @returns "1" if this is a mouse, empty otherwise.
      */
     const QString &idInputMouse() const;
 
     /**
-     * @brief Returns the cached ID_TYPE property.
+     * @brief Returns the cached @c ID_TYPE property.
      * @returns The ID type (e.g., "audio", "disk").
      */
     const QString &idType() const;
 
     /**
      * @brief Returns the cached model name from hardware database.
-     * @returns The model name from udev database.
+     * @returns The model name from @c udev database.
      */
     const QString &idModelFromDatabase() const;
 

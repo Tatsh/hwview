@@ -7,8 +7,8 @@
  * @brief Manages device name mappings loaded from JSON files.
  *
  * This singleton class loads name mappings from JSON files in standard locations. User-specific
- * mappings in ~/.local/share/devmgmt (or equivalent) override system mappings in /usr/share/devmgmt
- * (or equivalent).
+ * mappings in @c ~/.local/share/devmgmt (or equivalent) override system mappings in
+ * @c /usr/share/devmgmt (or equivalent).
  *
  * The JSON file format is:
  * @code
@@ -25,7 +25,7 @@ class NameMappings {
 public:
     /**
      * @brief Returns the singleton instance.
-     * @returns Reference to the global NameMappings instance.
+     * @returns Reference to the global @c NameMappings instance.
      */
     static NameMappings &instance();
 
@@ -53,7 +53,7 @@ public:
 
     /**
      * @brief Returns the nice name for a software device.
-     * @param deviceName The device name (without /dev/ prefix).
+     * @param deviceName The device name (without @c /dev/ prefix).
      * @returns The nice name, or empty string if not found.
      */
     QString softwareDeviceNiceName(const QString &deviceName) const;

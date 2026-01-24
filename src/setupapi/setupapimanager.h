@@ -19,12 +19,12 @@ class DeviceInfo;
 class SetupApiManager {
 public:
     /**
-     * @brief Constructs a SetupApiManager.
+     * @brief Constructs a @c SetupApiManager.
      */
     SetupApiManager();
 
     /**
-     * @brief Destroys the SetupApiManager.
+     * @brief Destroys the @c SetupApiManager.
      */
     ~SetupApiManager();
 
@@ -46,7 +46,7 @@ public:
      * @brief Gets a string property from a device.
      * @param devInfo The device information set handle.
      * @param devInfoData Pointer to the device info data.
-     * @param property The SPDRP_* property constant.
+     * @param property The @c SPDRP_* property constant.
      * @returns The property value, or empty string if not found.
      */
     static QString getDeviceRegistryProperty(HDEVINFO devInfo,

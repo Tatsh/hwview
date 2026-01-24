@@ -25,10 +25,10 @@ class DeviceMonitor;
  * provides thread-safe access to device information and supports automatic monitoring for device
  * changes on supported platforms.
  *
- * The cache can be manually refreshed by calling refresh(), or it will automatically refresh when
- * devices are added or removed (on platforms with monitoring support).
+ * The cache can be manually refreshed by calling @c refresh(), or it will automatically refresh
+ * when devices are added or removed (on platforms with monitoring support).
  *
- * @note This is a singleton class. Use instance() to access the single instance.
+ * @note This is a singleton class. Use @c instance() to access the single instance.
  *
  * Example usage:
  * @code
@@ -46,7 +46,7 @@ class DeviceCache : public QObject {
 public:
     /**
      * @brief Returns the singleton instance of the device cache.
-     * @returns Reference to the global DeviceCache instance.
+     * @returns Reference to the global @c DeviceCache instance.
      */
     static DeviceCache &instance();
 
@@ -65,17 +65,17 @@ public:
      * This method is thread-safe and returns a copy of the device list to ensure safe access from
      * multiple threads.
      *
-     * @returns List of all cached DeviceInfo objects.
+     * @returns List of all cached @c DeviceInfo objects.
      */
     QList<DeviceInfo> allDevices() const;
 
     /**
      * @brief Finds a device by its system path.
      * @param syspath The system path (e.g., "/sys/devices/...") to search for.
-     * @returns Pointer to the DeviceInfo if found, or @c nullptr if not found.
+     * @returns Pointer to the @c DeviceInfo if found, or @c nullptr if not found.
      *
-     * @note The returned pointer is valid only until the next call to refresh(). Do not store this
-     *       pointer for later use.
+     * @note The returned pointer is valid only until the next call to @c refresh(). Do not store
+     *       this pointer for later use.
      */
     const DeviceInfo *deviceBySyspath(const QString &syspath) const;
 
@@ -85,7 +85,7 @@ public:
      *
      * This method is only available on Linux.
      *
-     * @returns Pointer to the udev context structure.
+     * @returns Pointer to the @c udev context structure.
      */
     struct udev *context() const;
 #endif
@@ -93,7 +93,7 @@ public:
     /**
      * @brief Refreshes the device cache by re-enumerating all devices.
      *
-     * This method is thread-safe. After completion, the devicesChanged() signal is NOT
+     * This method is thread-safe. After completion, the @c devicesChanged() signal is NOT
      * automatically emitted; it is only emitted when devices change via the device monitor.
      *
      * @note This method blocks until enumeration is complete.
@@ -117,8 +117,8 @@ public:
     /**
      * @brief Starts monitoring for device changes.
      *
-     * On supported platforms, this creates a DeviceMonitor to receive device add/remove events.
-     * When a device change is detected, the cache is automatically refreshed and devicesChanged()
+     * On supported platforms, this creates a @c DeviceMonitor to receive device add/remove events.
+     * When a device change is detected, the cache is automatically refreshed and @c devicesChanged()
      * is emitted.
      *
      * On platforms without monitoring support, this method does nothing.

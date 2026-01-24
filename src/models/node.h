@@ -32,8 +32,8 @@ public:
     /**
      * @brief Constructs a node with the specified data.
      * @param data List of column data for this node.
-     * @param parentItem Parent node, or nullptr for root nodes.
-     * @param type The type of this node (Device or Label).
+     * @param parentItem Parent node, or @c nullptr for root nodes.
+     * @param type The type of this node (@c Device or @c Label).
      */
     explicit Node(const QList<QVariant> &data, Node *parentItem = nullptr, NodeType type = Label);
     ~Node();
@@ -47,7 +47,7 @@ public:
     /**
      * @brief Returns the child at the specified row.
      * @param row The row index of the child.
-     * @returns The child node, or nullptr if row is out of range.
+     * @returns The child node, or @c nullptr if row is out of range.
      */
     Node *child(int row);
 
@@ -71,7 +71,7 @@ public:
     /**
      * @brief Returns the data for the specified column.
      * @param column The column index.
-     * @returns The data as a QVariant.
+     * @returns The data as a @c QVariant.
      */
     QVariant data(int column) const;
 
@@ -83,7 +83,7 @@ public:
 
     /**
      * @brief Returns the parent node.
-     * @returns The parent node, or nullptr for root nodes.
+     * @returns The parent node, or @c nullptr for root nodes.
      */
     Node *parentItem();
 

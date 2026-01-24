@@ -12,23 +12,23 @@ class DeviceInfo;
 /**
  * @brief Manages IOKit device enumeration on macOS.
  *
- * This class provides an interface to enumerate devices using Apple's IOKit framework. It provides
- * methods to iterate over devices in the IORegistry and extract device properties.
+ * This class provides an interface to enumerate devices using Apple's IOKit framework. It
+ * provides methods to iterate over devices in the @c IORegistry and extract device properties.
  */
 class IOKitManager {
 public:
     /**
-     * @brief Constructs an IOKitManager.
+     * @brief Constructs an @c IOKitManager.
      */
     IOKitManager();
 
     /**
-     * @brief Destroys the IOKitManager.
+     * @brief Destroys the @c IOKitManager.
      */
     ~IOKitManager();
 
     /**
-     * @brief Enumerates all devices in the IORegistry.
+     * @brief Enumerates all devices in the @c IORegistry.
      * @param callback Function called for each device service found.
      */
     void enumerateAllDevices(std::function<void(io_service_t)> callback) const;
@@ -42,7 +42,7 @@ public:
                                  std::function<void(io_service_t)> callback) const;
 
     /**
-     * @brief Gets the IORegistry path for a service.
+     * @brief Gets the @c IORegistry path for a service.
      * @param service The IOKit service object.
      * @returns The registry path string.
      */
@@ -51,7 +51,7 @@ public:
     /**
      * @brief Gets a string property from an IOKit service.
      * @param service The IOKit service object.
-     * @param key The property key as a CFString.
+     * @param key The property key as a @c CFString.
      * @returns The property value, or empty string if not found.
      */
     static QString getStringProperty(io_service_t service, CFStringRef key);
@@ -59,16 +59,16 @@ public:
     /**
      * @brief Gets an integer property from an IOKit service.
      * @param service The IOKit service object.
-     * @param key The property key as a CFString.
+     * @param key The property key as a @c CFString.
      * @returns The property value, or 0 if not found.
      */
     static int64_t getIntProperty(io_service_t service, CFStringRef key);
 
     /**
-     * @brief Gets the parent service in the IORegistry.
+     * @brief Gets the parent service in the @c IORegistry.
      * @param service The IOKit service object.
-     * @param plane The IORegistry plane to traverse.
-     * @returns The parent service, or IO_OBJECT_NULL if none.
+     * @param plane The @c IORegistry plane to traverse.
+     * @returns The parent service, or @c IO_OBJECT_NULL if none.
      */
     static io_service_t getParent(io_service_t service, const io_name_t plane = kIOServicePlane);
 

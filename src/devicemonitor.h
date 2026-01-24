@@ -6,9 +6,9 @@
  * @brief Abstract interface for platform-specific device monitoring.
  *
  * This class defines the interface for monitoring device add/remove events. Platform-specific
- * implementations (e.g., UdevMonitor on Linux) inherit from this class.
+ * implementations (e.g., @c UdevMonitor on Linux) inherit from this class.
  *
- * On platforms without device monitoring support, no implementation is provided and DeviceCache
+ * On platforms without device monitoring support, no implementation is provided and @c DeviceCache
  * will not create a monitor.
  */
 class DeviceMonitor : public QObject {
@@ -16,8 +16,8 @@ class DeviceMonitor : public QObject {
 
 public:
     /**
-     * @brief Constructs a DeviceMonitor.
-     * @param parent Optional parent QObject for memory management.
+     * @brief Constructs a @c DeviceMonitor.
+     * @param parent Optional parent @c QObject for memory management.
      */
     explicit DeviceMonitor(QObject *parent = nullptr) : QObject(parent) {
     }

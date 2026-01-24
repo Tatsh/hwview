@@ -62,7 +62,7 @@ namespace strings {
 
     /**
      * @brief Maps a software device name to a user-friendly display name.
-     * @param name The device name (may include /dev/ prefix).
+     * @param name The device name (may include @c /dev/ prefix).
      * @returns A user-friendly name, or the original name if no mapping exists.
      */
     inline QString softwareDeviceNiceName(const QString &name) {
@@ -114,7 +114,7 @@ namespace strings {
     }
 
     /**
-     * @brief HID bus type constants from Linux input.h.
+     * @brief HID bus type constants from Linux @c input.h.
      */
     namespace hidBusTypes {
         constexpr int BUS_PCI = 0x01;       ///< PCI bus
@@ -129,7 +129,7 @@ namespace strings {
      * @brief Parsed HID device ID information.
      */
     struct HidDeviceId {
-        int busType = 0;    ///< Bus type (see hidBusTypes)
+        int busType = 0;    ///< Bus type (see @c hidBusTypes)
         QString vendorId;   ///< Vendor ID as hex string
         QString productId;  ///< Product ID as hex string
         QString instance;   ///< Instance number
@@ -143,7 +143,7 @@ namespace strings {
      * instance number.
      *
      * @param path The path containing a HID device ID component.
-     * @returns Parsed HidDeviceId structure.
+     * @returns Parsed @c HidDeviceId structure.
      */
     inline HidDeviceId parseHidDeviceId(const QString &path) {
         HidDeviceId result;
@@ -177,7 +177,7 @@ namespace strings {
     /**
      * @brief Parses an I2C bus number from a device path.
      * @param path The device path containing an I2C bus component.
-     * @returns The I2C bus number, or -1 if not found.
+     * @returns The I2C bus number, or @c -1 if not found.
      */
     inline int parseI2cBusNumber(const QString &path) {
         static const QRegularExpression i2cBusRe(QStringLiteral("/i2c-(\\d+)(?:/|$)"));

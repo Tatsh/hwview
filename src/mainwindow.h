@@ -24,8 +24,8 @@ QT_END_NAMESPACE
  * multiple view modes (Devices by Type, Devices by Connection, etc.) and automatically refreshes
  * when devices are added or removed.
  *
- * On KDE, this class inherits from KXmlGuiWindow for proper KDE integration. On other platforms,
- * it inherits from QMainWindow.
+ * On KDE, this class inherits from @c KXmlGuiWindow for proper KDE integration. On other platforms,
+ * it inherits from @c QMainWindow.
  *
  * Key features:
  * - Multiple device view modes
