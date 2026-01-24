@@ -8,14 +8,14 @@
 #include <utility>
 
 #ifdef Q_OS_MACOS
-#include "iokit/iokitmanager.h"
+#include "backends/iokit/iokitmanager.h"
 #include <IOKit/IOBSD.h>
 #include <IOKit/hid/IOHIDKeys.h>
 #include <IOKit/storage/IOMedia.h>
 #include <IOKit/usb/IOUSBLib.h>
 #elif defined(Q_OS_WIN)
-#include "setupapi/devclass_guids.h"
-#include "setupapi/setupapimanager.h"
+#include "backends/setupapi/devclass_guids.h"
+#include "backends/setupapi/setupapimanager.h"
 #endif
 
 namespace s = strings;

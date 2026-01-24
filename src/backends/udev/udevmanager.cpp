@@ -1,4 +1,4 @@
-#include "udev/udevmanager.h"
+#include "udevmanager.h"
 
 #ifdef Q_OS_LINUX
 #include "deviceinfo.h"

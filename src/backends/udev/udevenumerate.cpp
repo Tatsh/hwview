@@ -1,5 +1,5 @@
-#include "udev/udevenumerate.h"
-#include "udev/udevmanager.h"
+#include "udevenumerate.h"
+#include "udevmanager.h"
 
 #ifdef Q_OS_LINUX
 

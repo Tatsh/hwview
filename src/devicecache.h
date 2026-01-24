@@ -8,12 +8,12 @@
 #include "deviceinfo.h"
 
 #ifdef Q_OS_LINUX
-#include "udev/udevmanager.h"
+#include "backends/udev/udevmanager.h"
 struct udev;
 #elif defined(Q_OS_MACOS)
-#include "iokit/iokitmanager.h"
+#include "backends/iokit/iokitmanager.h"
 #elif defined(Q_OS_WIN)
-#include "setupapi/setupapimanager.h"
+#include "backends/setupapi/setupapimanager.h"
 #endif
 
 class DeviceMonitor;

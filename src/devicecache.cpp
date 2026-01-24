@@ -6,12 +6,12 @@
 #include <QMutexLocker>
 
 #ifdef Q_OS_LINUX
-#include "udev/udevmonitor.h"
+#include "backends/udev/udevmonitor.h"
 #include <libudev.h>
 #elif defined(Q_OS_MACOS)
-#include "iokit/iokitmonitor.h"
+#include "backends/iokit/iokitmonitor.h"
 #elif defined(Q_OS_WIN)
-#include "setupapi/setupapimonitor.h"
+#include "backends/setupapi/setupapimonitor.h"
 #endif
 
 DeviceCache &DeviceCache::instance() {

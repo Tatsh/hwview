@@ -1,4 +1,4 @@
-#include "setupapi/setupapimanager.h"
+#include "setupapimanager.h"
 
 #ifdef Q_OS_WIN
 

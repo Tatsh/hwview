@@ -1,11 +1,5 @@
+add_subdirectory(backends)
 add_subdirectory(models)
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  add_subdirectory(udev)
-elseif(APPLE)
-  add_subdirectory(iokit)
-elseif(WIN32)
-  add_subdirectory(setupapi)
-endif()
 
 add_executable(
   devmgmt

@@ -1,4 +1,4 @@
-#include "iokit/iokitmanager.h"
+#include "iokitmanager.h"
 
 #ifdef Q_OS_MACOS
 
