@@ -9,26 +9,66 @@ QT_BEGIN_NAMESPACE
 class QSocketNotifier;
 QT_END_NAMESPACE
 
-// Monitors udev events for device add/remove notifications.
-// Uses QSocketNotifier to integrate with Qt's event loop.
+/**
+ * @brief Monitors udev events for device add/remove notifications.
+ *
+ * This class uses the udev netlink interface to receive device events from the kernel. It
+ * integrates with Qt's event loop using QSocketNotifier for non-blocking operation.
+ *
+ * @note This class is only functional on Linux. On other platforms, a stub implementation is
+ *       provided that does nothing.
+ *
+ * Example usage:
+ * @code
+ * UdevMonitor monitor(udevContext);
+ * connect(&monitor, &UdevMonitor::deviceChanged, this, &MyClass::onDeviceChanged);
+ * monitor.start();
+ * @endcode
+ */
 class UdevMonitor : public QObject {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a UdevMonitor.
+     * @param ctx The udev context to use for monitoring. Must remain valid for the lifetime of
+     *            this object.
+     * @param parent Optional parent QObject for memory management.
+     */
     explicit UdevMonitor(struct udev *ctx, QObject *parent = nullptr);
     ~UdevMonitor() override;
 
-    // Start monitoring for device events
+    /**
+     * @brief Starts monitoring for device events.
+     *
+     * Creates a udev monitor, enables receiving, and sets up a QSocketNotifier to watch the
+     * monitor's file descriptor.
+     *
+     * @returns @c true if monitoring was started successfully, @c false otherwise.
+     */
     bool start();
 
-    // Stop monitoring
+    /**
+     * @brief Stops monitoring for device events.
+     *
+     * Disables the socket notifier and releases the udev monitor resources. Safe to call even if
+     * monitoring is not running.
+     */
     void stop();
 
-    // Check if monitoring is active
+    /**
+     * @brief Checks if monitoring is currently active.
+     * @returns @c true if monitoring is active, @c false otherwise.
+     */
     bool isRunning() const;
 
 Q_SIGNALS:
-    // Emitted when a device is added or removed
+    /**
+     * @brief Emitted when a device is added or removed.
+     *
+     * This signal is emitted for "add" and "remove" udev actions only. Other actions (e.g.,
+     * "change", "move") are ignored.
+     */
     void deviceChanged();
 
 private Q_SLOTS:
@@ -41,25 +81,52 @@ private:
     bool running_ = false;
 };
 #else
-// Stub class for non-Linux platforms
+/**
+ * @brief Stub class for UdevMonitor on non-Linux platforms.
+ *
+ * This class provides the same interface as the Linux implementation but does nothing. All methods
+ * are no-ops and start() always returns false.
+ */
 class UdevMonitor : public QObject {
     Q_OBJECT
 
 public:
-    explicit UdevMonitor(void *, QObject *parent = nullptr) : QObject(parent) {
+    /**
+     * @brief Constructs a stub UdevMonitor.
+     * @param ctx Ignored on non-Linux platforms.
+     * @param parent Optional parent QObject for memory management.
+     */
+    explicit UdevMonitor(void *ctx, QObject *parent = nullptr) : QObject(parent) {
+        Q_UNUSED(ctx);
     }
     ~UdevMonitor() override = default;
 
+    /**
+     * @brief Stub implementation that always fails.
+     * @returns Always returns @c false on non-Linux platforms.
+     */
     bool start() {
         return false;
     }
+
+    /**
+     * @brief Stub implementation that does nothing.
+     */
     void stop() {
     }
+
+    /**
+     * @brief Stub implementation.
+     * @returns Always returns @c false on non-Linux platforms.
+     */
     bool isRunning() const {
         return false;
     }
 
 Q_SIGNALS:
+    /**
+     * @brief Signal declared for API compatibility but never emitted on non-Linux platforms.
+     */
     void deviceChanged();
 };
 #endif

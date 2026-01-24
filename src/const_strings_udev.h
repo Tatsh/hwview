@@ -3,39 +3,58 @@
 #include <QString>
 
 namespace strings {
+
+    /**
+     * @brief Namespace containing udev-related constants and string accessors.
+     */
     namespace udev {
+
+        /**
+         * @brief udev property name constants.
+         */
         namespace propertyNames {
-            constexpr char DEVNAME[] = "DEVNAME";
-            constexpr char DEVPATH[] = "DEVPATH";
-            constexpr char DEVTYPE[] = "DEVTYPE";
-            constexpr char DM_NAME[] = "DM_NAME";
-            constexpr char DRIVER[] = "DRIVER";
-            constexpr char HID_NAME[] = "HID_NAME";
-            constexpr char HID_ID[] = "HID_ID";
-            constexpr char HID_PHYS[] = "HID_PHYS";
-            constexpr char HID_UNIQ[] = "HID_UNIQ";
-            constexpr char ID_CDROM[] = "ID_CDROM";
-            constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";
-            constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME";
-            constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID";
-            constexpr char ID_INPUT_KEYBOARD[] = "ID_INPUT_KEYBOARD";
-            constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";
-            constexpr char ID_MODEL[] = "ID_MODEL";
-            constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE";
-            constexpr char ID_PCI_CLASS_FROM_DATABASE[] = "ID_PCI_CLASS_FROM_DATABASE";
-            constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] = "ID_PCI_INTERFACE_FROM_DATABASE";
-            constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] = "ID_PCI_SUBCLASS_FROM_DATABASE";
-            constexpr char ID_TYPE[] = "ID_TYPE";
-            constexpr char ID_USB_VENDOR[] = "ID_USB_VENDOR";
-            constexpr char ID_VENDOR[] = "ID_VENDOR";
-            constexpr char ID_VENDOR_ENC[] = "ID_VENDOR_ENC";
-            constexpr char ID_VENDOR_FROM_DATABASE[] = "ID_VENDOR_FROM_DATABASE";
-            constexpr char MODALIAS[] = "MODALIAS";
-            constexpr char NAME[] = "NAME";
-            constexpr char SUBSYSTEM[] = "SUBSYSTEM";
+            constexpr char DEVNAME[] = "DEVNAME";                       ///< Device node name
+            constexpr char DEVPATH[] = "DEVPATH";                       ///< Device path in sysfs
+            constexpr char DEVTYPE[] = "DEVTYPE";                       ///< Device type
+            constexpr char DM_NAME[] = "DM_NAME";                       ///< Device mapper name
+            constexpr char DRIVER[] = "DRIVER";                         ///< Driver name
+            constexpr char HID_NAME[] = "HID_NAME";                     ///< HID device name
+            constexpr char HID_ID[] = "HID_ID";                         ///< HID device ID
+            constexpr char HID_PHYS[] = "HID_PHYS";                     ///< HID physical path
+            constexpr char HID_UNIQ[] = "HID_UNIQ";                     ///< HID unique ID
+            constexpr char ID_CDROM[] = "ID_CDROM";                     ///< CD-ROM indicator
+            constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";               ///< Filesystem label
+            constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME"; ///< Partition name
+            constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID"; ///< Partition table UUID
+            constexpr char ID_INPUT_KEYBOARD[] = "ID_INPUT_KEYBOARD";   ///< Keyboard indicator
+            constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";         ///< Mouse indicator
+            constexpr char ID_MODEL[] = "ID_MODEL";                     ///< Device model
+            constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE"; ///< Model from hwdb
+            constexpr char ID_PCI_CLASS_FROM_DATABASE[] =
+                "ID_PCI_CLASS_FROM_DATABASE"; ///< PCI class from hwdb
+            constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] =
+                "ID_PCI_INTERFACE_FROM_DATABASE"; ///< PCI interface
+            constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] =
+                "ID_PCI_SUBCLASS_FROM_DATABASE";              ///< PCI subclass
+            constexpr char ID_TYPE[] = "ID_TYPE";             ///< ID type
+            constexpr char ID_USB_VENDOR[] = "ID_USB_VENDOR"; ///< USB vendor name
+            constexpr char ID_VENDOR[] = "ID_VENDOR";         ///< Vendor name
+            constexpr char ID_VENDOR_ENC[] = "ID_VENDOR_ENC"; ///< Encoded vendor name
+            constexpr char ID_VENDOR_FROM_DATABASE[] =
+                "ID_VENDOR_FROM_DATABASE";            ///< Vendor from hwdb
+            constexpr char MODALIAS[] = "MODALIAS";   ///< Module alias
+            constexpr char NAME[] = "NAME";           ///< Device name
+            constexpr char SUBSYSTEM[] = "SUBSYSTEM"; ///< Subsystem name
         } // namespace propertyNames
 
+        /**
+         * @brief udev property value constants organized by property type.
+         */
         namespace propertyValues {
+
+            /**
+             * @brief DEVTYPE property values.
+             */
             namespace devType {
                 inline const QString &disk() {
                     static const QString s = QStringLiteral("disk");
@@ -103,6 +122,9 @@ namespace strings {
                 }
             } // namespace devType
 
+            /**
+             * @brief DRIVER property values.
+             */
             namespace driver {
                 inline const QString &battery() {
                     static const QString s = QStringLiteral("battery");
@@ -110,6 +132,9 @@ namespace strings {
                 }
             } // namespace driver
 
+            /**
+             * @brief ID_MODEL_FROM_DATABASE property values.
+             */
             namespace idModelFromDatabase {
                 inline const QString &ups() {
                     static const QString s = QStringLiteral("Uninterruptible Power Supply");
@@ -117,6 +142,9 @@ namespace strings {
                 }
             } // namespace idModelFromDatabase
 
+            /**
+             * @brief ID_PCI_CLASS_FROM_DATABASE property values.
+             */
             namespace idPciClassFromDatabase {
                 inline const QString &bridge() {
                     static const QString s = QStringLiteral("bridge");
@@ -156,6 +184,9 @@ namespace strings {
                 }
             } // namespace idPciClassFromDatabase
 
+            /**
+             * @brief ID_PCI_INTERFACE_FROM_DATABASE property values.
+             */
             namespace idPciInterfaceFromDatabase {
                 inline const QString &ahci1_0() {
                     static const QString s = QStringLiteral("AHCI 1.0");
@@ -183,6 +214,9 @@ namespace strings {
                 }
             } // namespace idPciInterfaceFromDatabase
 
+            /**
+             * @brief ID_PCI_SUBCLASS_FROM_DATABASE property values.
+             */
             namespace idPciSubclassFromDatabase {
                 inline const QString &audioDevice() {
                     static const QString s = QStringLiteral("Audio device");
@@ -246,14 +280,21 @@ namespace strings {
                 }
             } // namespace idPciSubclassFromDatabase
 
+            /**
+             * @brief ID_TYPE property values.
+             */
             namespace idType {
                 inline const QString &audio() {
                     static const QString s = QStringLiteral("audio");
                     return s;
                 }
             } // namespace idType
+
         } // namespace propertyValues
 
+        /**
+         * @brief udev subsystem name constants.
+         */
         namespace subsystems {
             inline const QString &acpi() {
                 static const QString s = QStringLiteral("acpi");
@@ -540,5 +581,6 @@ namespace strings {
                 return s;
             }
         } // namespace subsystems
+
     } // namespace udev
 } // namespace strings

@@ -4,18 +4,26 @@
 
 #include "node.h"
 
-// Base class for tree models that use Node as the underlying data structure.
-// Provides common implementations of QAbstractItemModel methods.
+/**
+ * @brief Base class for tree models that use Node as the underlying data structure.
+ *
+ * This class provides common implementations of QAbstractItemModel methods for all device tree
+ * models. Subclasses should create their tree structure in their constructor by setting the root
+ * item with setRootItem().
+ */
 class BaseTreeModel : public QAbstractItemModel {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a BaseTreeModel.
+     * @param parent Optional parent QObject.
+     */
     explicit BaseTreeModel(QObject *parent = nullptr);
     ~BaseTreeModel() override;
 
-    // QAbstractItemModel interface
-    QModelIndex
-    index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column,
+                      const QModelIndex &parent = QModelIndex()) const override;
     QModelIndex parent(const QModelIndex &child) const override;
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -23,16 +31,33 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
 protected:
-    // Returns the root item. Subclasses must set this in their constructor.
+    /**
+     * @brief Returns the root item of the tree.
+     * @returns Pointer to the root Node.
+     */
     Node *rootItem() const;
+
+    /**
+     * @brief Sets the root item of the tree.
+     * @param root The root Node. This model takes ownership.
+     */
     void setRootItem(Node *root);
 
-    // Override in subclasses to customize icon display behavior
-    // Default returns true (always show icons)
+    /**
+     * @brief Returns whether icons should be displayed.
+     *
+     * Subclasses can override this to control icon display behavior. Default returns true.
+     *
+     * @returns @c true if icons should be shown, @c false otherwise.
+     */
     virtual bool shouldShowIcons() const;
 
-    // Override in subclasses to customize decoration role
-    // Default checks column 0 only and respects shouldShowIcons()
+    /**
+     * @brief Returns the decoration (icon) data for a node.
+     * @param item The node to get decoration for.
+     * @param column The column index.
+     * @returns The icon as a QVariant, or empty QVariant if no icon.
+     */
     virtual QVariant decorationData(Node *item, int column) const;
 
 private:

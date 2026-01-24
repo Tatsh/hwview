@@ -11,8 +11,8 @@ SetupApiManager::~SetupApiManager() = default;
 void SetupApiManager::enumerateAllDevices(
     std::function<void(HDEVINFO, SP_DEVINFO_DATA *)> callback) const {
     // Get all devices (present and not present)
-    HDEVINFO devInfo = SetupDiGetClassDevsW(nullptr, nullptr, nullptr,
-                                            DIGCF_ALLCLASSES | DIGCF_PRESENT);
+    HDEVINFO devInfo =
+        SetupDiGetClassDevsW(nullptr, nullptr, nullptr, DIGCF_ALLCLASSES | DIGCF_PRESENT);
 
     if (devInfo == INVALID_HANDLE_VALUE) {
         return;
@@ -29,11 +29,9 @@ void SetupApiManager::enumerateAllDevices(
 }
 
 void SetupApiManager::enumerateDevicesOfClass(
-    const GUID *classGuid,
-    std::function<void(HDEVINFO, SP_DEVINFO_DATA *)> callback) const {
+    const GUID *classGuid, std::function<void(HDEVINFO, SP_DEVINFO_DATA *)> callback) const {
 
-    HDEVINFO devInfo = SetupDiGetClassDevsW(classGuid, nullptr, nullptr,
-                                            DIGCF_PRESENT);
+    HDEVINFO devInfo = SetupDiGetClassDevsW(classGuid, nullptr, nullptr, DIGCF_PRESENT);
 
     if (devInfo == INVALID_HANDLE_VALUE) {
         return;
@@ -56,8 +54,8 @@ QString SetupApiManager::getDeviceRegistryProperty(HDEVINFO devInfo,
     DWORD requiredSize = 0;
 
     // First call to get required buffer size
-    SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, property,
-                                      &dataType, nullptr, 0, &requiredSize);
+    SetupDiGetDeviceRegistryPropertyW(
+        devInfo, devInfoData, property, &dataType, nullptr, 0, &requiredSize);
 
     if (requiredSize == 0) {
         return {};
@@ -65,10 +63,13 @@ QString SetupApiManager::getDeviceRegistryProperty(HDEVINFO devInfo,
 
     QByteArray buffer(static_cast<int>(requiredSize), '\0');
 
-    if (!SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, property,
+    if (!SetupDiGetDeviceRegistryPropertyW(devInfo,
+                                           devInfoData,
+                                           property,
                                            &dataType,
                                            reinterpret_cast<PBYTE>(buffer.data()),
-                                           requiredSize, nullptr)) {
+                                           requiredSize,
+                                           nullptr)) {
         return {};
     }
 
@@ -82,7 +83,8 @@ QString SetupApiManager::getDeviceRegistryProperty(HDEVINFO devInfo,
 QString SetupApiManager::getDeviceInstanceId(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
     wchar_t instanceId[MAX_DEVICE_ID_LEN];
 
-    if (!SetupDiGetDeviceInstanceIdW(devInfo, devInfoData, instanceId, MAX_DEVICE_ID_LEN, nullptr)) {
+    if (!SetupDiGetDeviceInstanceIdW(
+            devInfo, devInfoData, instanceId, MAX_DEVICE_ID_LEN, nullptr)) {
         return {};
     }
 
@@ -114,7 +116,8 @@ QString SetupApiManager::getDeviceClassName(HDEVINFO devInfo, SP_DEVINFO_DATA *d
 
     wchar_t className[MAX_CLASS_NAME_LEN];
 
-    if (!SetupDiClassNameFromGuidW(&devInfoData->ClassGuid, className, MAX_CLASS_NAME_LEN, nullptr)) {
+    if (!SetupDiClassNameFromGuidW(
+            &devInfoData->ClassGuid, className, MAX_CLASS_NAME_LEN, nullptr)) {
         return {};
     }
 
@@ -138,8 +141,8 @@ QString SetupApiManager::getDriverKeyName(HDEVINFO devInfo, SP_DEVINFO_DATA *dev
 }
 
 bool SetupApiManager::getDeviceStatus(SP_DEVINFO_DATA *devInfoData,
-                                       ULONG *status,
-                                       ULONG *problemCode) {
+                                      ULONG *status,
+                                      ULONG *problemCode) {
     return CM_Get_DevNode_Status(status, problemCode, devInfoData->DevInst, 0) == CR_SUCCESS;
 }
 
@@ -148,10 +151,13 @@ bool SetupApiManager::isDeviceHidden(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoD
     DWORD capabilities = 0;
     DWORD requiredSize = sizeof(capabilities);
 
-    if (SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, SPDRP_CAPABILITIES,
+    if (SetupDiGetDeviceRegistryPropertyW(devInfo,
+                                          devInfoData,
+                                          SPDRP_CAPABILITIES,
                                           &dataType,
                                           reinterpret_cast<PBYTE>(&capabilities),
-                                          requiredSize, nullptr)) {
+                                          requiredSize,
+                                          nullptr)) {
         // CM_DEVCAP_SILENTINSTALL = 0x00000004
         // Devices with this capability are typically hidden/internal
         // But we check for the actual hidden registry flag
@@ -160,10 +166,13 @@ bool SetupApiManager::isDeviceHidden(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoD
     // Check ConfigFlags for hidden flag
     DWORD configFlags = 0;
     requiredSize = sizeof(configFlags);
-    if (SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, SPDRP_CONFIGFLAGS,
+    if (SetupDiGetDeviceRegistryPropertyW(devInfo,
+                                          devInfoData,
+                                          SPDRP_CONFIGFLAGS,
                                           &dataType,
                                           reinterpret_cast<PBYTE>(&configFlags),
-                                          requiredSize, nullptr)) {
+                                          requiredSize,
+                                          nullptr)) {
         // CONFIGFLAG_HIDDEN = 0x00000010
         if (configFlags & 0x00000010) {
             return true;
@@ -177,8 +186,8 @@ QStringList SetupApiManager::getHardwareIds(HDEVINFO devInfo, SP_DEVINFO_DATA *d
     DWORD dataType;
     DWORD requiredSize = 0;
 
-    SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, SPDRP_HARDWAREID,
-                                      &dataType, nullptr, 0, &requiredSize);
+    SetupDiGetDeviceRegistryPropertyW(
+        devInfo, devInfoData, SPDRP_HARDWAREID, &dataType, nullptr, 0, &requiredSize);
 
     if (requiredSize == 0) {
         return {};
@@ -186,10 +195,13 @@ QStringList SetupApiManager::getHardwareIds(HDEVINFO devInfo, SP_DEVINFO_DATA *d
 
     QByteArray buffer(static_cast<int>(requiredSize), '\0');
 
-    if (!SetupDiGetDeviceRegistryPropertyW(devInfo, devInfoData, SPDRP_HARDWAREID,
+    if (!SetupDiGetDeviceRegistryPropertyW(devInfo,
+                                           devInfoData,
+                                           SPDRP_HARDWAREID,
                                            &dataType,
                                            reinterpret_cast<PBYTE>(buffer.data()),
-                                           requiredSize, nullptr)) {
+                                           requiredSize,
+                                           nullptr)) {
         return {};
     }
 
@@ -204,7 +216,8 @@ QString SetupApiManager::getManufacturer(HDEVINFO devInfo, SP_DEVINFO_DATA *devI
     return getDeviceRegistryProperty(devInfo, devInfoData, SPDRP_MFG);
 }
 
-QString SetupApiManager::getPhysicalDeviceObjectName(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
+QString SetupApiManager::getPhysicalDeviceObjectName(HDEVINFO devInfo,
+                                                     SP_DEVINFO_DATA *devInfoData) {
     return getDeviceRegistryProperty(devInfo, devInfoData, SPDRP_PHYSICAL_DEVICE_OBJECT_NAME);
 }
 

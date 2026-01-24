@@ -4,10 +4,20 @@
 #include <QStringList>
 
 #ifdef Q_OS_LINUX
+/**
+ * @brief Utility functions for reading /proc filesystem files.
+ */
 namespace procutils {
-    // Read a /proc file and return its contents as a list of lines.
-    // Uses readAll() because proc files report size 0, which causes
-    // QTextStream::atEnd() to return true immediately.
+
+    /**
+ * @brief Reads a /proc file and returns its contents as a list of lines.
+ *
+ * This function uses readAll() because proc files report size 0,
+ * which causes QTextStream::atEnd() to return true immediately.
+ *
+ * @param path The path to the /proc file.
+ * @returns List of lines from the file, or empty list on error.
+ */
     inline QStringList readProcFile(const QString &path) {
         QFile file(path);
         if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -15,5 +25,6 @@ namespace procutils {
         }
         return {};
     }
+
 } // namespace procutils
 #endif

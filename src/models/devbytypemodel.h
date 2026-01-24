@@ -2,10 +2,21 @@
 
 #include "basetreemodel.h"
 
+/**
+ * @brief Tree model that organizes devices by their category/type.
+ *
+ * This model displays devices grouped under category nodes such as
+ * "Disk Drives", "Network Adapters", "USB Controllers", etc.
+ * It provides a two-column view with device name and driver.
+ */
 class DevicesByTypeModel : public BaseTreeModel {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a DevicesByTypeModel.
+     * @param parent Optional parent QObject.
+     */
     explicit DevicesByTypeModel(QObject *parent = nullptr);
     QVariant
     headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -18,7 +29,6 @@ private:
     void finalizeCategory(Node *&category);
 
     Node *hostnameItem;
-    // Categories
     Node *audioInputsAndOutputsItem;
     Node *batteriesItem;
     Node *computerItem;

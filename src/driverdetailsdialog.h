@@ -7,12 +7,32 @@
 #include <QString>
 #include <QStringList>
 
+/**
+ * @brief Dialog that displays detailed information about a kernel driver.
+ *
+ * This dialog shows driver file information including version, author,
+ * license, dependencies, and digital signature status.
+ */
 class DriverDetailsDialog : public QDialog {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a DriverDetailsDialog.
+     * @param parent Optional parent widget.
+     */
     explicit DriverDetailsDialog(QWidget *parent = nullptr);
+
+    /**
+     * @brief Sets the driver name to display details for.
+     * @param driverName The kernel module/driver name.
+     */
     void setDriverName(const QString &driverName);
+
+    /**
+     * @brief Sets the category icon to display in the header.
+     * @param icon The icon representing the device category.
+     */
     void setCategoryIcon(const QIcon &icon);
 
 private Q_SLOTS:
@@ -40,7 +60,6 @@ private:
     QString driverName_;
     QIcon categoryIcon_;
 
-    // UI elements
     QLabel *labelIcon_;
     QLabel *labelDeviceName_;
     QListWidget *listDriverFiles_;

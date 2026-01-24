@@ -8,13 +8,35 @@
 #include "deviceinfo.h"
 #include "ui_propertiesdialog.h"
 
+/**
+ * @brief Dialog that displays detailed properties of a device.
+ *
+ * This dialog shows comprehensive information about a device across
+ * multiple tabs: General, Driver, Details, Events, and Resources.
+ * It provides access to device properties, driver information, and
+ * system resource allocations.
+ */
 class PropertiesDialog : public QDialog, private Ui::PropertiesDialog {
     Q_OBJECT
 
 public:
+    /**
+     * @brief Constructs a PropertiesDialog.
+     * @param parent Optional parent widget.
+     */
     explicit PropertiesDialog(QWidget *parent = nullptr);
     ~PropertiesDialog() override;
+
+    /**
+     * @brief Sets the device to display properties for.
+     * @param syspath The system path of the device.
+     */
     void setDeviceSyspath(const QString &syspath);
+
+    /**
+     * @brief Sets the category icon to display in the header.
+     * @param icon The icon representing the device category.
+     */
     void setCategoryIcon(const QIcon &icon);
 
 private Q_SLOTS:
@@ -39,11 +61,10 @@ private:
     QString getBlockDeviceManufacturer();
     QString getMountPoint();
 
-    // Resource information structure
     struct ResourceInfo {
-        QString type;     // IRQ, Memory Range, I/O Range, DMA
-        QString setting;  // The actual value/range
-        QString iconName; // Icon for the resource type
+        QString type;
+        QString setting;
+        QString iconName;
     };
     QList<ResourceInfo> getDeviceResources();
 
@@ -51,11 +72,10 @@ private:
     const DeviceInfo *deviceInfo_;
     QIcon categoryIcon_;
     QStandardItemModel *eventsModel_;
-    QStringList allEvents_;           // Store all events for "View All Events" dialog
-    QWidget *resourcesTab_ = nullptr; // Track resources tab for removal/recreation
-    QFutureWatcher<QStringList> *eventsWatcher_ = nullptr; // Async events loading
+    QStringList allEvents_;
+    QWidget *resourcesTab_ = nullptr;
+    QFutureWatcher<QStringList> *eventsWatcher_ = nullptr;
 
-    // Property name to udev property key mapping
     struct PropertyMapping {
         QString displayName;
         QString propertyKey;
