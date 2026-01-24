@@ -27,6 +27,7 @@
 #include "customizedialog.h"
 #include "devicecache.h"
 #include "mainwindow.h"
+#include "models/node.h"
 #include "models/devbyconnmodel.h"
 #include "models/devbydrivermodel.h"
 #include "models/devbytypemodel.h"
@@ -130,6 +131,9 @@ MainWindow::MainWindow() {
 
     // Install event filter to handle Enter key for expand/collapse on categories
     treeView->installEventFilter(this);
+
+    // Connect to device monitor for automatic refresh on device changes
+    connectDeviceMonitor();
 
 #ifdef DEVMGMT_USE_KDE
     // Don't use setupGUI() as it replaces the menubar from .ui file
@@ -267,22 +271,58 @@ void MainWindow::toggleShowHiddenDevices(bool checked) {
 }
 
 void MainWindow::refreshCurrentView() {
+    // Save expanded state before rebuilding
+    auto expandedPaths = saveExpandedState();
+
     // Trigger the current view action to rebuild the model
     if (currentViewAction == actionDevicesByType) {
-        switchToDevicesByType();
+        auto *oldModel = treeView->model();
+        auto *model = new DevicesByTypeModel(this);
+        treeView->setModel(model);
+        if (oldModel && oldModel != model) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionDevicesByConnection) {
-        switchToModel(new DevicesByConnectionModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new DevicesByConnectionModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionDevicesByDriver) {
-        switchToModel(new DevicesByDriverModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new DevicesByDriverModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionDriversByType) {
-        switchToModel(new DriversByTypeModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new DriversByTypeModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionDriversByDevice) {
-        switchToModel(new DriversByDeviceModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new DriversByDeviceModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionResourcesByType) {
-        switchToModel(new ResourcesByTypeModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new ResourcesByTypeModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     } else if (currentViewAction == actionResourcesByConnection) {
-        switchToModel(new ResourcesByConnectionModel(this));
+        auto *oldModel = treeView->model();
+        treeView->setModel(new ResourcesByConnectionModel(this));
+        if (oldModel) {
+            oldModel->deleteLater();
+        }
     }
+
+    // Restore expanded state
+    restoreExpandedState(expandedPaths);
+    applyViewSettings();
 }
 
 void MainWindow::scanForHardwareChanges() {
@@ -388,6 +428,82 @@ void MainWindow::applyViewSettings() {
         // Single column mode - stretch to fill parent width
         treeView->header()->setStretchLastSection(true);
         treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    }
+}
+
+void MainWindow::connectDeviceMonitor() {
+    connect(&DeviceCache::instance(),
+            &DeviceCache::devicesChanged,
+            this,
+            &MainWindow::refreshCurrentView);
+}
+
+QSet<QString> MainWindow::saveExpandedState() const {
+    QSet<QString> expandedPaths;
+    auto *model = treeView->model();
+    if (!model) {
+        return expandedPaths;
+    }
+    collectExpandedPaths(QModelIndex(), QString(), expandedPaths);
+    return expandedPaths;
+}
+
+void MainWindow::collectExpandedPaths(const QModelIndex &parent, const QString &parentPath,
+                                      QSet<QString> &expandedPaths) const {
+    auto *model = treeView->model();
+    if (!model) {
+        return;
+    }
+
+    int rowCount = model->rowCount(parent);
+    for (int row = 0; row < rowCount; ++row) {
+        QModelIndex index = model->index(row, 0, parent);
+        if (!index.isValid()) {
+            continue;
+        }
+
+        // Build the path using the display name
+        QString name = model->data(index, Qt::DisplayRole).toString();
+        QString path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
+
+        if (treeView->isExpanded(index)) {
+            expandedPaths.insert(path);
+            // Recursively check children
+            collectExpandedPaths(index, path, expandedPaths);
+        }
+    }
+}
+
+void MainWindow::restoreExpandedState(const QSet<QString> &expandedPaths) {
+    if (expandedPaths.isEmpty()) {
+        return;
+    }
+    expandMatchingPaths(QModelIndex(), QString(), expandedPaths);
+}
+
+void MainWindow::expandMatchingPaths(const QModelIndex &parent, const QString &parentPath,
+                                     const QSet<QString> &expandedPaths) {
+    auto *model = treeView->model();
+    if (!model) {
+        return;
+    }
+
+    int rowCount = model->rowCount(parent);
+    for (int row = 0; row < rowCount; ++row) {
+        QModelIndex index = model->index(row, 0, parent);
+        if (!index.isValid()) {
+            continue;
+        }
+
+        // Build the path using the display name
+        QString name = model->data(index, Qt::DisplayRole).toString();
+        QString path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
+
+        if (expandedPaths.contains(path)) {
+            treeView->expand(index);
+            // Recursively expand children
+            expandMatchingPaths(index, path, expandedPaths);
+        }
     }
 }
 

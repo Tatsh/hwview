@@ -9,6 +9,7 @@
 
 #ifdef Q_OS_LINUX
 #include "udev/udevmanager.h"
+#include "udev/udevmonitor.h"
 // Forward declaration for udev context
 struct udev;
 #elif defined(Q_OS_MACOS)
@@ -46,6 +47,16 @@ public:
     bool showHiddenDevices() const;
     void setShowHiddenDevices(bool show);
 
+    // Start monitoring for device changes (Linux only)
+    void startMonitoring();
+
+Q_SIGNALS:
+    // Emitted when devices are added or removed
+    void devicesChanged();
+
+private Q_SLOTS:
+    void onDeviceChanged();
+
 private:
     DeviceCache();
     ~DeviceCache() override;
@@ -56,6 +67,7 @@ private:
 
 #ifdef Q_OS_LINUX
     UdevManager manager_;
+    UdevMonitor *monitor_ = nullptr;
 #elif defined(Q_OS_MACOS)
     IOKitManager manager_;
 #elif defined(Q_OS_WIN)

@@ -7,6 +7,7 @@
 #endif
 
 #include <QFutureWatcher>
+#include <QSet>
 
 #include "ui_mainwindow.h"
 
@@ -45,6 +46,16 @@ protected:
 private:
     void setupMenus();
     void restoreLastView();
+    void connectDeviceMonitor();
+
+    // Tree state preservation
+    QSet<QString> saveExpandedState() const;
+    void restoreExpandedState(const QSet<QString> &expandedPaths);
+    void collectExpandedPaths(const QModelIndex &parent, const QString &parentPath,
+                              QSet<QString> &expandedPaths) const;
+    void expandMatchingPaths(const QModelIndex &parent, const QString &parentPath,
+                             const QSet<QString> &expandedPaths);
+
 #ifdef DEVMGMT_USE_KDE
     void setupActions();
     void postSetupMenus();

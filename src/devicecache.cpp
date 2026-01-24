@@ -20,9 +20,20 @@ const QString &DeviceCache::hostname() {
 
 DeviceCache::DeviceCache() : QObject(nullptr) {
     enumerate();
+#ifdef Q_OS_LINUX
+    startMonitoring();
+#endif
 }
 
-DeviceCache::~DeviceCache() = default;
+DeviceCache::~DeviceCache() {
+#ifdef Q_OS_LINUX
+    if (monitor_) {
+        monitor_->stop();
+        delete monitor_;
+        monitor_ = nullptr;
+    }
+#endif
+}
 
 void DeviceCache::enumerate() {
     devices_.clear();
@@ -89,4 +100,17 @@ bool DeviceCache::showHiddenDevices() const {
 void DeviceCache::setShowHiddenDevices(bool show) {
     ViewSettings::instance().setShowHiddenDevices(show);
     ViewSettings::instance().save();
+}
+
+void DeviceCache::startMonitoring() {
+#ifdef Q_OS_LINUX
+    monitor_ = new UdevMonitor(manager_.context(), this);
+    connect(monitor_, &UdevMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
+    monitor_->start();
+#endif
+}
+
+void DeviceCache::onDeviceChanged() {
+    refresh();
+    Q_EMIT devicesChanged();
 }
