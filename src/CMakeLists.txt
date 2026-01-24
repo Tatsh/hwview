@@ -12,6 +12,7 @@ add_executable(
   customizedialog.cpp
   devicecache.cpp
   deviceinfo.cpp
+  devicemonitor.cpp
   driverdetailsdialog.cpp
   devmgmt.qrc
   main.cpp

@@ -1,10 +1,12 @@
 #include "devicecache.h"
+#include "devicemonitor.h"
 #include "viewsettings.h"
 
 #include <QHostInfo>
 #include <QMutexLocker>
 
 #ifdef Q_OS_LINUX
+#include "udev/udevmonitor.h"
 #include <libudev.h>
 #endif
 
@@ -20,19 +22,15 @@ const QString &DeviceCache::hostname() {
 
 DeviceCache::DeviceCache() : QObject(nullptr) {
     enumerate();
-#ifdef Q_OS_LINUX
     startMonitoring();
-#endif
 }
 
 DeviceCache::~DeviceCache() {
-#ifdef Q_OS_LINUX
     if (monitor_) {
         monitor_->stop();
         delete monitor_;
         monitor_ = nullptr;
     }
-#endif
 }
 
 void DeviceCache::enumerate() {
@@ -105,9 +103,10 @@ void DeviceCache::setShowHiddenDevices(bool show) {
 void DeviceCache::startMonitoring() {
 #ifdef Q_OS_LINUX
     monitor_ = new UdevMonitor(manager_.context(), this);
-    connect(monitor_, &UdevMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
+    connect(monitor_, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
     monitor_->start();
 #endif
+    // Other platforms don't have monitoring support yet
 }
 
 void DeviceCache::onDeviceChanged() {

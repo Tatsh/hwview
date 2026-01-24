@@ -1,9 +1,8 @@
-#include "udev/udevmonitor.h"
+#include "udevmonitor.h"
 
-#ifdef Q_OS_LINUX
 #include <QSocketNotifier>
 
-UdevMonitor::UdevMonitor(struct udev *ctx, QObject *parent) : QObject(parent), ctx_(ctx) {
+UdevMonitor::UdevMonitor(struct udev *ctx, QObject *parent) : DeviceMonitor(parent), ctx_(ctx) {
 }
 
 UdevMonitor::~UdevMonitor() {
@@ -89,4 +88,3 @@ void UdevMonitor::onUdevEvent() {
 
     udev_device_unref(dev);
 }
-#endif

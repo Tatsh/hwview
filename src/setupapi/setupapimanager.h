@@ -1,9 +1,5 @@
 #pragma once
 
-#include <QtGlobal>
-
-#ifdef Q_OS_WIN
-
 #include <QList>
 #include <QString>
 #include <functional>
@@ -17,9 +13,8 @@ class DeviceInfo;
 /**
  * @brief Manages SetupAPI device enumeration on Windows.
  *
- * This class provides an interface to enumerate devices using the Windows
- * SetupAPI. It provides methods to iterate over devices and extract
- * device properties from the registry.
+ * This class provides an interface to enumerate devices using the Windows SetupAPI. It provides
+ * methods to iterate over devices and extract device properties from the registry.
  */
 class SetupApiManager {
 public:
@@ -54,8 +49,9 @@ public:
      * @param property The SPDRP_* property constant.
      * @returns The property value, or empty string if not found.
      */
-    static QString
-    getDeviceRegistryProperty(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData, DWORD property);
+    static QString getDeviceRegistryProperty(HDEVINFO devInfo,
+                                             SP_DEVINFO_DATA *devInfoData,
+                                             DWORD property);
 
     /**
      * @brief Gets the device instance ID (equivalent to syspath).
@@ -148,16 +144,3 @@ public:
 private:
     static QStringList multiSzToStringList(const wchar_t *multiSz);
 };
-
-#else
-
-/**
- * @brief Stub class for SetupApiManager on non-Windows platforms.
- */
-class SetupApiManager {
-public:
-    SetupApiManager() = default;
-    ~SetupApiManager() = default;
-};
-
-#endif // Q_OS_WIN

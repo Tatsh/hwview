@@ -4,18 +4,17 @@
 #include <QMap>
 #include <memory>
 
-#include "deviceinfo.h"
-
-#ifdef Q_OS_LINUX
-#include "udev/udevenumerate.h"
 #include <libudev.h>
+
+#include "deviceinfo.h"
+#include "udevenumerate.h"
 
 /**
  * @brief Manages udev device enumeration on Linux.
  *
- * This class provides an interface to enumerate devices using the udev
- * library. It owns the udev context and provides methods to scan for
- * devices by subsystem or with custom enumeration criteria.
+ * This class provides an interface to enumerate devices using the udev library. It owns the udev
+ * context and provides methods to scan for devices by subsystem or with custom enumeration
+ * criteria.
  */
 class UdevManager {
 public:
@@ -73,41 +72,3 @@ public:
 private:
     struct udev *ctx;
 };
-#else
-/**
- * @brief Stub class for UdevManager on non-Linux platforms.
- */
-class UdevManager {
-public:
-    UdevManager() = default;
-    ~UdevManager() = default;
-
-    /**
-     * @brief Stub that returns nullptr.
-     * @returns Always returns nullptr on non-Linux platforms.
-     */
-    void *context() const {
-        return nullptr;
-    }
-
-    /**
-     * @brief Stub that returns an empty list.
-     * @param subsystem Ignored.
-     * @returns Empty list.
-     */
-    QList<DeviceInfo> iterDevicesSubsystem(const char *subsystem) const {
-        Q_UNUSED(subsystem);
-        return {};
-    }
-
-    /**
-     * @brief Stub that returns an empty list.
-     * @param subsystem Ignored.
-     * @returns Empty list.
-     */
-    QList<DeviceInfo> iterDevicesSubsystem(const QString &subsystem) const {
-        Q_UNUSED(subsystem);
-        return {};
-    }
-};
-#endif

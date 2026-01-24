@@ -9,10 +9,6 @@
 #elif defined(Q_OS_WIN)
 #include <setupapi.h>
 #include <windows.h>
-#else
-// Stub types for unsupported platforms
-struct udev;
-struct udev_device;
 #endif
 
 /**

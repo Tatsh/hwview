@@ -1,9 +1,5 @@
 #pragma once
 
-#include <QtGlobal>
-
-#ifdef Q_OS_MACOS
-
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -16,9 +12,8 @@ class DeviceInfo;
 /**
  * @brief Manages IOKit device enumeration on macOS.
  *
- * This class provides an interface to enumerate devices using Apple's
- * IOKit framework. It provides methods to iterate over devices in the
- * IORegistry and extract device properties.
+ * This class provides an interface to enumerate devices using Apple's IOKit framework. It provides
+ * methods to iterate over devices in the IORegistry and extract device properties.
  */
 class IOKitManager {
 public:
@@ -116,16 +111,3 @@ private:
     static QString cfStringToQString(CFStringRef cfStr);
     static CFMutableDictionaryRef getAllProperties(io_service_t service);
 };
-
-#else
-
-/**
- * @brief Stub class for IOKitManager on non-macOS platforms.
- */
-class IOKitManager {
-public:
-    IOKitManager() = default;
-    ~IOKitManager() = default;
-};
-
-#endif
