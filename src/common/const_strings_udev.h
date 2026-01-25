@@ -5,13 +5,13 @@
 namespace strings {
 
 /**
-     * @brief Namespace containing udev-related constants and string accessors.
-     */
+ * @brief Namespace containing udev-related constants and string accessors.
+ */
 namespace udev {
 
 /**
-         * @brief udev property name constants.
-         */
+ * @brief udev property name constants.
+ */
 namespace propertyNames {
 constexpr char DEVNAME[] = "DEVNAME";                               ///< Device node name
 constexpr char DEVPATH[] = "DEVPATH";                               ///< Device path in sysfs
@@ -45,13 +45,13 @@ constexpr char SUBSYSTEM[] = "SUBSYSTEM";                             ///< Subsy
 } // namespace propertyNames
 
 /**
-         * @brief udev property value constants organized by property type.
-         */
+ * @brief udev property value constants organized by property type.
+ */
 namespace propertyValues {
 
 /**
-             * @brief DEVTYPE property values.
-             */
+ * @brief DEVTYPE property values.
+ */
 namespace devType {
 inline const QString &disk() {
     static const QString s = QStringLiteral("disk");
@@ -120,8 +120,8 @@ inline const QString &usbInterface() {
 } // namespace devType
 
 /**
-             * @brief DRIVER property values.
-             */
+ * @brief DRIVER property values.
+ */
 namespace driver {
 inline const QString &battery() {
     static const QString s = QStringLiteral("battery");
@@ -130,8 +130,8 @@ inline const QString &battery() {
 } // namespace driver
 
 /**
-             * @brief ID_MODEL_FROM_DATABASE property values.
-             */
+ * @brief ID_MODEL_FROM_DATABASE property values.
+ */
 namespace idModelFromDatabase {
 inline const QString &ups() {
     static const QString s = QStringLiteral("Uninterruptible Power Supply");
@@ -140,8 +140,8 @@ inline const QString &ups() {
 } // namespace idModelFromDatabase
 
 /**
-             * @brief ID_PCI_CLASS_FROM_DATABASE property values.
-             */
+ * @brief ID_PCI_CLASS_FROM_DATABASE property values.
+ */
 namespace idPciClassFromDatabase {
 inline const QString &bridge() {
     static const QString s = QStringLiteral("bridge");
@@ -182,8 +182,8 @@ inline const QString &serialBusController() {
 } // namespace idPciClassFromDatabase
 
 /**
-             * @brief ID_PCI_INTERFACE_FROM_DATABASE property values.
-             */
+ * @brief ID_PCI_INTERFACE_FROM_DATABASE property values.
+ */
 namespace idPciInterfaceFromDatabase {
 inline const QString &ahci1_0() {
     static const QString s = QStringLiteral("AHCI 1.0");
@@ -212,8 +212,8 @@ inline const QString &xhci() {
 } // namespace idPciInterfaceFromDatabase
 
 /**
-             * @brief ID_PCI_SUBCLASS_FROM_DATABASE property values.
-             */
+ * @brief ID_PCI_SUBCLASS_FROM_DATABASE property values.
+ */
 namespace idPciSubclassFromDatabase {
 inline const QString &audioDevice() {
     static const QString s = QStringLiteral("Audio device");
@@ -278,8 +278,8 @@ inline const QString &vgaCompatibleController() {
 } // namespace idPciSubclassFromDatabase
 
 /**
-             * @brief ID_TYPE property values.
-             */
+ * @brief ID_TYPE property values.
+ */
 namespace idType {
 inline const QString &audio() {
     static const QString s = QStringLiteral("audio");
@@ -290,8 +290,8 @@ inline const QString &audio() {
 } // namespace propertyValues
 
 /**
-         * @brief udev subsystem name constants.
-         */
+ * @brief udev subsystem name constants.
+ */
 namespace subsystems {
 inline const QString &acpi() {
     static const QString s = QStringLiteral("acpi");

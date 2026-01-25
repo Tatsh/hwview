@@ -142,10 +142,10 @@ inline DeviceCategory classGuidToCategory(const GUID &guid) {
 }
 
 /**
-     * @brief Converts a GUID to its string representation.
-     * @param guid The GUID to convert.
-     * @returns The GUID as a lowercase string with braces (e.g., "{4d36e96b-e325-11ce-bfc1-08002be10318}").
-     */
+ * @brief Converts a GUID to its string representation.
+ * @param guid The GUID to convert.
+ * @returns The GUID as a lowercase string with braces (e.g., "{4d36e96b-e325-11ce-bfc1-08002be10318}").
+ */
 inline QString guidToString(const GUID &guid) {
     wchar_t buffer[39];
     StringFromGUID2(guid, buffer, 39);

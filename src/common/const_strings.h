@@ -18,55 +18,55 @@
 namespace strings {
 
 /**
-     * @brief Returns the string "1".
-     * @returns Reference to the cached string.
-     */
+ * @brief Returns the string "1".
+ * @returns Reference to the cached string.
+ */
 inline const QString &digit1() {
     static const QString s = QStringLiteral("1");
     return s;
 }
 
 /**
-     * @brief Returns an empty string.
-     * @returns Reference to the cached empty string.
-     */
+ * @brief Returns an empty string.
+ * @returns Reference to the cached empty string.
+ */
 inline const QString &empty() {
     static const QString s;
     return s;
 }
 
 /**
-     * @brief Returns a single space string.
-     * @returns Reference to the cached string.
-     */
+ * @brief Returns a single space string.
+ * @returns Reference to the cached string.
+ */
 inline const QString &singleSpace() {
     static const QString s = QStringLiteral(" ");
     return s;
 }
 
 /**
-     * @brief Returns an underscore string.
-     * @returns Reference to the cached string.
-     */
+ * @brief Returns an underscore string.
+ * @returns Reference to the cached string.
+ */
 inline const QString &underscore() {
     static const QString s = QStringLiteral("_");
     return s;
 }
 
 /**
-     * @brief Looks up a HID vendor name by vendor ID.
-     * @param vendorId The vendor ID as a hexadecimal string.
-     * @returns The vendor name, or empty string if unknown.
-     */
+ * @brief Looks up a HID vendor name by vendor ID.
+ * @param vendorId The vendor ID as a hexadecimal string.
+ * @returns The vendor name, or empty string if unknown.
+ */
 inline QString hidVendorName(const QString &vendorId) {
     return NameMappings::instance().hidVendorName(vendorId);
 }
 
 /**
-     * @brief Maps a software device name to a user-friendly display name.
-     * @param name The device name (may include @c /dev/ prefix).
-     * @returns A user-friendly name, or the original name if no mapping exists.
-     */
+ * @brief Maps a software device name to a user-friendly display name.
+ * @param name The device name (may include @c /dev/ prefix).
+ * @returns A user-friendly name, or the original name if no mapping exists.
+ */
 inline QString softwareDeviceDisplayName(const QString &name) {
     // Strip /dev/ prefix if present
     QString shortName = name;
@@ -135,8 +135,8 @@ inline QString softwareDeviceDisplayName(const QString &name) {
 }
 
 /**
-     * @brief HID bus type constants from Linux @c input.h.
-     */
+ * @brief HID bus type constants from Linux @c input.h.
+ */
 namespace hidBusTypes {
 constexpr int BUS_PCI = 0x01;       ///< PCI bus
 constexpr int BUS_USB = 0x03;       ///< USB bus
@@ -147,8 +147,8 @@ constexpr int BUS_HOST = 0x19;      ///< Host bus
 } // namespace hidBusTypes
 
 /**
-     * @brief Parsed HID device ID information.
-     */
+ * @brief Parsed HID device ID information.
+ */
 struct HidDeviceId {
     int busType = 0;    ///< Bus type (see @c hidBusTypes)
     QString vendorId;   ///< Vendor ID as hex string
@@ -158,14 +158,14 @@ struct HidDeviceId {
 };
 
 /**
-     * @brief Parses a HID device ID from a path component.
-     *
-     * Parses strings like "0018:06CB:7E7E.0005" to extract bus type, vendor ID, product ID, and
-     * instance number.
-     *
-     * @param path The path containing a HID device ID component.
-     * @returns Parsed @c HidDeviceId structure.
-     */
+ * @brief Parses a HID device ID from a path component.
+ *
+ * Parses strings like "0018:06CB:7E7E.0005" to extract bus type, vendor ID, product ID, and
+ * instance number.
+ *
+ * @param path The path containing a HID device ID component.
+ * @returns Parsed @c HidDeviceId structure.
+ */
 inline HidDeviceId parseHidDeviceId(const QString &path) {
     HidDeviceId result;
     static const QRegularExpression hidIdRe(
@@ -187,19 +187,19 @@ inline HidDeviceId parseHidDeviceId(const QString &path) {
 }
 
 /**
-     * @brief Returns the human-readable name for a HID bus type.
-     * @param busType The bus type constant.
-     * @returns The bus type name, or empty string if unknown.
-     */
+ * @brief Returns the human-readable name for a HID bus type.
+ * @param busType The bus type constant.
+ * @returns The bus type name, or empty string if unknown.
+ */
 inline QString hidBusTypeName(int busType) {
     return NameMappings::instance().hidBusTypeName(busType);
 }
 
 /**
-     * @brief Parses an I2C bus number from a device path.
-     * @param path The device path containing an I2C bus component.
-     * @returns The I2C bus number, or @c -1 if not found.
-     */
+ * @brief Parses an I2C bus number from a device path.
+ * @param path The device path containing an I2C bus component.
+ * @returns The I2C bus number, or @c -1 if not found.
+ */
 inline int parseI2cBusNumber(const QString &path) {
     static const QRegularExpression i2cBusRe(QStringLiteral("/i2c-(\\d+)(?:/|$)"));
     auto match = i2cBusRe.match(path);
@@ -214,11 +214,11 @@ inline int parseI2cBusNumber(const QString &path) {
 }
 
 /**
-     * @brief Maps an ACPI/PNP device ID to a user-friendly name.
-     * @param devPath The device path containing the PNP ID.
-     * @param fallbackName Name to use if no mapping exists.
-     * @returns A user-friendly name for the ACPI device.
-     */
+ * @brief Maps an ACPI/PNP device ID to a user-friendly name.
+ * @param devPath The device path containing the PNP ID.
+ * @param fallbackName Name to use if no mapping exists.
+ * @returns A user-friendly name for the ACPI device.
+ */
 inline QString acpiDeviceDisplayName(const QString &devPath, const QString &fallbackName) {
     auto lastSlash = devPath.lastIndexOf(QLatin1Char('/'));
     if (lastSlash < 0) {
