@@ -116,12 +116,6 @@ int main(int argc, char *argv[]) {
         QCoreApplication::translate("main", "View and manage device hardware settings."));
     parser.addHelpOption();
     parser.addVersionOption();
-
-    QCommandLineOption exportOption(
-        {QStringLiteral("e"), QStringLiteral("export")},
-        QCoreApplication::translate("main", "Export device data to <file> and exit."),
-        QStringLiteral("file"));
-    parser.addOption(exportOption);
     parser.addPositionalArgument(QStringLiteral("file"),
                                  QCoreApplication::translate("main", "Export file to open."),
                                  QStringLiteral("[file]"));
