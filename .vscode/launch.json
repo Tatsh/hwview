@@ -1,12 +1,5 @@
 {
-  "configurations": [
-    {
-      "name": "Debug",
-      "cwd": "${workspaceFolder}/build",
-      "program": "${workspaceFolder}/build/devmgmt",
-      "request": "launch",
-      "type": "cppdbg"
-    }
-  ],
+  "configurations": [],
+  "inputs": [],
   "version": "0.2.0"
 }

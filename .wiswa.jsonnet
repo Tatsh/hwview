@@ -1,0 +1,94 @@
+{
+  security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
+  project_name: 'devmgmt',
+  version: '0.0.1',
+  description: 'Hardware information utility, inspired by Redmond.',
+  keywords: ['device', 'manager', 'system', 'information', 'linux'],
+  want_main: false,
+  want_codeql: false,
+  want_tests: false,
+  copilot+: {
+    intro: 'Device Manager is a Qt-based system device information viewer, inspired by Device Manager (`devmgmt.msc`) on Windows.',
+  },
+  package_json+: {
+    cspell+: {
+      ignorePaths+: [
+        '.docs/*.tags',
+        '.docs/*.tag.xml',
+      ],
+    },
+    scripts+: {
+      'check-formatting': "clang-format -n src/*.cpp src/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules' '#vcpkg_installed'",
+      'flatpak-build-install': 'flatpak run --command=flathub-build org.flatpak.Builder --install sh.tat..yml',
+      'flatpak-install': 'flatpak uninstall -y  || true && flatpak install -y --user --reinstall flathub sh.tat.devmgmt',
+      'flatpak-lint': 'flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest sh.tat..yml',
+      'flatpak-run': 'flatpak run sh.tat.',
+      'flatpak-uninstall': 'flatpak uninstall -y sh.tat.',
+      format: 'clang-format -i src/*.cpp src/*.h && yarn prettier -w .',
+    },
+  },
+  prettierignore+: ['*.desktop', '*.tags', 'src/icon.rc'],
+  cz+: {
+    commitizen+: {
+      version_files+: [
+        'CMakeLists.txt',
+        'man/devmgmt.1',
+        'sh.tat.devmgmt.yml',
+        'src/cli/main.cpp',
+        'src/main.cpp',
+      ],
+    },
+  },
+  shared_ignore+: [
+    '/.flatpak-builder/',
+    '/build_fp/',
+    '/repo/',
+  ],
+  vscode+: {
+    c_cpp+: {
+      configurations: [
+        {
+          cStandard: 'c23',
+          compilerPath: '/usr/bin/gcc',
+          cppStandard: 'c++23',
+          includePath: [
+            '${workspaceFolder}/src/**',
+            '${workspaceFolder}/build/**/include',
+          ],
+          name: 'Linux',
+        },
+      ],
+    },
+    settings+: {
+      'files.associations': {
+        '*.moc': 'cpp',
+        '*.ui': 'xml',
+        'i18n/*.ts': 'xml',
+      },
+    },
+  },
+  // C++ only
+  cmake+: {
+    uses_qt: true,
+  },
+  project_type: 'c++',
+  vcpkg+: {
+    dependencies: [
+      {
+        name: 'ecm',
+        'version>=': '6.7.0',
+      },
+      {
+        features: ['concurrent', 'gui', 'network', 'widgets'],
+        name: 'qtbase',
+        'version>=': '6.8.3',
+      },
+    ],
+  },
+  github+: {
+    publish_winget: {
+      identifier: 'Tatsh.',
+      max_versions_to_keep: 1,
+    },
+  },
+}

@@ -1,13 +1,11 @@
 {
   "configurations": [
     {
-      "name": "Linux",
-      "includePath": ["${workspaceFolder}/**"],
-      "defines": [],
+      "cStandard": "c23",
       "compilerPath": "/usr/bin/gcc",
-      "cStandard": "gnu17",
-      "cppStandard": "gnu++17",
-      "configurationProvider": "ms-vscode.cmake-tools"
+      "cppStandard": "c++23",
+      "includePath": ["${workspaceFolder}/src/**", "${workspaceFolder}/build/**/include"],
+      "name": "Linux"
     }
   ],
   "version": 4

@@ -1,0 +1,20 @@
+{
+  "dependencies": [
+    {
+      "name": "ecm",
+      "version>=": "6.7.0"
+    },
+    {
+      "features": ["concurrent", "gui", "network", "widgets"],
+      "name": "qtbase",
+      "version>=": "6.8.3"
+    }
+  ],
+  "description": "Hardware information utility, inspired by Redmond.",
+  "documentation": "https://devmgmt.readthedocs.org",
+  "homepage": "https://tatsh.github.io/devmgmt/",
+  "license": "MIT",
+  "maintainers": ["Andrew Udvare <audvare@gmail.com>"],
+  "name": "devmgmt",
+  "version": "0.0.1"
+}
