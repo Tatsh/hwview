@@ -1,6 +1,6 @@
 #include "deviceinfo.h"
-#include "deviceinfo_p.h"
 #include "common/importeddeviceinfo.h"
+#include "deviceinfo_p.h"
 
 #include <utility>
 
@@ -20,8 +20,8 @@ DeviceInfoPrivate::DeviceInfoPrivate(const DeviceInfoPrivate &other, DeviceInfo 
       modAlias_(other.modAlias_), name_(other.name_), subsystem_(other.subsystem_),
       syspath_(other.syspath_), parentSyspath_(other.parentSyspath_), devnode_(other.devnode_),
       idVendorFromDatabase_(other.idVendorFromDatabase_), pciClass_(other.pciClass_),
-      pciSubclass_(other.pciSubclass_), pciInterface_(other.pciInterface_), idCdrom_(other.idCdrom_),
-      devType_(other.devType_), idInputKeyboard_(other.idInputKeyboard_),
+      pciSubclass_(other.pciSubclass_), pciInterface_(other.pciInterface_),
+      idCdrom_(other.idCdrom_), devType_(other.devType_), idInputKeyboard_(other.idInputKeyboard_),
       idInputMouse_(other.idInputMouse_), idType_(other.idType_),
       idModelFromDatabase_(other.idModelFromDatabase_), isHidden_(other.isHidden_),
       category_(other.category_), platformClassName_(other.platformClassName_), q_ptr(q) {

@@ -88,7 +88,8 @@ void DeviceCache::startMonitoring() {
     if (monitor_) {
         auto *deviceMonitor = qobject_cast<DeviceMonitor *>(monitor_);
         if (deviceMonitor) {
-            connect(deviceMonitor, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
+            connect(
+                deviceMonitor, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
             deviceMonitor->start();
         }
     }

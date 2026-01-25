@@ -30,8 +30,8 @@ UdevDeviceInfoPrivate::UdevDeviceInfoPrivate(udev *ctx, const char *syspath)
     modAlias_ = QString::fromLocal8Bit(udev_device_get_property_value(dev_, props::MODALIAS));
     subsystem_ = QString::fromLocal8Bit(udev_device_get_property_value(dev_, props::SUBSYSTEM));
     driver_ = QString::fromLocal8Bit(udev_device_get_property_value(dev_, props::DRIVER));
-    idVendorFromDatabase_ =
-        QString::fromLocal8Bit(udev_device_get_property_value(dev_, props::ID_VENDOR_FROM_DATABASE));
+    idVendorFromDatabase_ = QString::fromLocal8Bit(
+        udev_device_get_property_value(dev_, props::ID_VENDOR_FROM_DATABASE));
 
     pciClass_ = QString::fromLocal8Bit(
         udev_device_get_property_value(dev_, props::ID_PCI_CLASS_FROM_DATABASE));

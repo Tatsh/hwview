@@ -2,7 +2,8 @@
 #include "udevmanager.h"
 
 UdevEnumerate::UdevEnumerate(UdevManager &manager)
-    : enumerator_(udev_enumerate_new(manager.context())) {}
+    : enumerator_(udev_enumerate_new(manager.context())) {
+}
 
 void UdevEnumerate::addMatchProperty(const char *property) {
     udev_enumerate_add_match_property(enumerator_, property, "1");

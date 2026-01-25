@@ -32,8 +32,7 @@ QJsonObject DeviceExport::createExportData(const QList<DeviceInfo> &devices,
     // Format metadata
     root[QStringLiteral("formatVersion")] = FORMAT_VERSION;
     root[QStringLiteral("mimeType")] = QLatin1String(MIME_TYPE);
-    root[QStringLiteral("exportDate")] =
-        QDateTime::currentDateTime().toString(Qt::ISODateWithMs);
+    root[QStringLiteral("exportDate")] = QDateTime::currentDateTime().toString(Qt::ISODateWithMs);
     root[QStringLiteral("applicationName")] = QCoreApplication::applicationName();
     root[QStringLiteral("applicationVersion")] = QCoreApplication::applicationVersion();
 

@@ -1,6 +1,6 @@
+#include "models/resbytypemodel.h"
 #include "const_strings.h"
 #include "devicecache.h"
-#include "models/resbytypemodel.h"
 #include "systeminfo.h"
 #include "viewsettings.h"
 

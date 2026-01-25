@@ -85,8 +85,13 @@ void ResourcesByConnectionModel::addIoPorts() {
     nodeStack.push({-1, ioItem});
 
     for (const auto &port : ports) {
-        buildHierarchicalResource(ioItem, s::categoryIcons::ioPorts(), port.indentLevel,
-                                  port.rangeStart, port.rangeEnd, port.name, nodeStack);
+        buildHierarchicalResource(ioItem,
+                                  s::categoryIcons::ioPorts(),
+                                  port.indentLevel,
+                                  port.rangeStart,
+                                  port.rangeEnd,
+                                  port.name,
+                                  nodeStack);
     }
 
     hostnameItem->appendChild(ioItem);
@@ -104,7 +109,8 @@ void ResourcesByConnectionModel::addIrq() {
     for (const auto &irq : irqs) {
         QString displayText;
         if (!irq.irqType.isEmpty()) {
-            displayText = QStringLiteral("(%1) %2 %3").arg(irq.irqType, irq.irqNumber, irq.deviceName);
+            displayText =
+                QStringLiteral("(%1) %2 %3").arg(irq.irqType, irq.irqNumber, irq.deviceName);
         } else {
             displayText = QStringLiteral("%1 %2").arg(irq.irqNumber, irq.deviceName);
         }
@@ -129,8 +135,13 @@ void ResourcesByConnectionModel::addMemory() {
     nodeStack.push({-1, memoryItem});
 
     for (const auto &range : ranges) {
-        buildHierarchicalResource(memoryItem, s::categoryIcons::memory(), range.indentLevel,
-                                  range.rangeStart, range.rangeEnd, range.name, nodeStack);
+        buildHierarchicalResource(memoryItem,
+                                  s::categoryIcons::memory(),
+                                  range.indentLevel,
+                                  range.rangeStart,
+                                  range.rangeEnd,
+                                  range.name,
+                                  nodeStack);
     }
 
     hostnameItem->appendChild(memoryItem);

@@ -157,8 +157,7 @@ DriverFileDetails getDriverFileDetails(const QString &driverPath, const QString 
         details.copyright = QStringLiteral("NVIDIA Driver License Agreement");
         details.signer = QStringLiteral("NVIDIA Corporation");
     } else {
-        details.provider =
-            info.author.isEmpty() ? QStringLiteral("Linux Foundation") : info.author;
+        details.provider = info.author.isEmpty() ? QStringLiteral("Linux Foundation") : info.author;
         details.copyright = info.license;
         details.signer = info.signer.isEmpty() ? QStringLiteral("Linux Foundation") : info.signer;
     }
@@ -829,8 +828,7 @@ static QString getBlockDeviceManufacturer(const QString &syspath,
                 {QStringLiteral("HGST"), QStringLiteral("HGST")},
                 {QStringLiteral("HL-DT-ST"), QStringLiteral("LG Electronics")},
                 {QStringLiteral("HLDS"), QStringLiteral("LG Electronics")},
-                {QStringLiteral("TSSTcorp"),
-                 QStringLiteral("Toshiba Samsung Storage Technology")},
+                {QStringLiteral("TSSTcorp"), QStringLiteral("Toshiba Samsung Storage Technology")},
                 {QStringLiteral("PIONEER"), QStringLiteral("Pioneer")},
                 {QStringLiteral("ASUS"), QStringLiteral("ASUSTeK Computer")},
                 {QStringLiteral("LITE-ON"), QStringLiteral("Lite-On")},
@@ -1152,9 +1150,8 @@ QStringList convertToHardwareIds(const QString &propertyKey, const QString &valu
     }
 
     // Parse PCI modalias: pci:vXXXXXXXXdXXXXXXXXsvXXXXXXXXsdXXXXXXXXbcXXscXXiXX
-    static const QRegularExpression pciRe(
-        QStringLiteral("^pci:v([0-9A-Fa-f]{8})d([0-9A-Fa-f]{8})"
-                       "sv([0-9A-Fa-f]{8})sd([0-9A-Fa-f]{8})"));
+    static const QRegularExpression pciRe(QStringLiteral("^pci:v([0-9A-Fa-f]{8})d([0-9A-Fa-f]{8})"
+                                                         "sv([0-9A-Fa-f]{8})sd([0-9A-Fa-f]{8})"));
     auto pciMatch = pciRe.match(value);
     if (pciMatch.hasMatch()) {
         QString vendorId = pciMatch.captured(1).right(4).toUpper();
@@ -1328,8 +1325,8 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         properties.insert(QStringLiteral("ID_MODEL"), info.propertyValue("ID_MODEL"));
         properties.insert(QStringLiteral("ID_MODEL_FROM_DATABASE"),
                           info.propertyValue("ID_MODEL_FROM_DATABASE"));
-        manufacturer = getBlockDeviceManufacturer(info.syspath(), info.name(), info.parentSyspath(),
-                                                  properties);
+        manufacturer = getBlockDeviceManufacturer(
+            info.syspath(), info.name(), info.parentSyspath(), properties);
     }
 
     if (manufacturer.isEmpty()) {
@@ -1406,8 +1403,7 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         return QStringLiteral("Intel Corporation");
     }
     // Linux Foundation devices (misc/software devices and input devices)
-    if (shortName == QStringLiteral("autofs") ||
-        shortName == QStringLiteral("cpu dma latency") ||
+    if (shortName == QStringLiteral("autofs") || shortName == QStringLiteral("cpu dma latency") ||
         shortName == QStringLiteral("cpu_dma_latency") || shortName == QStringLiteral("fuse") ||
         shortName == QStringLiteral("hpet") || shortName == QStringLiteral("hwrng") ||
         shortName == QStringLiteral("kvm") || shortName == QStringLiteral("loop-control") ||
@@ -1418,13 +1414,13 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         shortName == QStringLiteral("vhost-net") ||
         shortName.startsWith(QStringLiteral("input/event")) ||
         shortName.startsWith(QStringLiteral("input/mouse")) ||
-        shortNode == QStringLiteral("autofs") ||
-        shortNode == QStringLiteral("cpu_dma_latency") || shortNode == QStringLiteral("fuse") ||
-        shortNode == QStringLiteral("hpet") || shortNode == QStringLiteral("hwrng") ||
-        shortNode == QStringLiteral("kvm") || shortNode == QStringLiteral("loop-control") ||
-        shortNode == QStringLiteral("mcelog") || shortNode == QStringLiteral("net/tun") ||
-        shortNode == QStringLiteral("ntsync") || shortNode == QStringLiteral("rfkill") ||
-        shortNode == QStringLiteral("uhid") || shortNode == QStringLiteral("uinput") ||
+        shortNode == QStringLiteral("autofs") || shortNode == QStringLiteral("cpu_dma_latency") ||
+        shortNode == QStringLiteral("fuse") || shortNode == QStringLiteral("hpet") ||
+        shortNode == QStringLiteral("hwrng") || shortNode == QStringLiteral("kvm") ||
+        shortNode == QStringLiteral("loop-control") || shortNode == QStringLiteral("mcelog") ||
+        shortNode == QStringLiteral("net/tun") || shortNode == QStringLiteral("ntsync") ||
+        shortNode == QStringLiteral("rfkill") || shortNode == QStringLiteral("uhid") ||
+        shortNode == QStringLiteral("uinput") ||
         shortNode.startsWith(QStringLiteral("input/event")) ||
         shortNode.startsWith(QStringLiteral("input/mouse")) ||
         shortNode == QStringLiteral("vga_arbiter") || shortNode == QStringLiteral("vhost-net") ||
@@ -1506,8 +1502,8 @@ QHash<QString, QString> getExportDeviceProperties(const DeviceInfo &info) {
 }
 
 static bool isPciDeviceForExport(const QString &syspath) {
-    static const QRegularExpression pciPathRe(QStringLiteral(
-        "/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\\.[0-9a-fA-F]$"));
+    static const QRegularExpression pciPathRe(
+        QStringLiteral("/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\\.[0-9a-fA-F]$"));
     return pciPathRe.match(syspath).hasMatch();
 }
 
@@ -1524,10 +1520,8 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath) {
         ExportResourceInfo res;
         res.type = QStringLiteral("IRQ");
         res.value = irq.toInt();
-        res.displayValue = QStringLiteral("0x%1 (%2)")
-                               .arg(res.value, 8, 16, QLatin1Char('0'))
-                               .arg(irq)
-                               .toUpper();
+        res.displayValue =
+            QStringLiteral("0x%1 (%2)").arg(res.value, 8, 16, QLatin1Char('0')).arg(irq).toUpper();
         resources.append(res);
     }
 

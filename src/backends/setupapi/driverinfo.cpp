@@ -5,9 +5,9 @@
 #include <QFile>
 #include <QSettings>
 
-#include <windows.h>
 #include <softpub.h>
 #include <wincrypt.h>
+#include <windows.h>
 #include <wintrust.h>
 
 DriverSearchResult findDriverFiles(const QString &driverName) {
@@ -190,12 +190,8 @@ DriverInfo getDriverInfo(const QString &driverPath) {
                 PCCERT_CONTEXT cert = signer->pasCertChain[0].pCert;
                 if (cert) {
                     wchar_t subjectName[256];
-                    DWORD subjectLen = CertGetNameStringW(cert,
-                                                          CERT_NAME_SIMPLE_DISPLAY_TYPE,
-                                                          0,
-                                                          nullptr,
-                                                          subjectName,
-                                                          256);
+                    DWORD subjectLen = CertGetNameStringW(
+                        cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, nullptr, subjectName, 256);
                     if (subjectLen > 1) {
                         info.signer = QString::fromWCharArray(subjectName);
                     }

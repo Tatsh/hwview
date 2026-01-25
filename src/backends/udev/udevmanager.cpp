@@ -5,7 +5,8 @@
 
 #include <utility>
 
-UdevManager::UdevManager() : ctx(udev_new()) {}
+UdevManager::UdevManager() : ctx(udev_new()) {
+}
 
 UdevManager::~UdevManager() {
     udev_unref(ctx);

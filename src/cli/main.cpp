@@ -53,8 +53,7 @@ int main(int argc, char *argv[]) {
 
     QCommandLineParser parser;
     parser.setApplicationDescription(
-        QCoreApplication::translate("main",
-                                    "Export device hardware information to a file."));
+        QCoreApplication::translate("main", "Export device hardware information to a file."));
     parser.addHelpOption();
     parser.addVersionOption();
 

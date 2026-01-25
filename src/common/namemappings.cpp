@@ -59,9 +59,8 @@ void NameMappings::reload() {
     // On Linux: ~/.local/share/devmgmt
     // On Windows: C:/Users/<USER>/AppData/Local/devmgmt
     // On macOS: ~/Library/Application Support/devmgmt
-    QString userPath =
-        QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-        QStringLiteral("/devmgmt");
+    QString userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+                       QStringLiteral("/devmgmt");
     loadFromDirectory(userPath, locale);
 }
 
@@ -73,9 +72,8 @@ void NameMappings::loadFromDirectory(const QString &dirPath, const QString &loca
 
     // Load default file first (en-US)
     // Try name-mappings.en-US.json first, fall back to name-mappings.json
-    QString defaultLocalePath =
-        dirPath + QStringLiteral("/name-mappings.") + QLatin1String(kDefaultLocale) +
-        QStringLiteral(".json");
+    QString defaultLocalePath = dirPath + QStringLiteral("/name-mappings.") +
+                                QLatin1String(kDefaultLocale) + QStringLiteral(".json");
     QString defaultPath = dirPath + QStringLiteral("/name-mappings.json");
 
     if (QFile::exists(defaultLocalePath)) {

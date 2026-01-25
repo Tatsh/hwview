@@ -87,10 +87,8 @@ std::expected<void, DeviceMonitorError> SetupApiMonitor::registerForDeviceNotifi
     filter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
     // Leave dbcc_classguid as zero to receive notifications for all device classes
 
-    deviceNotification_ = RegisterDeviceNotificationW(messageWindow_,
-                                                      &filter,
-                                                      DEVICE_NOTIFY_WINDOW_HANDLE |
-                                                          DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);
+    deviceNotification_ = RegisterDeviceNotificationW(
+        messageWindow_, &filter, DEVICE_NOTIFY_WINDOW_HANDLE | DEVICE_NOTIFY_ALL_INTERFACE_CLASSES);
 
     if (!deviceNotification_) {
         return std::unexpected(DeviceMonitorError::DeviceNotificationFailed);
@@ -101,8 +99,7 @@ std::expected<void, DeviceMonitorError> SetupApiMonitor::registerForDeviceNotifi
 
 LRESULT CALLBACK SetupApiMonitor::windowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
     if (msg == WM_DEVICECHANGE) {
-        auto *monitor =
-            reinterpret_cast<SetupApiMonitor *>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
+        auto *monitor = reinterpret_cast<SetupApiMonitor *>(GetWindowLongPtrW(hwnd, GWLP_USERDATA));
 
         if (monitor && monitor->running_) {
             switch (wParam) {

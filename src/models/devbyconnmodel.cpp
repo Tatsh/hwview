@@ -31,10 +31,10 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *r
             name = syspath;
         }
         // Only add prefix for subsystems without dedicated display name handling
-        addSubsystemPrefix =
-            !subsystem.isEmpty() && subsystem != QStringLiteral("acpi") &&
-            subsystem != QStringLiteral("scsi_host") && subsystem != QStringLiteral("scsi") &&
-            subsystem != QStringLiteral("i2c");
+        addSubsystemPrefix = !subsystem.isEmpty() && subsystem != QStringLiteral("acpi") &&
+                             subsystem != QStringLiteral("scsi_host") &&
+                             subsystem != QStringLiteral("scsi") &&
+                             subsystem != QStringLiteral("i2c");
     }
 
     // Store raw name before transformation

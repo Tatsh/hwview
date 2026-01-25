@@ -33,9 +33,13 @@ private:
     void addIoPorts();
     void addIrq();
     void addMemory();
-    void buildHierarchicalResource(Node *categoryNode, const QIcon &itemIcon, int indentLevel,
-                                   const QString &rangeStart, const QString &rangeEnd,
-                                   const QString &name, QStack<QPair<int, Node *>> &nodeStack);
+    void buildHierarchicalResource(Node *categoryNode,
+                                   const QIcon &itemIcon,
+                                   int indentLevel,
+                                   const QString &rangeStart,
+                                   const QString &rangeEnd,
+                                   const QString &name,
+                                   QStack<QPair<int, Node *>> &nodeStack);
 
     Node *hostnameItem;
     Node *dmaItem;

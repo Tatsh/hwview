@@ -3,7 +3,8 @@
 
 #include <QDebug>
 
-ImportedDeviceInfoPrivate::ImportedDeviceInfoPrivate(const QJsonObject &json) : DeviceInfoPrivate() {
+ImportedDeviceInfoPrivate::ImportedDeviceInfoPrivate(const QJsonObject &json)
+    : DeviceInfoPrivate() {
     syspath_ = json[QStringLiteral("syspath")].toString();
     name_ = json[QStringLiteral("name")].toString();
     driver_ = json[QStringLiteral("driver")].toString();

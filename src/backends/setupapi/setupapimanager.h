@@ -49,9 +49,8 @@ public:
      * @param property The @c SPDRP_* property constant.
      * @returns The property value, or empty string if not found.
      */
-    static QString getDeviceRegistryProperty(HDEVINFO devInfo,
-                                             SP_DEVINFO_DATA *devInfoData,
-                                             DWORD property);
+    static QString
+    getDeviceRegistryProperty(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData, DWORD property);
 
     /**
      * @brief Gets the device instance ID (equivalent to syspath).

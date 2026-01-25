@@ -13,8 +13,8 @@
 #include <QRegularExpression>
 #include <QTextStream>
 
-#include <windows.h>
 #include <cfgmgr32.h>
+#include <windows.h>
 
 bool isComputerEntry(const QString &syspath) {
     // Windows: The computer entry can be empty, the root tree, or the ACPI HAL
@@ -431,13 +431,11 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                 switch (resType) {
                 case ResType_IRQ: {
                     auto *irqData = reinterpret_cast<IRQ_RESOURCE *>(data.data());
-                    QString setting = QStringLiteral("0x%1 (%2)")
-                                          .arg(irqData->IRQ_Header.IRQD_Alloc_Num,
-                                               8,
-                                               16,
-                                               QLatin1Char('0'))
-                                          .arg(irqData->IRQ_Header.IRQD_Alloc_Num)
-                                          .toUpper();
+                    QString setting =
+                        QStringLiteral("0x%1 (%2)")
+                            .arg(irqData->IRQ_Header.IRQD_Alloc_Num, 8, 16, QLatin1Char('0'))
+                            .arg(irqData->IRQ_Header.IRQD_Alloc_Num)
+                            .toUpper();
                     resources.append(
                         {QObject::tr("IRQ"), setting, QStringLiteral("preferences-other")});
                     break;
@@ -466,9 +464,8 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                                               .arg(start, 8, 16, QLatin1Char('0'))
                                               .arg(end, 8, 16, QLatin1Char('0'))
                                               .toUpper();
-                        resources.append({QObject::tr("I/O Range"),
-                                          setting,
-                                          QStringLiteral("drive-harddisk")});
+                        resources.append(
+                            {QObject::tr("I/O Range"), setting, QStringLiteral("drive-harddisk")});
                     }
                     break;
                 }
@@ -564,8 +561,7 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
         return info;
     }
 
-    QString driverKeyPath =
-        QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+    QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
     HKEY hKey;
     std::wstring keyPath = driverKeyPath.toStdWString();
 
@@ -577,46 +573,34 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
     DWORD valueSize = sizeof(value);
     DWORD type;
 
-    if (RegQueryValueExW(hKey,
-                         L"ProviderName",
-                         nullptr,
-                         &type,
-                         reinterpret_cast<LPBYTE>(value),
-                         &valueSize) == ERROR_SUCCESS &&
+    if (RegQueryValueExW(
+            hKey, L"ProviderName", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
+            ERROR_SUCCESS &&
         type == REG_SZ) {
         info.provider = QString::fromWCharArray(value);
         info.hasDriverFiles = true;
     }
 
     valueSize = sizeof(value);
-    if (RegQueryValueExW(hKey,
-                         L"DriverVersion",
-                         nullptr,
-                         &type,
-                         reinterpret_cast<LPBYTE>(value),
-                         &valueSize) == ERROR_SUCCESS &&
+    if (RegQueryValueExW(
+            hKey, L"DriverVersion", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
+            ERROR_SUCCESS &&
         type == REG_SZ) {
         info.version = QString::fromWCharArray(value);
     }
 
     valueSize = sizeof(value);
-    if (RegQueryValueExW(hKey,
-                         L"DriverDate",
-                         nullptr,
-                         &type,
-                         reinterpret_cast<LPBYTE>(value),
-                         &valueSize) == ERROR_SUCCESS &&
+    if (RegQueryValueExW(
+            hKey, L"DriverDate", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
+            ERROR_SUCCESS &&
         type == REG_SZ) {
         info.date = QString::fromWCharArray(value);
     }
 
     valueSize = sizeof(value);
-    if (RegQueryValueExW(hKey,
-                         L"InfPath",
-                         nullptr,
-                         &type,
-                         reinterpret_cast<LPBYTE>(value),
-                         &valueSize) == ERROR_SUCCESS &&
+    if (RegQueryValueExW(
+            hKey, L"InfPath", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
+            ERROR_SUCCESS &&
         type == REG_SZ) {
         QString infPath = QString::fromWCharArray(value);
         if (infPath.startsWith(QStringLiteral("oem"), Qt::CaseInsensitive)) {
@@ -734,8 +718,7 @@ ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     driverInfo.name = driver;
 
     // Windows driver info from registry
-    QString driverKeyPath =
-        QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+    QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
     HKEY hKey;
     std::wstring keyPath = driverKeyPath.toStdWString();
 
@@ -744,24 +727,33 @@ ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
         DWORD valueSize = sizeof(value);
         DWORD type;
 
-        if (RegQueryValueExW(hKey, L"ProviderName", nullptr, &type,
-                             reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+        if (RegQueryValueExW(hKey,
+                             L"ProviderName",
+                             nullptr,
+                             &type,
+                             reinterpret_cast<LPBYTE>(value),
+                             &valueSize) == ERROR_SUCCESS) {
             if (type == REG_SZ) {
                 driverInfo.provider = QString::fromWCharArray(value);
             }
         }
 
         valueSize = sizeof(value);
-        if (RegQueryValueExW(hKey, L"DriverVersion", nullptr, &type,
-                             reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+        if (RegQueryValueExW(hKey,
+                             L"DriverVersion",
+                             nullptr,
+                             &type,
+                             reinterpret_cast<LPBYTE>(value),
+                             &valueSize) == ERROR_SUCCESS) {
             if (type == REG_SZ) {
                 driverInfo.version = QString::fromWCharArray(value);
             }
         }
 
         valueSize = sizeof(value);
-        if (RegQueryValueExW(hKey, L"DriverDate", nullptr, &type,
-                             reinterpret_cast<LPBYTE>(value), &valueSize) == ERROR_SUCCESS) {
+        if (RegQueryValueExW(
+                hKey, L"DriverDate", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
+            ERROR_SUCCESS) {
             if (type == REG_SZ) {
                 driverInfo.date = QString::fromWCharArray(value);
             }

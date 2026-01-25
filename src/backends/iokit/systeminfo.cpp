@@ -514,8 +514,7 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
     }
 
     // Extract memory ranges from IODeviceMemory or reg property
-    QRegularExpression memoryRe(
-        QStringLiteral("\"(?:IODeviceMemory|reg)\"\\s*=\\s*\\(([^)]+)\\)"));
+    QRegularExpression memoryRe(QStringLiteral("\"(?:IODeviceMemory|reg)\"\\s*=\\s*\\(([^)]+)\\)"));
     auto memoryMatch = memoryRe.match(output);
     if (memoryMatch.hasMatch()) {
         QString memData = memoryMatch.captured(1);
@@ -533,9 +532,8 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                 if (ok && addr != 0) {
                     QString setting =
                         QStringLiteral("0x%1").arg(addr, 16, 16, QLatin1Char('0')).toUpper();
-                    resources.append({QObject::tr("Memory Range"),
-                                      setting,
-                                      QStringLiteral("drive-harddisk")});
+                    resources.append(
+                        {QObject::tr("Memory Range"), setting, QStringLiteral("drive-harddisk")});
                     ++memIndex;
                     if (memIndex >= 8) {
                         break; // Limit to avoid too many entries
@@ -738,7 +736,8 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         bool ok;
         int vid = vendorId.toInt(&ok);
         if (ok && vid != 0) {
-            manufacturer = lookupUsbVendor(QString::number(vid, 16).rightJustified(4, QLatin1Char('0')));
+            manufacturer =
+                lookupUsbVendor(QString::number(vid, 16).rightJustified(4, QLatin1Char('0')));
             if (!manufacturer.isEmpty()) {
                 return manufacturer;
             }

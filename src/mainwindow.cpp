@@ -28,7 +28,6 @@
 
 #include "customizedialog.h"
 #include "devicecache.h"
-#include "systeminfo.h"
 #include "deviceexport.h"
 #include "mainwindow.h"
 #include "models/devbyconnmodel.h"
@@ -40,6 +39,7 @@
 #include "models/resbyconnmodel.h"
 #include "models/resbytypemodel.h"
 #include "propertiesdialog.h"
+#include "systeminfo.h"
 #include "viewsettings.h"
 
 MainWindow::MainWindow() {
