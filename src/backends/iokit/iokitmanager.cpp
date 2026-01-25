@@ -1,7 +1,5 @@
 #include "iokitmanager.h"
 
-#ifdef Q_OS_MACOS
-
 #include <IOKit/IOBSD.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/storage/IOMedia.h>
@@ -225,5 +223,3 @@ void IOKitManager::enumerateDevicesOfClass(const char *className,
 
     IOObjectRelease(iterator);
 }
-
-#endif // Q_OS_MACOS

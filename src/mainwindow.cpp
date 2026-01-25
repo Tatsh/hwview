@@ -1,6 +1,3 @@
-#include <QAction>
-#include <QActionGroup>
-#include <QDesktopServices>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QIcon>
@@ -15,6 +12,9 @@
 #include <QUrl>
 #include <QWhatsThis>
 #include <QtConcurrent>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
+#include <QtGui/QDesktopServices>
 
 #ifdef DEVMGMT_USE_KDE
 #include <KAboutApplicationDialog>
@@ -28,6 +28,7 @@
 
 #include "customizedialog.h"
 #include "devicecache.h"
+#include "systeminfo.h"
 #include "deviceexport.h"
 #include "mainwindow.h"
 #include "models/devbyconnmodel.h"
@@ -110,27 +111,21 @@ MainWindow::MainWindow() {
     // Export action
     connect(actionExport, &QAction::triggered, this, &MainWindow::exportDeviceData);
 
+    // Open action (for viewing exported files)
+    connect(actionOpen, &QAction::triggered, this, &MainWindow::openExportFile);
+
+    // Return to live view action
+    connect(actionReturnToLive, &QAction::triggered, this, &MainWindow::returnToLiveView);
+
 #ifdef DEVMGMT_USE_KDE
     // For KDE, register actions before setupGUI()
     setupActions();
 #else
-    // Setup menus for non-KDE builds
     setupMenus();
 #endif
 
     // Devices and Printers - open platform-specific printers settings
-    connect(actionDevicesAndPrinters, &QAction::triggered, []() {
-#if defined(Q_OS_WIN)
-        // Windows: Open Devices and Printers control panel
-        QProcess::startDetached(QStringLiteral("control"), {QStringLiteral("printers")});
-#elif defined(Q_OS_MACOS)
-        // macOS: Open System Preferences/Settings to Printers
-        QDesktopServices::openUrl(QUrl(QStringLiteral("x-apple.systempreferences:com.apple.preference.printfax")));
-#else
-        // Linux/KDE: Open System Settings printers page
-        QProcess::startDetached(QStringLiteral("systemsettings"), {QStringLiteral("kcm_printer_manager")});
-#endif
-    });
+    connect(actionDevicesAndPrinters, &QAction::triggered, []() { openPrintersSettings(); });
 
     // Open properties dialog on double-click (for devices)
     connect(treeView, &QTreeView::activated, this, &MainWindow::openPropertiesForIndex);
@@ -414,19 +409,21 @@ void MainWindow::showCustomizeDialog() {
 
 void MainWindow::exportDeviceData() {
     // Generate default filename with hostname and timestamp
-    QString defaultName = QStringLiteral("%1_%2%3")
-                              .arg(DeviceCache::hostname())
-                              .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_HHmmss")))
-                              .arg(QLatin1String(DeviceExport::FILE_EXTENSION));
+    QString defaultName =
+        QStringLiteral("%1_%2%3")
+            .arg(DeviceCache::hostname())
+            .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_HHmmss")))
+            .arg(QLatin1String(DeviceExport::FILE_EXTENSION));
 
     QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
     QString defaultPath = defaultDir + QLatin1Char('/') + defaultName;
 
-    QString filePath = QFileDialog::getSaveFileName(
-        this,
-        tr("Export Device Data"),
-        defaultPath,
-        tr("Device Manager Export (*%1);;All Files (*)").arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
+    QString filePath =
+        QFileDialog::getSaveFileName(this,
+                                     tr("Export Device Data"),
+                                     defaultPath,
+                                     tr("Device Manager Export (*%1);;All Files (*)")
+                                         .arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
 
     if (filePath.isEmpty()) {
         return;
@@ -438,7 +435,8 @@ void MainWindow::exportDeviceData() {
     }
 
     // Show progress dialog
-    auto *progressDialog = new QProgressDialog(tr("Exporting device data..."), QString(), 0, 0, this);
+    auto *progressDialog =
+        new QProgressDialog(tr("Exporting device data..."), QString(), 0, 0, this);
     progressDialog->setWindowTitle(tr("Device Manager"));
     progressDialog->setWindowModality(Qt::WindowModal);
     progressDialog->setCancelButton(nullptr);
@@ -447,24 +445,101 @@ void MainWindow::exportDeviceData() {
 
     // Run export in background thread
     auto *watcher = new QFutureWatcher<bool>(this);
-    connect(watcher, &QFutureWatcher<bool>::finished, this, [this, watcher, progressDialog, filePath]() {
-        progressDialog->close();
-        progressDialog->deleteLater();
+    connect(watcher,
+            &QFutureWatcher<bool>::finished,
+            this,
+            [this, watcher, progressDialog, filePath]() {
+                progressDialog->close();
+                progressDialog->deleteLater();
 
-        bool success = watcher->result();
-        watcher->deleteLater();
+                bool success = watcher->result();
+                watcher->deleteLater();
 
-        if (!success) {
-            QMessageBox::warning(this,
-                                 tr("Export Failed"),
-                                 tr("Failed to export device data to:\n%1").arg(filePath));
-        }
-    });
+                if (!success) {
+                    QMessageBox::warning(this,
+                                         tr("Export Failed"),
+                                         tr("Failed to export device data to:\n%1").arg(filePath));
+                }
+            });
 
-    auto future = QtConcurrent::run([filePath]() {
-        return DeviceExport::exportToFile(filePath);
+    // Capture device data before starting the background thread
+    QList<DeviceInfo> devices = DeviceCache::instance().allDevices();
+    QString hostname = DeviceCache::hostname();
+
+    auto future = QtConcurrent::run([filePath, devices, hostname]() {
+        return DeviceExport::exportToFile(filePath, devices, hostname);
     });
     watcher->setFuture(future);
+}
+
+void MainWindow::openExportFile() {
+    QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+
+    QString filePath =
+        QFileDialog::getOpenFileName(this,
+                                     tr("Open Device Manager Export"),
+                                     defaultDir,
+                                     tr("Device Manager Export (*%1);;All Files (*)")
+                                         .arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
+
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    if (!loadExportFile(filePath)) {
+        QMessageBox::warning(
+            this, tr("Error"), tr("Failed to load export file:\n%1").arg(filePath));
+    }
+}
+
+bool MainWindow::loadExportFile(const QString &filePath) {
+    if (!DeviceCache::instance().loadFromFile(filePath)) {
+        return false;
+    }
+
+    // Update UI for viewer mode
+    actionReturnToLive->setEnabled(true);
+    actionExport->setEnabled(false);
+    actionScanForHardwareChanges->setEnabled(false);
+    if (menuAction) {
+        menuAction->setEnabled(false);
+    }
+
+    // Update window title
+    QFileInfo fi(filePath);
+#ifdef DEVMGMT_USE_KDE
+    // KDE appends " -- <app name>" automatically, so just set the document part
+    setWindowTitle(tr("%1 - %2").arg(fi.fileName(), DeviceCache::hostname()));
+#else
+    setWindowTitle(tr("%1 - %2 —  Device Manager").arg(fi.fileName(), DeviceCache::hostname()));
+#endif
+
+    // Refresh the current view
+    refreshCurrentView();
+    return true;
+}
+
+void MainWindow::returnToLiveView() {
+    DeviceCache::instance().reloadLiveData();
+
+    // Update UI for live mode
+    actionReturnToLive->setEnabled(false);
+    actionExport->setEnabled(true);
+    actionScanForHardwareChanges->setEnabled(true);
+    if (menuAction) {
+        menuAction->setEnabled(true);
+    }
+
+    // Restore window title
+#ifdef DEVMGMT_USE_KDE
+    // KDE appends " -- <app name>" automatically, so clear the document part
+    setWindowTitle(QString());
+#else
+    setWindowTitle(tr("Device Manager"));
+#endif
+
+    // Refresh the current view
+    refreshCurrentView();
 }
 
 void MainWindow::applyViewSettings() {
@@ -596,16 +671,34 @@ void MainWindow::setupActions() {
 }
 
 void MainWindow::postSetupMenus() {
-    // Rebuild File menu for KDE HIG - keep Export and add Quit
+    // Rebuild File menu for KDE HIG
     if (menuFile) {
         menuFile->clear();
 
+        // Open action
+        auto *openAction =
+            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), i18n("&Open..."), this);
+        openAction->setShortcut(QKeySequence::Open);
+        connect(openAction, &QAction::triggered, this, &MainWindow::openExportFile);
+        menuFile->addAction(openAction);
+
         // Export action
-        auto *exportAction =
-            new QAction(QIcon::fromTheme(QStringLiteral("document-export")), i18n("&Export..."), this);
+        auto *exportAction = new QAction(
+            QIcon::fromTheme(QStringLiteral("document-export")), i18n("&Export..."), this);
         exportAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_E));
         connect(exportAction, &QAction::triggered, this, &MainWindow::exportDeviceData);
         menuFile->addAction(exportAction);
+
+        menuFile->addSeparator();
+
+        // Return to Live View action
+        auto *returnToLiveAction = new QAction(
+            QIcon::fromTheme(QStringLiteral("view-refresh")), i18n("&Return to Live View"), this);
+        returnToLiveAction->setEnabled(false);
+        connect(returnToLiveAction, &QAction::triggered, this, &MainWindow::returnToLiveView);
+        menuFile->addAction(returnToLiveAction);
+        // Store reference for later enable/disable
+        actionReturnToLive = returnToLiveAction;
 
         menuFile->addSeparator();
 
@@ -714,10 +807,8 @@ void MainWindow::setupMenus() {
         QDesktopServices::openUrl(QUrl(QStringLiteral(DEVMGMT_WEBSITE_URL)));
     });
 
-    // Remove File menu (not needed for non-KDE)
-    if (menuFile) {
-        menubar->removeAction(menuFile->menuAction());
-    }
+    // Exit action
+    connect(actionExit, &QAction::triggered, this, &QMainWindow::close);
 
     // Remove Help from Action menu
     if (menuAction) {

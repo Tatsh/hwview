@@ -1,9 +1,5 @@
 #pragma once
 
-#include <QtGlobal>
-
-#ifdef Q_OS_WIN
-
 #include <devguid.h>
 #include <initguid.h>
 #include <windows.h>
@@ -157,5 +153,3 @@ namespace setupapi {
     }
 
 } // namespace setupapi
-
-#endif // Q_OS_WIN

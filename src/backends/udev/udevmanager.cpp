@@ -1,12 +1,11 @@
 #include "udevmanager.h"
+#include "udevdeviceinfo.h"
 
-#ifdef Q_OS_LINUX
 #include "deviceinfo.h"
 
 #include <utility>
 
-UdevManager::UdevManager() : ctx(udev_new()) {
-}
+UdevManager::UdevManager() : ctx(udev_new()) {}
 
 UdevManager::~UdevManager() {
     udev_unref(ctx);
@@ -20,7 +19,10 @@ QList<DeviceInfo> UdevManager::convertToDeviceInfo(struct udev_enumerate *enumer
     QList<DeviceInfo> ret;
     struct udev_list_entry *listEntry;
     udev_list_entry_foreach(listEntry, udev_enumerate_get_list_entry(enumerator)) {
-        ret.emplaceBack(ctx, udev_list_entry_get_name(listEntry));
+        auto *d = createDeviceInfo(ctx, udev_list_entry_get_name(listEntry));
+        if (d) {
+            ret.emplaceBack(d);
+        }
     }
     std::sort(ret.begin(), ret.end(), [](auto &a, auto &b) { return a.name() < b.name(); });
     return ret;
@@ -48,4 +50,3 @@ QList<DeviceInfo> UdevManager::scanDevices(const std::unique_ptr<UdevEnumerate> 
     udev_enumerate_scan_devices(wrapper->enumerator());
     return convertToDeviceInfo(wrapper->enumerator());
 }
-#endif

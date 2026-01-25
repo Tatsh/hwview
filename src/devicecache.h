@@ -1,22 +1,12 @@
 #pragma once
 
 #include <QHash>
+#include <QJsonObject>
 #include <QList>
 #include <QMutex>
 #include <QObject>
 
 #include "deviceinfo.h"
-
-#ifdef Q_OS_LINUX
-#include "backends/udev/udevmanager.h"
-struct udev;
-#elif defined(Q_OS_MACOS)
-#include "backends/iokit/iokitmanager.h"
-#elif defined(Q_OS_WIN)
-#include "backends/setupapi/setupapimanager.h"
-#endif
-
-class DeviceMonitor;
 
 /**
  * @brief Singleton cache that holds all device information.
@@ -79,17 +69,6 @@ public:
      */
     const DeviceInfo *deviceBySyspath(const QString &syspath) const;
 
-#ifdef Q_OS_LINUX
-    /**
-     * @brief Returns the udev context.
-     *
-     * This method is only available on Linux.
-     *
-     * @returns Pointer to the @c udev context structure.
-     */
-    struct udev *context() const;
-#endif
-
     /**
      * @brief Refreshes the device cache by re-enumerating all devices.
      *
@@ -125,6 +104,71 @@ public:
      */
     void startMonitoring();
 
+    /**
+     * @brief Loads device data from an export file.
+     *
+     * This replaces the current device cache with data loaded from the specified export file.
+     * After loading, the cache enters "viewer mode" where refresh and monitoring are disabled.
+     *
+     * @param filePath Path to the .dmexport file.
+     * @returns @c true if the file was loaded successfully, @c false otherwise.
+     */
+    bool loadFromFile(const QString &filePath);
+
+    /**
+     * @brief Returns whether the cache is in viewer mode.
+     *
+     * In viewer mode, the cache contains data loaded from an export file rather than live
+     * system data. Refresh and device monitoring are disabled in this mode.
+     *
+     * @returns @c true if in viewer mode, @c false otherwise.
+     */
+    bool isViewerMode() const;
+
+    /**
+     * @brief Reloads live device data and exits viewer mode.
+     *
+     * This re-enumerates system devices and clears any imported data, returning to normal
+     * operation mode.
+     */
+    void reloadLiveData();
+
+    /**
+     * @brief Returns the path of the currently loaded export file.
+     * @returns The file path, or empty string if not in viewer mode.
+     */
+    const QString &currentFilePath() const;
+
+    /**
+     * @brief Returns the export date when in viewer mode.
+     * @returns The export date string, or empty if not in viewer mode.
+     */
+    const QString &exportDate() const;
+
+    /**
+     * @brief Returns the source application name from the export.
+     * @returns The application name, or empty if not in viewer mode.
+     */
+    const QString &sourceApplicationName() const;
+
+    /**
+     * @brief Returns the source application version from the export.
+     * @returns The version string, or empty if not in viewer mode.
+     */
+    const QString &sourceApplicationVersion() const;
+
+    /**
+     * @brief Returns system information from the export.
+     * @returns The system info JSON object (empty if not in viewer mode).
+     */
+    const QJsonObject &systemInfo() const;
+
+    /**
+     * @brief Returns system resources from the export (for Resources views).
+     * @returns The system resources JSON object (empty if not in viewer mode).
+     */
+    const QJsonObject &systemResources() const;
+
 Q_SIGNALS:
     /**
      * @brief Emitted when devices are added or removed.
@@ -147,15 +191,18 @@ private:
 
     void enumerate();
 
-#ifdef Q_OS_LINUX
-    UdevManager manager_;
-#elif defined(Q_OS_MACOS)
-    IOKitManager manager_;
-#elif defined(Q_OS_WIN)
-    SetupApiManager manager_;
-#endif
-    DeviceMonitor *monitor_ = nullptr;
+    QObject *monitor_ = nullptr;
     QList<DeviceInfo> devices_;
     QHash<QString, int> syspathIndex_;
     mutable QMutex mutex_;
+
+    // Viewer mode state
+    bool viewerMode_ = false;
+    QString filePath_;
+    QString importedHostname_;
+    QString exportDate_;
+    QString sourceAppName_;
+    QString sourceAppVersion_;
+    QJsonObject systemInfo_;
+    QJsonObject systemResources_;
 };

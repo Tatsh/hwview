@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtGlobal>
-
-#ifdef Q_OS_LINUX
 #include <QString>
 #include <libudev.h>
 
@@ -10,9 +7,6 @@ class UdevManager;
 
 /**
  * @brief RAII wrapper for udev device enumeration.
- *
- * This class provides a convenient C++ interface for udev device enumeration,
- * automatically managing the lifecycle of the udev_enumerate object.
  */
 class UdevEnumerate {
 public:
@@ -21,10 +15,6 @@ public:
      * @param manager The UdevManager providing the udev context.
      */
     UdevEnumerate(UdevManager &manager);
-
-    /**
-     * @brief Destroys the UdevEnumerate and releases resources.
-     */
     ~UdevEnumerate();
 
     /**
@@ -49,4 +39,3 @@ public:
 private:
     struct udev_enumerate *enumerator_;
 };
-#endif

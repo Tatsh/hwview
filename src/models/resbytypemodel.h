@@ -27,12 +27,10 @@ protected:
 
 private:
     void buildTree();
-#ifdef Q_OS_LINUX
     void addDma();
     void addIoPorts();
     void addIrq();
     void addMemory();
-#endif
 
     Node *hostnameItem;
     Node *dmaItem;

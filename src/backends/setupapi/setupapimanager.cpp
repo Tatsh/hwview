@@ -1,7 +1,5 @@
 #include "setupapimanager.h"
 
-#ifdef Q_OS_WIN
-
 #include <devpkey.h>
 
 SetupApiManager::SetupApiManager() = default;
@@ -236,5 +234,3 @@ QStringList SetupApiManager::multiSzToStringList(const wchar_t *multiSz) {
 
     return result;
 }
-
-#endif // Q_OS_WIN

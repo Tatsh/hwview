@@ -2,6 +2,7 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QList>
 #include <QString>
 
 class DeviceInfo;
@@ -25,15 +26,21 @@ public:
      * and all hidden devices. The viewer application can reconstruct any view from this data.
      *
      * @param filePath The path to save the export file.
+     * @param devices List of devices to export.
+     * @param hostname The hostname of the system being exported.
      * @returns @c true if export was successful, @c false otherwise.
      */
-    static bool exportToFile(const QString &filePath);
+    static bool exportToFile(const QString &filePath,
+                             const QList<DeviceInfo> &devices,
+                             const QString &hostname);
 
     /**
      * @brief Creates a JSON object containing all export data.
+     * @param devices List of devices to include in the export.
+     * @param hostname The hostname of the system being exported.
      * @returns A QJsonObject containing the complete export data for all views.
      */
-    static QJsonObject createExportData();
+    static QJsonObject createExportData(const QList<DeviceInfo> &devices, const QString &hostname);
 
     /**
      * @brief File extension for export files.
@@ -50,7 +57,6 @@ public:
      */
     static constexpr int FORMAT_VERSION = 1;
 
-private:
     /**
      * @brief Serializes a DeviceInfo object to JSON.
      * @param info The device info to serialize.
@@ -60,9 +66,10 @@ private:
 
     /**
      * @brief Collects system information for the export.
+     * @param hostname The hostname to include.
      * @returns A QJsonObject containing system metadata.
      */
-    static QJsonObject collectSystemInfo();
+    static QJsonObject collectSystemInfo(const QString &hostname);
 
     /**
      * @brief Collects system-wide resources for Resources views.
@@ -75,16 +82,9 @@ private:
     static QJsonObject collectSystemResources();
 
     /**
-     * @brief Gets device resources for a device (IRQ, memory, I/O).
-     * @param syspath The device system path.
-     * @returns A QJsonArray containing resource information.
-     */
-    static QJsonArray getDeviceResources(const QString &syspath);
-
-    /**
-     * @brief Gets device driver information.
+     * @brief Serializes driver information to JSON.
      * @param info The device info.
      * @returns A QJsonObject containing driver details.
      */
-    static QJsonObject getDriverInfo(const DeviceInfo &info);
+    static QJsonObject serializeDriverInfo(const DeviceInfo &info);
 };

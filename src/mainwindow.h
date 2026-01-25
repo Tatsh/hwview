@@ -51,6 +51,13 @@ public:
     MainWindow();
     ~MainWindow() override;
 
+    /**
+     * @brief Loads an export file.
+     * @param filePath Path to the .dmexport file.
+     * @returns @c true if loaded successfully.
+     */
+    bool loadExportFile(const QString &filePath);
+
 private Q_SLOTS:
     void about();
     void switchToDevicesByType();
@@ -63,6 +70,8 @@ private Q_SLOTS:
     void applyViewSettings();
     void openPropertiesForIndex(const QModelIndex &index);
     void exportDeviceData();
+    void openExportFile();
+    void returnToLiveView();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

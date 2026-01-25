@@ -1,17 +1,17 @@
 #pragma once
 
-#include <QIcon>
-#include <QList>
-#include <QPixmap>
-#include <QString>
-#include <QVariant>
+#include <QtCore/QList>
+#include <QtCore/QString>
+#include <QtCore/QVariant>
+#include <QtGui/QIcon>
+#include <QtGui/QPixmap>
 
 /**
  * @brief Enumeration of node types in the device tree.
  */
 enum NodeType {
-    Device, ///< Represents an actual device
-    Label,  ///< Represents a category or label node
+    Device, ///< Represents an actual device.
+    Label,  ///< Represents a category or label node.
 };
 
 /**
@@ -136,13 +136,13 @@ public:
     void setIsHidden(bool hidden);
 
     /**
-     * @brief Returns the raw/original name before nice name conversion.
+     * @brief Returns the raw/original name before display name conversion.
      * @returns The raw name, or empty if not set.
      */
     QString rawName() const;
 
     /**
-     * @brief Sets the raw/original name before nice name conversion.
+     * @brief Sets the raw/original name before display name conversion.
      * @param name The original name.
      */
     void setRawName(const QString &name);

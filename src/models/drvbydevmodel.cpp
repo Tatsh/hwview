@@ -66,12 +66,12 @@ void DriversByDeviceModel::buildTree() {
                     rawName = syspath;
                 }
             }
-            // Apply nice name transformations
+            // Apply display name transformations
             QString name;
             if (info.subsystem() == QStringLiteral("acpi")) {
-                name = s::acpiDeviceNiceName(info.devPath(), rawName);
+                name = s::acpiDeviceDisplayName(info.devPath(), rawName);
             } else {
-                name = s::softwareDeviceNiceName(rawName);
+                name = s::softwareDeviceDisplayName(rawName);
             }
 
             auto *deviceNode = new Node({name}, driverNode, NodeType::Device);

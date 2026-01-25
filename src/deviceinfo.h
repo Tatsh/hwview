@@ -1,15 +1,12 @@
 #pragma once
 
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QString>
 
-#ifdef Q_OS_LINUX
-#include <libudev.h>
-#elif defined(Q_OS_MACOS)
-#include <IOKit/IOKitLib.h>
-#elif defined(Q_OS_WIN)
-#include <setupapi.h>
-#include <windows.h>
-#endif
+#include <memory>
+
+class DeviceInfoPrivate;
 
 /**
  * @brief Pre-computed device category for fast classification.
@@ -47,28 +44,22 @@ enum class DeviceCategory {
  * counting for efficient memory management.
  */
 class DeviceInfo {
+    Q_DECLARE_PRIVATE(DeviceInfo)
 public:
-#ifdef Q_OS_LINUX
     /**
-     * @brief Constructs a @c DeviceInfo from a @c udev device path.
-     * @param ctx The @c udev context.
-     * @param syspath The system path to the device (e.g., "/sys/devices/...").
+     * @brief Constructs a @c DeviceInfo from a private implementation.
+     * @param d The private implementation (takes ownership).
      */
-    DeviceInfo(udev *ctx, const char *syspath);
-#elif defined(Q_OS_MACOS)
+    explicit DeviceInfo(DeviceInfoPrivate *d);
+
     /**
-     * @brief Constructs a @c DeviceInfo from an @c IOKit service.
-     * @param service The @c IOKit service object.
+     * @brief Constructs a @c DeviceInfo from exported JSON data.
+     * @param json The JSON object containing device data from an export file.
+     *
+     * This constructor is used when loading devices from a .dmexport file for viewing.
      */
-    explicit DeviceInfo(io_service_t service);
-#elif defined(Q_OS_WIN)
-    /**
-     * @brief Constructs a @c DeviceInfo from @c SetupAPI device info.
-     * @param devInfo The device information set handle.
-     * @param devInfoData Pointer to the device info data structure.
-     */
-    DeviceInfo(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData);
-#endif
+    explicit DeviceInfo(const QJsonObject &json);
+
     ~DeviceInfo();
 
     /**
@@ -110,7 +101,7 @@ public:
     const QString &name() const;
 
     /**
-     * @brief Returns a @c udev property value.
+     * @brief Returns a property value by key.
      * @param key The property key name.
      * @returns The property value, or empty string if not found.
      */
@@ -206,6 +197,42 @@ public:
     const QString &idModelFromDatabase() const;
 
     /**
+     * @brief Returns all device properties as a JSON object.
+     *
+     * For live devices, this returns an empty object. For imported devices,
+     * this returns the properties stored in the export file.
+     *
+     * @returns The properties JSON object.
+     */
+    const QJsonObject &properties() const;
+
+    /**
+     * @brief Returns driver information as a JSON object.
+     *
+     * For live devices, this returns an empty object. For imported devices,
+     * this returns the driver info stored in the export file.
+     *
+     * @returns The driver info JSON object.
+     */
+    const QJsonObject &driverInfo() const;
+
+    /**
+     * @brief Returns device resources as a JSON array.
+     *
+     * For live devices, this returns an empty array. For imported devices,
+     * this returns the resources stored in the export file.
+     *
+     * @returns The resources JSON array.
+     */
+    const QJsonArray &resources() const;
+
+    /**
+     * @brief Returns whether this device was loaded from an export file.
+     * @returns @c true if imported, @c false if live.
+     */
+    bool isImported() const;
+
+    /**
      * @brief Returns whether this device should be considered hidden.
      *
      * Hidden devices are: virtual devices, devices without a driver, or devices without a name.
@@ -228,46 +255,6 @@ public:
     DeviceCategory category() const;
 
 private:
-#ifdef Q_OS_LINUX
-    void setName();
-
-    udev *ctx;
-    udev_device *dev;
-#elif defined(Q_OS_MACOS)
-    void setNameFromIOKit(io_service_t service);
-    void extractIOKitProperties(io_service_t service);
-
-    QString ioKitClassName_;
-#elif defined(Q_OS_WIN)
-    void extractWindowsProperties(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData);
-
-    QString deviceClassName_;
-#endif
-    void calculateIsHidden();
-    void calculateCategory();
-
-    QString devPath_;
-    QString driver_;
-    QString hidID_;
-    QString hidName_;
-    QString hidPhysicalMac_;
-    QString hidUniq_;
-    QString modAlias_;
-    QString name_;
-    QString subsystem_;
-    QString syspath_;
-    QString parentSyspath_;
-    QString devnode_;
-    QString idVendorFromDatabase_;
-    QString pciClass_;
-    QString pciSubclass_;
-    QString pciInterface_;
-    QString idCdrom_;
-    QString devType_;
-    QString idInputKeyboard_;
-    QString idInputMouse_;
-    QString idType_;
-    QString idModelFromDatabase_;
-    bool isHidden_ = false;
-    DeviceCategory category_ = DeviceCategory::Unknown;
+    std::unique_ptr<DeviceInfoPrivate> d_ptr;
+    bool isImported_ = false;
 };

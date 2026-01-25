@@ -1,17 +1,12 @@
-#include <QRegularExpression>
 #include <QStack>
 
 #include "const_strings.h"
 #include "devicecache.h"
 #include "models/resbyconnmodel.h"
-#include "procutils.h"
+#include "systeminfo.h"
 #include "viewsettings.h"
 
 namespace s = strings;
-
-#ifdef Q_OS_LINUX
-using procutils::readProcFile;
-#endif
 
 ResourcesByConnectionModel::ResourcesByConnectionModel(QObject *parent)
     : BaseTreeModel(parent), hostnameItem(nullptr), dmaItem(nullptr), ioItem(nullptr),
@@ -29,191 +24,117 @@ bool ResourcesByConnectionModel::shouldShowIcons() const {
 }
 
 void ResourcesByConnectionModel::buildTree() {
-#ifdef Q_OS_LINUX
     addDma();
     addIoPorts();
     addIrq();
     addMemory();
-#endif
 }
 
-#ifdef Q_OS_LINUX
 void ResourcesByConnectionModel::addDma() {
+    auto channels = getSystemDmaChannels();
+    if (channels.isEmpty()) {
+        return;
+    }
+
     dmaItem = new Node({tr("Direct memory access (DMA)"), s::empty()}, hostnameItem);
     dmaItem->setIcon(s::categoryIcons::dma());
 
-    static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
-    for (const auto &line : readProcFile(QStringLiteral("/proc/dma"))) {
-        if (line.trimmed().isEmpty()) {
-            continue;
-        }
-        auto match = dmaRe.match(line.trimmed());
-        if (match.hasMatch()) {
-            auto channel = match.captured(1);
-            auto name = match.captured(2);
-            auto displayText = QStringLiteral("[%1] %2").arg(channel, name);
-            auto *node = new Node({displayText, s::empty()}, dmaItem);
-            node->setIcon(s::categoryIcons::dma());
-            dmaItem->appendChild(node);
-        }
+    for (const auto &channel : channels) {
+        auto displayText = QStringLiteral("[%1] %2").arg(channel.channel, channel.name);
+        auto *node = new Node({displayText, s::empty()}, dmaItem);
+        node->setIcon(s::categoryIcons::dma());
+        dmaItem->appendChild(node);
     }
 
-    if (dmaItem->childCount() > 0) {
-        hostnameItem->appendChild(dmaItem);
-    } else {
-        delete dmaItem;
-        dmaItem = nullptr;
-    }
+    hostnameItem->appendChild(dmaItem);
 }
 
-void ResourcesByConnectionModel::parseHierarchicalResource(const QString &filePath,
-                                                           Node *categoryNode,
-                                                           const QIcon &itemIcon) {
-    static const QRegularExpression resourceRe(
-        QStringLiteral("^(\\s*)([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
-
-    // Stack to track parent nodes at each indentation level
-    // Each entry is (indentLevel, Node*)
-    QStack<QPair<int, Node *>> nodeStack;
-    nodeStack.push({-1, categoryNode});
-
-    for (const auto &line : readProcFile(filePath)) {
-        if (line.trimmed().isEmpty()) {
-            continue;
-        }
-
-        auto match = resourceRe.match(line);
-        if (!match.hasMatch()) {
-            continue;
-        }
-
-        auto indentLevel = static_cast<int>(match.captured(1).length());
-        auto rangeStart = match.captured(2).toUpper();
-        auto rangeEnd = match.captured(3).toUpper();
-        auto name = match.captured(4);
-
-        if (name.isEmpty()) {
-            continue;
-        }
-
-        // Pop stack until we find a parent with smaller indentation
-        while (nodeStack.size() > 1 && nodeStack.top().first >= indentLevel) {
-            nodeStack.pop();
-        }
-
-        auto *parentNode = nodeStack.top().second;
-
-        auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
-        auto *node = new Node({displayText, s::empty()}, parentNode);
-        node->setIcon(itemIcon);
-        parentNode->appendChild(node);
-
-        // Push this node as potential parent for more indented entries
-        nodeStack.push({indentLevel, node});
+void ResourcesByConnectionModel::buildHierarchicalResource([[maybe_unused]] Node *categoryNode,
+                                                           const QIcon &itemIcon,
+                                                           int indentLevel,
+                                                           const QString &rangeStart,
+                                                           const QString &rangeEnd,
+                                                           const QString &name,
+                                                           QStack<QPair<int, Node *>> &nodeStack) {
+    // Pop stack until we find a parent with smaller indentation
+    while (nodeStack.size() > 1 && nodeStack.top().first >= indentLevel) {
+        nodeStack.pop();
     }
+
+    auto *parentNode = nodeStack.top().second;
+
+    auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
+    auto *node = new Node({displayText, s::empty()}, parentNode);
+    node->setIcon(itemIcon);
+    parentNode->appendChild(node);
+
+    // Push this node as potential parent for more indented entries
+    nodeStack.push({indentLevel, node});
 }
 
 void ResourcesByConnectionModel::addIoPorts() {
+    auto ports = getSystemIoPorts();
+    if (ports.isEmpty()) {
+        return;
+    }
+
     ioItem = new Node({tr("Input/output (IO)"), s::empty()}, hostnameItem);
     ioItem->setIcon(s::categoryIcons::ioPorts());
 
-    parseHierarchicalResource(QStringLiteral("/proc/ioports"), ioItem, s::categoryIcons::ioPorts());
+    QStack<QPair<int, Node *>> nodeStack;
+    nodeStack.push({-1, ioItem});
 
-    if (ioItem->childCount() > 0) {
-        hostnameItem->appendChild(ioItem);
-    } else {
-        delete ioItem;
-        ioItem = nullptr;
+    for (const auto &port : ports) {
+        buildHierarchicalResource(ioItem, s::categoryIcons::ioPorts(), port.indentLevel,
+                                  port.rangeStart, port.rangeEnd, port.name, nodeStack);
     }
+
+    hostnameItem->appendChild(ioItem);
 }
 
 void ResourcesByConnectionModel::addIrq() {
+    auto irqs = getSystemIrqs();
+    if (irqs.isEmpty()) {
+        return;
+    }
+
     irqItem = new Node({tr("Interrupt request (IRQ)"), s::empty()}, hostnameItem);
     irqItem->setIcon(s::categoryIcons::irq());
 
-    auto lines = readProcFile(QStringLiteral("/proc/interrupts"));
-    if (!lines.isEmpty()) {
-        lines.removeFirst(); // Skip header
-    }
-
-    static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
-    for (const auto &line : lines) {
-        if (line.trimmed().isEmpty()) {
-            continue;
-        }
-
-        auto parts = line.split(whitespaceRe, Qt::SkipEmptyParts);
-        if (parts.size() < 2) {
-            continue;
-        }
-
-        auto irqNum = parts[0];
-        if (irqNum.endsWith(QLatin1Char(':'))) {
-            irqNum.chop(1);
-        }
-
-        QString deviceName;
-        QString irqType;
-
-        for (auto i = 1; i < parts.size(); ++i) {
-            if (parts[i].contains(QStringLiteral("APIC")) ||
-                parts[i].contains(QStringLiteral("PCI")) ||
-                parts[i].contains(QStringLiteral("MSI")) ||
-                parts[i].contains(QStringLiteral("DMAR")) ||
-                parts[i].contains(QStringLiteral("edge")) ||
-                parts[i].contains(QStringLiteral("level")) ||
-                parts[i].contains(QStringLiteral("fasteoi"))) {
-                if (irqType.isEmpty()) {
-                    irqType = parts[i];
-                } else {
-                    irqType += QLatin1Char(' ') + parts[i];
-                }
-            } else if (i > 1 && !parts[i].isEmpty() && !parts[i].at(0).isDigit()) {
-                if (deviceName.isEmpty()) {
-                    deviceName = parts[i];
-                } else {
-                    deviceName += QLatin1Char(' ') + parts[i];
-                }
-            }
-        }
-
-        if (deviceName.isEmpty()) {
-            continue;
-        }
-
+    for (const auto &irq : irqs) {
         QString displayText;
-        if (!irqType.isEmpty()) {
-            displayText = QStringLiteral("(%1) %2 %3").arg(irqType, irqNum, deviceName);
+        if (!irq.irqType.isEmpty()) {
+            displayText = QStringLiteral("(%1) %2 %3").arg(irq.irqType, irq.irqNumber, irq.deviceName);
         } else {
-            displayText = QStringLiteral("%1 %2").arg(irqNum, deviceName);
+            displayText = QStringLiteral("%1 %2").arg(irq.irqNumber, irq.deviceName);
         }
         auto *node = new Node({displayText, s::empty()}, irqItem);
         node->setIcon(s::categoryIcons::irq());
         irqItem->appendChild(node);
     }
 
-    if (irqItem->childCount() > 0) {
-        hostnameItem->appendChild(irqItem);
-    } else {
-        delete irqItem;
-        irqItem = nullptr;
-    }
+    hostnameItem->appendChild(irqItem);
 }
 
 void ResourcesByConnectionModel::addMemory() {
+    auto ranges = getSystemMemoryRanges();
+    if (ranges.isEmpty()) {
+        return;
+    }
+
     memoryItem = new Node({tr("Memory"), s::empty()}, hostnameItem);
     memoryItem->setIcon(s::categoryIcons::memory());
 
-    parseHierarchicalResource(QStringLiteral("/proc/iomem"), memoryItem, s::categoryIcons::memory());
+    QStack<QPair<int, Node *>> nodeStack;
+    nodeStack.push({-1, memoryItem});
 
-    if (memoryItem->childCount() > 0) {
-        hostnameItem->appendChild(memoryItem);
-    } else {
-        delete memoryItem;
-        memoryItem = nullptr;
+    for (const auto &range : ranges) {
+        buildHierarchicalResource(memoryItem, s::categoryIcons::memory(), range.indentLevel,
+                                  range.rangeStart, range.rangeEnd, range.name, nodeStack);
     }
+
+    hostnameItem->appendChild(memoryItem);
 }
-#endif
 
 int ResourcesByConnectionModel::columnCount([[maybe_unused]] const QModelIndex &parent) const {
     return 1;

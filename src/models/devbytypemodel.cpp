@@ -1,14 +1,9 @@
-#include <QtCore/QFileInfo>
 #include <QtCore/QRegularExpression>
-#ifdef Q_OS_MACOS
-#include <QtCore/QProcess>
-#elif defined(Q_OS_WIN)
-#include <windows.h>
-#endif
 
 #include "const_strings.h"
 #include "devicecache.h"
 #include "models/devbytypemodel.h"
+#include "systeminfo.h"
 
 namespace s = strings;
 namespace us = strings::udev;
@@ -106,103 +101,9 @@ void DevicesByTypeModel::buildTree() {
         new Node({tr("Universal Serial Bus controllers"), s::empty()}, hostnameItem);
     universalSerialBusControllersItem->setIcon(s::categoryIcons::usbControllers());
 
-    // Add computer info - determine system type based on firmware
-    QString computerName;
-    QString computerSyspath;
-#ifdef Q_OS_LINUX
-    QFileInfo acpiInfo(QStringLiteral("/sys/firmware/acpi"));
-    QFileInfo dtInfo(QStringLiteral("/sys/firmware/devicetree"));
-
-    if (acpiInfo.exists() && acpiInfo.isDir()) {
-#if defined(Q_PROCESSOR_X86_64)
-        computerName = tr("ACPI x64-based PC");
-#elif defined(Q_PROCESSOR_X86_32)
-        computerName = tr("ACPI x86-based PC");
-#elif defined(Q_PROCESSOR_ARM_64)
-        computerName = tr("ACPI ARM64-based PC");
-#elif defined(Q_PROCESSOR_ARM)
-        computerName = tr("ACPI ARM-based PC");
-#else
-        computerName = tr("ACPI-based PC");
-#endif
-    } else if (dtInfo.exists() && dtInfo.isDir()) {
-        computerName = tr("Device Tree-based System");
-    } else {
-        computerName = tr("Standard PC");
-    }
-    computerSyspath = QStringLiteral("/sys/devices/virtual/dmi/id");
-#elif defined(Q_OS_MACOS)
-    // macOS: Detect Mac model
-#if defined(Q_PROCESSOR_ARM_64)
-    computerName = tr("Apple Silicon Mac");
-#elif defined(Q_PROCESSOR_X86_64)
-    computerName = tr("Intel-based Mac");
-#else
-    computerName = tr("Mac");
-#endif
-    // Try to get more specific model name using sysctl
-    QProcess sysctl;
-    sysctl.start(QStringLiteral("sysctl"), {QStringLiteral("-n"), QStringLiteral("hw.model")});
-    if (sysctl.waitForFinished(1000)) {
-        QString model = QString::fromUtf8(sysctl.readAllStandardOutput()).trimmed();
-        if (!model.isEmpty()) {
-            // Convert model identifier to friendly name
-            if (model.startsWith(QStringLiteral("Mac"))) {
-                if (model.contains(QStringLiteral("BookPro"))) {
-                    computerName = tr("MacBook Pro");
-                } else if (model.contains(QStringLiteral("BookAir"))) {
-                    computerName = tr("MacBook Air");
-                } else if (model.contains(QStringLiteral("Book"))) {
-                    computerName = tr("MacBook");
-                } else if (model.contains(QStringLiteral("Pro"))) {
-                    computerName = tr("Mac Pro");
-                } else if (model.contains(QStringLiteral("mini"))) {
-                    computerName = tr("Mac mini");
-                } else if (model.contains(QStringLiteral("Studio"))) {
-                    computerName = tr("Mac Studio");
-                } else {
-                    computerName = tr("Mac (%1)").arg(model);
-                }
-            } else if (model.startsWith(QStringLiteral("iMac"))) {
-                computerName = tr("iMac");
-            } else {
-                computerName = model;
-            }
-        }
-    }
-    computerSyspath = QStringLiteral("IOService:/");
-#elif defined(Q_OS_WIN)
-    // Windows: Detect system type using GetNativeSystemInfo
-    SYSTEM_INFO sysInfo;
-    GetNativeSystemInfo(&sysInfo);
-
-    switch (sysInfo.wProcessorArchitecture) {
-    case PROCESSOR_ARCHITECTURE_AMD64:
-        computerName = tr("x64-based PC");
-        break;
-    case PROCESSOR_ARCHITECTURE_ARM64:
-        computerName = tr("ARM64-based PC");
-        break;
-    case PROCESSOR_ARCHITECTURE_INTEL:
-        computerName = tr("x86-based PC");
-        break;
-    case PROCESSOR_ARCHITECTURE_ARM:
-        computerName = tr("ARM-based PC");
-        break;
-    case PROCESSOR_ARCHITECTURE_IA64:
-        computerName = tr("Itanium-based PC");
-        break;
-    default:
-        computerName = tr("Standard PC");
-        break;
-    }
-
-    // Check for ACPI (all modern Windows PCs are ACPI)
-    computerName = tr("ACPI %1").arg(computerName);
-    computerSyspath = QStringLiteral("ACPI_HAL\\PNP0C08\\0");
-#else
-    computerName = tr("Standard PC");
-#endif
+    // Add computer info using platform-specific backend
+    QString computerName = getComputerDisplayName();
+    QString computerSyspath = getComputerSyspath();
 
     auto *acpiNode = new Node({computerName, s::empty()}, computerItem, NodeType::Device);
     if (!computerSyspath.isEmpty()) {
@@ -233,7 +134,7 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::Batteries:
-            displayName = s::acpiDeviceNiceName(info.devPath(), rawName);
+            displayName = s::acpiDeviceDisplayName(info.devPath(), rawName);
             parentNode = batteriesItem;
             break;
 
@@ -258,7 +159,7 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::StorageVolumes: {
-            // Try to get a nice name: partition label, filesystem label, or device name
+            // Try to get a display name: partition label, filesystem label, or device name
             QString volumeName = info.propertyValue(us::propertyNames::ID_PART_ENTRY_NAME);
             if (volumeName.isEmpty()) {
                 volumeName = info.propertyValue(us::propertyNames::ID_FS_LABEL);
@@ -275,17 +176,17 @@ void DevicesByTypeModel::buildTree() {
             break;
 
         case DeviceCategory::HumanInterfaceDevices:
-            displayName = s::softwareDeviceNiceName(rawName);
+            displayName = s::softwareDeviceDisplayName(rawName);
             parentNode = humanInterfaceDevicesItem;
             break;
 
         case DeviceCategory::Keyboards:
-            displayName = s::softwareDeviceNiceName(rawName);
+            displayName = s::softwareDeviceDisplayName(rawName);
             parentNode = keyboardsItem;
             break;
 
         case DeviceCategory::MiceAndOtherPointingDevices:
-            displayName = s::softwareDeviceNiceName(rawName);
+            displayName = s::softwareDeviceDisplayName(rawName);
             parentNode = miceAndOtherPointingDevicesItem;
             break;
 
@@ -296,7 +197,7 @@ void DevicesByTypeModel::buildTree() {
         case DeviceCategory::SoftwareDevices: {
             rawName = info.name();
             rawName.replace(kBeginningWithSlashDevRe, s::empty());
-            displayName = s::softwareDeviceNiceName(rawName);
+            displayName = s::softwareDeviceDisplayName(rawName);
             parentNode = softwareDevicesItem;
             break;
         }

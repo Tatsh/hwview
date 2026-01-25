@@ -1,6 +1,9 @@
 add_library(
   devmgmt_udev STATIC
+  driverinfo.cpp
+  systeminfo.cpp
   udevenumerate.cpp
+  udevdeviceinfo.cpp
   udevmanager.cpp
   udevmonitor.cpp)
 

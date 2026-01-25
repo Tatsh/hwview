@@ -1,18 +1,13 @@
 #include "driverdetailsdialog.h"
+#include "driverinfo.h"
+#include "systeminfo.h"
 
 #include <QGridLayout>
-#include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QProcess>
 #include <QPushButton>
-#include <QRegularExpression>
-#include <QSpacerItem>
 #include <QVBoxLayout>
-
-#ifdef Q_OS_LINUX
-#include <sys/utsname.h>
-#endif
+#include <QtConcurrent>
 
 DriverDetailsDialog::DriverDetailsDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Driver File Details"));
@@ -109,7 +104,6 @@ void DriverDetailsDialog::setCategoryIcon(const QIcon &icon) {
     labelIcon_->setPixmap(icon.pixmap(32, 32));
 }
 
-#ifdef Q_OS_LINUX
 void DriverDetailsDialog::populateDriverFiles() {
     listDriverFiles_->clear();
 
@@ -117,65 +111,55 @@ void DriverDetailsDialog::populateDriverFiles() {
         return;
     }
 
-    // Look for the module file
-    QStringList modulePaths;
+    listDriverFiles_->addItem(tr("Searching..."));
 
-    // Use modinfo to find the actual module file
-    QProcess modinfo;
-    modinfo.start(QStringLiteral("modinfo"),
-                  {QStringLiteral("-F"), QStringLiteral("filename"), driverName_});
-    if (modinfo.waitForFinished(3000)) {
-        QString filename = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
-        if (!filename.isEmpty() && filename != QStringLiteral("(builtin)")) {
-            modulePaths << filename;
-        } else if (filename == QStringLiteral("(builtin)")) {
-            // Built-in module
-            listDriverFiles_->addItem(tr("(Built-in kernel module)"));
+    if (fileSearchWatcher_) {
+        fileSearchWatcher_->cancel();
+        fileSearchWatcher_->deleteLater();
+    }
+
+    fileSearchWatcher_ = new QFutureWatcher<DriverSearchResult>(this);
+    connect(fileSearchWatcher_,
+            &QFutureWatcher<DriverSearchResult>::finished,
+            this,
+            &DriverDetailsDialog::onDriverFilesFound);
+
+    QString driverName = driverName_;
+    fileSearchWatcher_->setFuture(
+        QtConcurrent::run([driverName]() { return findDriverFiles(driverName); }));
+}
+
+void DriverDetailsDialog::onDriverFilesFound() {
+    listDriverFiles_->clear();
+
+    if (!fileSearchWatcher_) {
+        return;
+    }
+
+    DriverSearchResult result = fileSearchWatcher_->result();
+    fileSearchWatcher_->deleteLater();
+    fileSearchWatcher_ = nullptr;
+
+    if (result.paths.isEmpty()) {
+        if (result.isBuiltin) {
+            BuiltinDriverInfo builtinInfo = getBuiltinDriverInfo();
+            listDriverFiles_->addItem(builtinInfo.builtinMessage);
+        } else {
+            listDriverFiles_->addItem(tr("(Driver file not found)"));
+        }
+    } else {
+        for (const QString &path : result.paths) {
+            auto *item = new QListWidgetItem(formatDriverPath(path));
+            item->setData(Qt::UserRole, path);
+            listDriverFiles_->addItem(item);
         }
     }
 
-    // Also check for related modules (dependencies)
-    modinfo.start(QStringLiteral("modinfo"),
-                  {QStringLiteral("-F"), QStringLiteral("depends"), driverName_});
-    if (modinfo.waitForFinished(3000)) {
-        QString depends = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
-        if (!depends.isEmpty()) {
-            QStringList depList = depends.split(QStringLiteral(","), Qt::SkipEmptyParts);
-            for (const QString &dep : depList) {
-                QProcess depInfo;
-                depInfo.start(QStringLiteral("modinfo"),
-                              {QStringLiteral("-F"), QStringLiteral("filename"), dep.trimmed()});
-                if (depInfo.waitForFinished(3000)) {
-                    QString depFile = QString::fromUtf8(depInfo.readAllStandardOutput()).trimmed();
-                    if (!depFile.isEmpty() && depFile != QStringLiteral("(builtin)") &&
-                        !modulePaths.contains(depFile)) {
-                        modulePaths << depFile;
-                    }
-                }
-            }
-        }
-    }
-
-    // Add files to list
-    for (const QString &path : modulePaths) {
-        auto *item = new QListWidgetItem(path);
-        item->setData(Qt::UserRole, path);
-        listDriverFiles_->addItem(item);
-    }
-
-    // Select first item
     if (listDriverFiles_->count() > 0) {
         listDriverFiles_->setCurrentRow(0);
     }
 }
-#else
-void DriverDetailsDialog::populateDriverFiles() {
-    listDriverFiles_->clear();
-    listDriverFiles_->addItem(tr("(Driver details not available on this platform)"));
-}
-#endif
 
-#ifdef Q_OS_LINUX
 void DriverDetailsDialog::onFileSelectionChanged() {
     QListWidgetItem *item = listDriverFiles_->currentItem();
     if (!item) {
@@ -186,140 +170,24 @@ void DriverDetailsDialog::onFileSelectionChanged() {
         return;
     }
 
-    QString modulePath = item->data(Qt::UserRole).toString();
-    if (modulePath.isEmpty()) {
-        // Built-in module
-        labelProviderValue_->setText(QStringLiteral("Linux Foundation"));
-        struct utsname buffer;
-        if (uname(&buffer) == 0) {
-            labelFileVersionValue_->setText(QString::fromLocal8Bit(buffer.release));
-        }
-        labelCopyrightValue_->setText(tr("GPL-compatible"));
-        labelDigitalSignerValue_->setText(QStringLiteral("Linux Foundation"));
+    QString driverPath = item->data(Qt::UserRole).toString();
+    if (driverPath.isEmpty()) {
+        // Built-in driver - show platform defaults
+        BuiltinDriverInfo builtinInfo = getBuiltinDriverInfo();
+        labelProviderValue_->setText(builtinInfo.provider);
+        labelFileVersionValue_->setText(builtinInfo.version);
+        labelCopyrightValue_->setText(builtinInfo.copyright);
+        labelDigitalSignerValue_->setText(builtinInfo.signer);
         return;
     }
 
-    updateFileDetails(modulePath);
+    updateFileDetails(driverPath);
 }
 
-void DriverDetailsDialog::updateFileDetails(const QString &modulePath) {
-    // Extract module name from path
-    QString moduleName = modulePath;
-    auto lastSlash = moduleName.lastIndexOf(QLatin1Char('/'));
-    if (lastSlash >= 0) {
-        moduleName = moduleName.mid(lastSlash + 1);
-    }
-    // Remove .ko, .ko.gz, .ko.xz, .ko.zst extensions
-    moduleName.remove(QRegularExpression(QStringLiteral("\\.ko(\\.gz|\\.xz|\\.zst)?$")));
-
-    ModuleInfo info = getModuleInfo(moduleName);
-
-    // Check if this is an nvidia module
-    bool isNvidia = moduleName == QStringLiteral("nvidia") ||
-                    moduleName.startsWith(QStringLiteral("nvidia_")) ||
-                    moduleName.startsWith(QStringLiteral("nvidia-"));
-
-    // Provider - special handling for nvidia, otherwise use author or "Linux Foundation"
-    if (isNvidia) {
-        labelProviderValue_->setText(QStringLiteral("NVIDIA Corporation"));
-    } else if (!info.author.isEmpty()) {
-        labelProviderValue_->setText(info.author);
-    } else {
-        labelProviderValue_->setText(QStringLiteral("Linux Foundation"));
-    }
-
-    // Version
-    if (!info.version.isEmpty()) {
-        labelFileVersionValue_->setText(info.version);
-    } else {
-        // Fall back to kernel version
-        struct utsname buffer;
-        if (uname(&buffer) == 0) {
-            labelFileVersionValue_->setText(QString::fromLocal8Bit(buffer.release));
-        }
-    }
-
-    // Copyright - special handling for nvidia, otherwise use license info
-    if (isNvidia) {
-        labelCopyrightValue_->setText(QStringLiteral("NVIDIA Driver License Agreement"));
-    } else if (!info.license.isEmpty()) {
-        labelCopyrightValue_->setText(info.license);
-    } else {
-        labelCopyrightValue_->clear();
-    }
-
-    // Digital signer
-    if (isNvidia) {
-        labelDigitalSignerValue_->setText(QStringLiteral("NVIDIA Corporation"));
-    } else if (!info.signer.isEmpty()) {
-        labelDigitalSignerValue_->setText(info.signer);
-    } else {
-        // Most kernel modules are signed by the kernel build
-        labelDigitalSignerValue_->setText(QStringLiteral("Linux Foundation"));
-    }
+void DriverDetailsDialog::updateFileDetails(const QString &driverPath) {
+    DriverFileDetails details = getDriverFileDetails(driverPath, driverName_);
+    labelProviderValue_->setText(details.provider);
+    labelFileVersionValue_->setText(details.version);
+    labelCopyrightValue_->setText(details.copyright);
+    labelDigitalSignerValue_->setText(details.signer);
 }
-
-DriverDetailsDialog::ModuleInfo DriverDetailsDialog::getModuleInfo(const QString &moduleName) {
-    ModuleInfo info;
-
-    QProcess modinfo;
-    modinfo.start(QStringLiteral("modinfo"), {moduleName});
-    if (!modinfo.waitForFinished(3000)) {
-        return info;
-    }
-
-    QString output = QString::fromUtf8(modinfo.readAllStandardOutput());
-    QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
-
-    for (const QString &line : lines) {
-        auto colonIdx = line.indexOf(QLatin1Char(':'));
-        if (colonIdx < 0)
-            continue;
-
-        QString key = line.left(colonIdx).trimmed();
-        QString value = line.mid(colonIdx + 1).trimmed();
-
-        if (key == QStringLiteral("filename")) {
-            info.filename = value;
-        } else if (key == QStringLiteral("version")) {
-            info.version = value;
-        } else if (key == QStringLiteral("author")) {
-            if (info.author.isEmpty()) {
-                info.author = value;
-            } else {
-                info.author += QStringLiteral(", ") + value;
-            }
-        } else if (key == QStringLiteral("description")) {
-            info.description = value;
-        } else if (key == QStringLiteral("license")) {
-            info.license = value;
-        } else if (key == QStringLiteral("srcversion")) {
-            info.srcversion = value;
-        } else if (key == QStringLiteral("depends")) {
-            info.depends = value;
-        } else if (key == QStringLiteral("signer")) {
-            info.signer = value;
-        } else if (key == QStringLiteral("sig_key")) {
-            info.sigKey = value;
-        }
-    }
-
-    return info;
-}
-#else
-void DriverDetailsDialog::onFileSelectionChanged() {
-    labelProviderValue_->setText(tr("N/A"));
-    labelFileVersionValue_->setText(tr("N/A"));
-    labelCopyrightValue_->setText(tr("N/A"));
-    labelDigitalSignerValue_->setText(tr("N/A"));
-}
-
-void DriverDetailsDialog::updateFileDetails([[maybe_unused]] const QString &modulePath) {
-    // Not available on non-Linux platforms
-}
-
-DriverDetailsDialog::ModuleInfo
-DriverDetailsDialog::getModuleInfo([[maybe_unused]] const QString &moduleName) {
-    return ModuleInfo();
-}
-#endif

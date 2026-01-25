@@ -3,7 +3,9 @@
 #include <QRegularExpression>
 #include <QString>
 
+#ifndef DEVMGMT_CLI_ONLY
 #include "const_strings_icons.h"
+#endif
 #include "const_strings_udev.h"
 #include "namemappings.h"
 
@@ -65,7 +67,7 @@ namespace strings {
      * @param name The device name (may include @c /dev/ prefix).
      * @returns A user-friendly name, or the original name if no mapping exists.
      */
-    inline QString softwareDeviceNiceName(const QString &name) {
+    inline QString softwareDeviceDisplayName(const QString &name) {
         // Strip /dev/ prefix if present
         QString shortName = name;
         if (shortName.startsWith(QStringLiteral("/dev/"))) {
@@ -124,9 +126,9 @@ namespace strings {
         }
 
         // Look up in JSON mappings
-        QString niceName = NameMappings::instance().softwareDeviceNiceName(shortName);
-        if (!niceName.isEmpty()) {
-            return niceName;
+        QString displayName = NameMappings::instance().softwareDeviceDisplayName(shortName);
+        if (!displayName.isEmpty()) {
+            return displayName;
         }
 
         return shortName;
@@ -217,7 +219,7 @@ namespace strings {
      * @param fallbackName Name to use if no mapping exists.
      * @returns A user-friendly name for the ACPI device.
      */
-    inline QString acpiDeviceNiceName(const QString &devPath, const QString &fallbackName) {
+    inline QString acpiDeviceDisplayName(const QString &devPath, const QString &fallbackName) {
         auto lastSlash = devPath.lastIndexOf(QLatin1Char('/'));
         if (lastSlash < 0) {
             return fallbackName;
@@ -228,9 +230,9 @@ namespace strings {
         QString pnpId = colonPos > 0 ? lastComponent.left(colonPos) : lastComponent;
 
         // Look up in JSON mappings
-        QString niceName = NameMappings::instance().acpiDeviceNiceName(pnpId);
-        if (!niceName.isEmpty()) {
-            return niceName;
+        QString displayName = NameMappings::instance().acpiDeviceDisplayName(pnpId);
+        if (!displayName.isEmpty()) {
+            return displayName;
         }
 
         // Fallback: capitalize simple names like "battery" -> "Battery"

@@ -6,6 +6,7 @@
 #include <QtWidgets/QDialog>
 
 #include "deviceinfo.h"
+#include "systeminfo.h"
 #include "ui_propertiesdialog.h"
 
 /**
@@ -46,6 +47,8 @@ private Q_SLOTS:
     void onViewAllEventsClicked();
     void onCopyDevicePath();
     void onEventsLoaded();
+    void onDriverInfoLoaded();
+    void onResourcesLoaded();
 
 private:
     void populateGeneralTab();
@@ -53,20 +56,7 @@ private:
     void populateDetailsTab();
     void populateEventsTab();
     void createResourcesTab();
-    QString getKernelVersion();
-    QString getKernelBuildDate();
-    QString lookupUsbVendor(const QString &vendorId);
-    QString translateLocation(const QString &devpath);
     QString getDeviceCategory();
-    QString getBlockDeviceManufacturer();
-    QString getMountPoint();
-
-    struct ResourceInfo {
-        QString type;
-        QString setting;
-        QString iconName;
-    };
-    QList<ResourceInfo> getDeviceResources();
 
     QString syspath_;
     const DeviceInfo *deviceInfo_;
@@ -75,11 +65,7 @@ private:
     QStringList allEvents_;
     QWidget *resourcesTab_ = nullptr;
     QFutureWatcher<QStringList> *eventsWatcher_ = nullptr;
-
-    struct PropertyMapping {
-        QString displayName;
-        QString propertyKey;
-        bool isMultiValue;
-    };
+    QFutureWatcher<BasicDriverInfo> *driverInfoWatcher_ = nullptr;
+    QFutureWatcher<QList<ResourceInfo>> *resourcesWatcher_ = nullptr;
     QList<PropertyMapping> propertyMappings_;
 };

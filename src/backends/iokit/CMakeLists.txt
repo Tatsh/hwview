@@ -1,7 +1,10 @@
 add_library(
   devmgmt_iokit STATIC
+  driverinfo.cpp
+  iokitdeviceinfo.cpp
   iokitmanager.cpp
-  iokitmonitor.cpp)
+  iokitmonitor.cpp
+  systeminfo.cpp)
 
 set_target_properties(devmgmt_iokit PROPERTIES AUTOMOC ON)
 

@@ -74,8 +74,8 @@ void DevicesByDriverModel::buildTree() {
                     rawName = syspath;
                 }
             }
-            // Convert to nice name if available
-            QString name = s::softwareDeviceNiceName(rawName);
+            // Convert to display name if available
+            QString name = s::softwareDeviceDisplayName(rawName);
 
             auto *deviceNode = new Node({name}, driverNode, NodeType::Device);
             deviceNode->setSyspath(info.syspath());

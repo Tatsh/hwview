@@ -1,16 +1,10 @@
-#include <QRegularExpression>
-
 #include "const_strings.h"
 #include "devicecache.h"
 #include "models/resbytypemodel.h"
-#include "procutils.h"
+#include "systeminfo.h"
 #include "viewsettings.h"
 
 namespace s = strings;
-
-#ifdef Q_OS_LINUX
-using procutils::readProcFile;
-#endif
 
 ResourcesByTypeModel::ResourcesByTypeModel(QObject *parent)
     : BaseTreeModel(parent), hostnameItem(nullptr), dmaItem(nullptr), ioItem(nullptr),
@@ -28,70 +22,50 @@ bool ResourcesByTypeModel::shouldShowIcons() const {
 }
 
 void ResourcesByTypeModel::buildTree() {
-#ifdef Q_OS_LINUX
     addDma();
     addIoPorts();
     addIrq();
     addMemory();
-#endif
 }
 
-#ifdef Q_OS_LINUX
 void ResourcesByTypeModel::addDma() {
+    auto channels = getSystemDmaChannels();
+    if (channels.isEmpty()) {
+        return;
+    }
+
     dmaItem = new Node({tr("Direct memory access (DMA)"), s::empty()}, hostnameItem);
     dmaItem->setIcon(s::categoryIcons::dma());
 
-    static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
-    for (const auto &line : readProcFile(QStringLiteral("/proc/dma"))) {
-        if (line.trimmed().isEmpty()) {
-            continue;
-        }
-        // Format: "4: cascade"
-        auto match = dmaRe.match(line.trimmed());
-        if (match.hasMatch()) {
-            auto channel = match.captured(1);
-            auto name = match.captured(2);
-            auto displayText = QStringLiteral("[%1] %2").arg(channel, name);
-            auto *node = new Node({displayText, s::empty()}, dmaItem);
-            node->setIcon(s::categoryIcons::dma());
-            dmaItem->appendChild(node);
-        }
+    for (const auto &channel : channels) {
+        auto displayText = QStringLiteral("[%1] %2").arg(channel.channel, channel.name);
+        auto *node = new Node({displayText, s::empty()}, dmaItem);
+        node->setIcon(s::categoryIcons::dma());
+        dmaItem->appendChild(node);
     }
 
-    if (dmaItem->childCount() > 0) {
-        hostnameItem->appendChild(dmaItem);
-    } else {
-        delete dmaItem;
-        dmaItem = nullptr;
-    }
+    hostnameItem->appendChild(dmaItem);
 }
 
 void ResourcesByTypeModel::addIoPorts() {
+    auto ports = getSystemIoPorts();
+    if (ports.isEmpty()) {
+        return;
+    }
+
     ioItem = new Node({tr("Input/output (IO)"), s::empty()}, hostnameItem);
     ioItem->setIcon(s::categoryIcons::ioPorts());
 
-    static const QRegularExpression ioRe(
-        QStringLiteral("^\\s*([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
-    for (const auto &line : readProcFile(QStringLiteral("/proc/ioports"))) {
-        if (line.trimmed().isEmpty()) {
+    for (const auto &port : ports) {
+        // Skip generic entries for the flat view
+        if (port.name.startsWith(QStringLiteral("PCI Bus"))) {
             continue;
         }
-        // Format: "  0000-0cf7 : PCI Bus 0000:00"
-        // Indentation indicates hierarchy, but we'll flatten for simplicity
-        auto match = ioRe.match(line);
-        if (match.hasMatch()) {
-            auto rangeStart = match.captured(1).toUpper();
-            auto rangeEnd = match.captured(2).toUpper();
-            auto name = match.captured(3);
-            // Skip empty or generic entries
-            if (name.isEmpty() || name.startsWith(QStringLiteral("PCI Bus"))) {
-                continue;
-            }
-            auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
-            auto *node = new Node({displayText, s::empty()}, ioItem);
-            node->setIcon(s::categoryIcons::ioPorts());
-            ioItem->appendChild(node);
-        }
+        auto displayText =
+            QStringLiteral("[%1 - %2] %3").arg(port.rangeStart, port.rangeEnd, port.name);
+        auto *node = new Node({displayText, s::empty()}, ioItem);
+        node->setIcon(s::categoryIcons::ioPorts());
+        ioItem->appendChild(node);
     }
 
     if (ioItem->childCount() > 0) {
@@ -103,113 +77,55 @@ void ResourcesByTypeModel::addIoPorts() {
 }
 
 void ResourcesByTypeModel::addIrq() {
+    auto irqs = getSystemIrqs();
+    if (irqs.isEmpty()) {
+        return;
+    }
+
     irqItem = new Node({tr("Interrupt request (IRQ)"), s::empty()}, hostnameItem);
     irqItem->setIcon(s::categoryIcons::irq());
 
-    static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
-
-    auto lines = readProcFile(QStringLiteral("/proc/interrupts"));
-    // Skip header line
-    if (!lines.isEmpty()) {
-        lines.removeFirst();
-    }
-    for (const auto &line : lines) {
-        if (line.trimmed().isEmpty()) {
-            continue;
-        }
-        // Format: "  0:         23   IO-APIC   2-edge      timer"
-        // or:     "NMI:          0          0   Non-maskable interrupts"
-        // First column is IRQ number or name, last column(s) are device name
-        auto parts = line.split(whitespaceRe, Qt::SkipEmptyParts);
-        if (parts.size() < 2) {
-            continue;
-        }
-        auto irqNum = parts[0];
-        if (irqNum.endsWith(QLatin1Char(':'))) {
-            irqNum.chop(1);
-        }
-        // The device name is typically the last part(s)
-        // Find the interrupt type (like IO-APIC, PCI-MSI, etc.) and device name
-        QString deviceName;
-        QString irqType;
-
-        // Look for common IRQ type indicators
-        for (auto i = 1; i < parts.size(); ++i) {
-            if (parts[i].contains(QStringLiteral("APIC")) ||
-                parts[i].contains(QStringLiteral("PCI")) ||
-                parts[i].contains(QStringLiteral("MSI")) ||
-                parts[i].contains(QStringLiteral("DMAR")) ||
-                parts[i].contains(QStringLiteral("edge")) ||
-                parts[i].contains(QStringLiteral("level")) ||
-                parts[i].contains(QStringLiteral("fasteoi"))) {
-                if (irqType.isEmpty()) {
-                    irqType = parts[i];
-                } else {
-                    irqType += QLatin1Char(' ') + parts[i];
-                }
-            } else if (i > 1 && !parts[i].isEmpty() && !parts[i].at(0).isDigit()) {
-                // This is likely the device name
-                if (deviceName.isEmpty()) {
-                    deviceName = parts[i];
-                } else {
-                    deviceName += QLatin1Char(' ') + parts[i];
-                }
-            }
-        }
-
-        if (deviceName.isEmpty()) {
-            continue;
-        }
-
+    for (const auto &irq : irqs) {
         QString displayText;
-        if (!irqType.isEmpty()) {
-            displayText = QStringLiteral("(%1) %2 %3").arg(irqType, irqNum, deviceName);
+        if (!irq.irqType.isEmpty()) {
+            displayText =
+                QStringLiteral("(%1) %2 %3").arg(irq.irqType, irq.irqNumber, irq.deviceName);
         } else {
-            displayText = QStringLiteral("%1 %2").arg(irqNum, deviceName);
+            displayText = QStringLiteral("%1 %2").arg(irq.irqNumber, irq.deviceName);
         }
         auto *node = new Node({displayText, s::empty()}, irqItem);
         node->setIcon(s::categoryIcons::irq());
         irqItem->appendChild(node);
     }
 
-    if (irqItem->childCount() > 0) {
-        hostnameItem->appendChild(irqItem);
-    } else {
-        delete irqItem;
-        irqItem = nullptr;
-    }
+    hostnameItem->appendChild(irqItem);
 }
 
 void ResourcesByTypeModel::addMemory() {
+    auto ranges = getSystemMemoryRanges();
+    if (ranges.isEmpty()) {
+        return;
+    }
+
     memoryItem = new Node({tr("Memory"), s::empty()}, hostnameItem);
     memoryItem->setIcon(s::categoryIcons::memory());
 
-    static const QRegularExpression memRe(
-        QStringLiteral("^\\s*([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
-    for (const auto &line : readProcFile(QStringLiteral("/proc/iomem"))) {
-        if (line.trimmed().isEmpty()) {
+    for (const auto &range : ranges) {
+        // Skip generic/system entries for the flat view
+        if (range.name.isEmpty() || range.name == QStringLiteral("Reserved") ||
+            range.name == QStringLiteral("System RAM") ||
+            range.name == QStringLiteral("System ROM") ||
+            range.name.startsWith(QStringLiteral("PCI Bus")) ||
+            range.name.startsWith(QStringLiteral("PCI MMCONFIG")) ||
+            range.name.startsWith(QStringLiteral("ACPI")) ||
+            range.name.startsWith(QStringLiteral("0000:"))) {
             continue;
         }
-        // Format: "  00000000-00000fff : Reserved"
-        auto match = memRe.match(line);
-        if (match.hasMatch()) {
-            auto rangeStart = match.captured(1).toUpper();
-            auto rangeEnd = match.captured(2).toUpper();
-            auto name = match.captured(3);
-            // Skip generic/system entries
-            if (name.isEmpty() || name == QStringLiteral("Reserved") ||
-                name == QStringLiteral("System RAM") || name == QStringLiteral("System ROM") ||
-                name.startsWith(QStringLiteral("PCI Bus")) ||
-                name.startsWith(QStringLiteral("PCI MMCONFIG")) ||
-                name.startsWith(QStringLiteral("ACPI")) ||
-                name.startsWith(QStringLiteral("0000:"))) {
-                continue;
-            }
-            auto displayText = QStringLiteral("[%1 - %2] %3").arg(rangeStart, rangeEnd, name);
-            auto *node = new Node({displayText, s::empty()}, memoryItem);
-            node->setIcon(s::categoryIcons::memory());
-            memoryItem->appendChild(node);
-        }
+        auto displayText =
+            QStringLiteral("[%1 - %2] %3").arg(range.rangeStart, range.rangeEnd, range.name);
+        auto *node = new Node({displayText, s::empty()}, memoryItem);
+        node->setIcon(s::categoryIcons::memory());
+        memoryItem->appendChild(node);
     }
 
     if (memoryItem->childCount() > 0) {
@@ -219,7 +135,6 @@ void ResourcesByTypeModel::addMemory() {
         memoryItem = nullptr;
     }
 }
-#endif
 
 int ResourcesByTypeModel::columnCount([[maybe_unused]] const QModelIndex &parent) const {
     return 1;

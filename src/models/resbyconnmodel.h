@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QStack>
+
 #include "basetreemodel.h"
 
 /**
@@ -27,14 +29,13 @@ protected:
 
 private:
     void buildTree();
-#ifdef Q_OS_LINUX
     void addDma();
     void addIoPorts();
     void addIrq();
     void addMemory();
-    void parseHierarchicalResource(const QString &filePath, Node *categoryNode,
-                                    const QIcon &itemIcon);
-#endif
+    void buildHierarchicalResource(Node *categoryNode, const QIcon &itemIcon, int indentLevel,
+                                   const QString &rangeStart, const QString &rangeEnd,
+                                   const QString &name, QStack<QPair<int, Node *>> &nodeStack);
 
     Node *hostnameItem;
     Node *dmaItem;

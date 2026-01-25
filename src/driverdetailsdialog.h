@@ -1,26 +1,21 @@
 #pragma once
 
 #include <QDialog>
+#include <QFutureWatcher>
 #include <QIcon>
 #include <QLabel>
 #include <QListWidget>
 #include <QString>
-#include <QStringList>
+
+struct DriverSearchResult;
 
 /**
  * @brief Dialog that displays detailed information about a kernel driver.
- *
- * This dialog shows driver file information including version, author,
- * license, dependencies, and digital signature status.
  */
 class DriverDetailsDialog : public QDialog {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Constructs a DriverDetailsDialog.
-     * @param parent Optional parent widget.
-     */
     explicit DriverDetailsDialog(QWidget *parent = nullptr);
 
     /**
@@ -37,28 +32,15 @@ public:
 
 private Q_SLOTS:
     void onFileSelectionChanged();
+    void onDriverFilesFound();
 
 private:
     void populateDriverFiles();
-    void updateFileDetails(const QString &modulePath);
-
-    struct ModuleInfo {
-        QString filename;
-        QString version;
-        QString author;
-        QString description;
-        QString license;
-        QString srcversion;
-        QString alias;
-        QString depends;
-        QString signer;
-        QString sigKey;
-    };
-
-    ModuleInfo getModuleInfo(const QString &moduleName);
+    void updateFileDetails(const QString &driverPath);
 
     QString driverName_;
     QIcon categoryIcon_;
+    QFutureWatcher<DriverSearchResult> *fileSearchWatcher_ = nullptr;
 
     QLabel *labelIcon_;
     QLabel *labelDeviceName_;

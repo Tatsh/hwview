@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.31)
-project(devmgmt)
+project(devmgmt LANGUAGES CXX VERSION 0.0.1 DESCRIPTION "Hardware information utility." HOMEPAGE_URL "https://github.com/Tatsh/devmgmt")
 
 include(FindPkgConfig)
+include(GNUInstallDirs)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -13,31 +14,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Configurable website URL
 set(DEVMGMT_WEBSITE_URL "https://github.com/Tatsh/devmgmt" CACHE STRING "Project website URL")
 
-# KDE Plasma integration option
-option(DEVMGMT_USE_KDE "Build with KDE Frameworks integration" OFF)
+option(DEVMGMT_CLI_ONLY "Build CLI-only version without GUI." OFF)
+option(DEVMGMT_CXX_WARN_ERROR_ALL "Do not use." OFF)
+option(DEVMGMT_USE_KDE "Build with KDE Frameworks integration." OFF)
 
-# Enable all Clang warnings (for development)
-option(DEVMGMT_CXX_WARN_ERROR_ALL "Enable all warnings with Clang (requires Debug build)" OFF)
+if(DEVMGMT_CLI_ONLY)
+  find_package(Qt6Core CONFIG REQUIRED)
+  set(DEVMGMT_USE_KDE OFF)
+else()
+  find_package(Qt6Concurrent CONFIG REQUIRED)
+  find_package(Qt6Network CONFIG REQUIRED)
+  find_package(Qt6Widgets CONFIG REQUIRED)
+endif()
 
-find_package(
-  Qt6
-  COMPONENTS Concurrent Network Widgets
-  REQUIRED)
-
-# libudev is only available on Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
 endif()
 
-# macOS frameworks for IOKit device enumeration
 if(APPLE)
   find_library(IOKIT_FRAMEWORK IOKit REQUIRED)
   find_library(COREFOUNDATION_FRAMEWORK CoreFoundation REQUIRED)
   find_library(DISKARBITRATION_FRAMEWORK DiskArbitration REQUIRED)
 endif()
 
-# Optional KDE Frameworks support
-if(DEVMGMT_USE_KDE)
+if(DEVMGMT_USE_KDE AND NOT DEVMGMT_CLI_ONLY)
   find_package(ECM REQUIRED NO_MODULE)
   set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
   find_package(
@@ -67,17 +67,17 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
       -Weverything
       -Wno-c++98-compat
       -Wno-c++98-compat-pedantic
-      -Wno-covered-switch-default # Conflicts with -Wswitch-default
-      -Wno-ctad-maybe-unsupported # Qt moc uses CTAD without deduction guides
+      -Wno-covered-switch-default # Conflicts with -Wswitch-default.
+      -Wno-ctad-maybe-unsupported # Qt's moc uses CTAD without deduction guides.
       -Wno-deprecated-copy-with-user-provided-dtor
       -Wno-exit-time-destructors
       -Wno-global-constructors
       -Wno-inconsistent-missing-destructor-override
-      -Wno-nrvo # Conflicts with -Wpessimizing-move in some cases
+      -Wno-nrvo # Conflicts with -Wpessimizing-move in some cases.
       -Wno-padded
       -Wno-redundant-parens
-      -Wno-unsafe-buffer-usage # Qt moc uses strcmp
-      -Wno-unsafe-buffer-usage-in-libc-call) # Qt moc uses strcmp
+      -Wno-unsafe-buffer-usage # Qt moc uses strcmp.
+      -Wno-unsafe-buffer-usage-in-libc-call) # Qt moc uses strcmp.
   endif()
 endif()
 

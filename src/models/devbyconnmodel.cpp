@@ -30,7 +30,7 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *r
         } else {
             name = syspath;
         }
-        // Only add prefix for subsystems without dedicated nice name handling
+        // Only add prefix for subsystems without dedicated display name handling
         addSubsystemPrefix =
             !subsystem.isEmpty() && subsystem != QStringLiteral("acpi") &&
             subsystem != QStringLiteral("scsi_host") && subsystem != QStringLiteral("scsi") &&
@@ -42,14 +42,14 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *r
         *rawName = addSubsystemPrefix ? QStringLiteral("[%1] %2").arg(subsystem, name) : name;
     }
 
-    // Apply nice name transformations
+    // Apply display name transformations
     if (subsystem == QStringLiteral("acpi")) {
-        name = s::acpiDeviceNiceName(info.devPath(), name);
+        name = s::acpiDeviceDisplayName(info.devPath(), name);
     } else {
-        name = s::softwareDeviceNiceName(name);
+        name = s::softwareDeviceDisplayName(name);
     }
 
-    // Add subsystem prefix if name was empty and subsystem lacks nice name handling
+    // Add subsystem prefix if name was empty and subsystem lacks display name handling
     if (addSubsystemPrefix) {
         name = QStringLiteral("[%1] %2").arg(subsystem, name);
     }

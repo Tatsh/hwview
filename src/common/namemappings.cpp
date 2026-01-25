@@ -37,9 +37,10 @@ void NameMappings::reload() {
     // This allows running the application without installation during development
     QString appDir = QCoreApplication::applicationDirPath();
     loadFromDirectory(appDir + QStringLiteral("/data"), locale);
-    // Also check parent directory (for when binary is in build/src/)
+    // Also check parent directories (for when binary is in build/src/ or build/src/viewer/)
     loadFromDirectory(appDir + QStringLiteral("/../data"), locale);
     loadFromDirectory(appDir + QStringLiteral("/../../data"), locale);
+    loadFromDirectory(appDir + QStringLiteral("/../../../data"), locale);
 
     // Get standard data locations
     // On Linux: /usr/share, /usr/local/share, etc.
@@ -186,11 +187,11 @@ QString NameMappings::hidBusTypeName(int busType) const {
     return hidBusType_.value(busType);
 }
 
-QString NameMappings::softwareDeviceNiceName(const QString &deviceName) const {
+QString NameMappings::softwareDeviceDisplayName(const QString &deviceName) const {
     return softwareDevice_.value(deviceName);
 }
 
-QString NameMappings::acpiDeviceNiceName(const QString &pnpId) const {
+QString NameMappings::acpiDeviceDisplayName(const QString &pnpId) const {
     // Normalize to uppercase for lookup
     QString normalizedId = pnpId.toUpper();
     return acpiDevice_.value(normalizedId);

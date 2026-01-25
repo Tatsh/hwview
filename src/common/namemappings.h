@@ -72,18 +72,18 @@ public:
     QString hidBusTypeName(int busType) const;
 
     /**
-     * @brief Returns the nice name for a software device.
+     * @brief Returns the display name for a software device.
      * @param deviceName The device name (without @c /dev/ prefix).
-     * @returns The nice name, or empty string if not found.
+     * @returns The display name, or empty string if not found.
      */
-    QString softwareDeviceNiceName(const QString &deviceName) const;
+    QString softwareDeviceDisplayName(const QString &deviceName) const;
 
     /**
-     * @brief Returns the nice name for an ACPI/PNP device ID.
+     * @brief Returns the display name for an ACPI/PNP device ID.
      * @param pnpId The PNP ID (e.g., "PNP0C0A").
-     * @returns The nice name, or empty string if not found.
+     * @returns The display name, or empty string if not found.
      */
-    QString acpiDeviceNiceName(const QString &pnpId) const;
+    QString acpiDeviceDisplayName(const QString &pnpId) const;
 
     /**
      * @brief Reloads all mappings from JSON files.

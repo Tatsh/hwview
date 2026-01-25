@@ -4,15 +4,11 @@
 #include <QStandardPaths>
 
 namespace {
-    QSettings createSettings() {
-#ifdef Q_OS_LINUX
-        // On Linux, use ~/.config/devmgmtrc
-        auto configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-        return QSettings(configPath + QStringLiteral("/devmgmtrc"), QSettings::IniFormat);
-#else
-        return QSettings();
-#endif
-    }
+QSettings createSettings() {
+    // Use platform-appropriate config location
+    auto configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
+    return QSettings(configPath + QStringLiteral("/devmgmtrc"), QSettings::IniFormat);
+}
 } // namespace
 
 ViewSettings &ViewSettings::instance() {
