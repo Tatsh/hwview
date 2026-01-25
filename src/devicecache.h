@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QHash>
-#include <QJsonObject>
-#include <QList>
-#include <QMutex>
-#include <QObject>
+#include <QtCore/QHash>
+#include <QtCore/QJsonObject>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
 
 #include "deviceinfo.h"
 

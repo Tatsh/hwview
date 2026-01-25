@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QHash>
-#include <QString>
-#include <QStringList>
+#include <QtCore/QHash>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 #include "deviceinfo.h"
 

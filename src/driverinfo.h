@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 
 /**
  * @brief Information about a driver/kernel module.

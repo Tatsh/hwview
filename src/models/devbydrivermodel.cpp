@@ -1,4 +1,3 @@
-#include <QtCore/QHash>
 #include <QtCore/QMap>
 
 #include "const_strings.h"

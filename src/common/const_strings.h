@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QRegularExpression>
-#include <QString>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QString>
 
 #ifndef DEVMGMT_CLI_ONLY
 #include "const_strings_icons.h"
-#endif
+#endif // DEVMGMT_CLI_ONLY
 #include "const_strings_udev.h"
 #include "namemappings.h"
 

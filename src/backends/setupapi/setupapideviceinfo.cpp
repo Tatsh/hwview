@@ -1,9 +1,9 @@
-#include "setupapideviceinfo.h"
+#include <QtCore/QDebug>
+
 #include "devclass_guids.h"
 #include "deviceinfo.h"
+#include "setupapideviceinfo.h"
 #include "setupapimanager.h"
-
-#include <QDebug>
 
 SetupApiDeviceInfoPrivate::SetupApiDeviceInfoPrivate(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData)
     : DeviceInfoPrivate() {

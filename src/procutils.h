@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QFile>
-#include <QStringList>
+#include <QtCore/QFile>
+#include <QtCore/QStringList>
 
 #include "devicecache.h"
 

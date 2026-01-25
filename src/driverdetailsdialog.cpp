@@ -1,13 +1,13 @@
+#include <QtConcurrent/QtConcurrent>
+#include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
+
 #include "driverdetailsdialog.h"
 #include "driverinfo.h"
 #include "systeminfo.h"
-
-#include <QGridLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QVBoxLayout>
-#include <QtConcurrent>
 
 DriverDetailsDialog::DriverDetailsDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Driver File Details"));

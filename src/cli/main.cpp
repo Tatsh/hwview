@@ -11,7 +11,7 @@
 #include <windows.h>
 #else
 #include <unistd.h>
-#endif
+#endif // _WIN32
 
 #include "deviceexport.h"
 #include "deviceinfo.h"
@@ -37,7 +37,7 @@ QString getHostname() {
         return QString::fromLocal8Bit(buffer);
     }
     return QStringLiteral("unknown");
-#endif
+#endif // _WIN32
 }
 
 } // namespace

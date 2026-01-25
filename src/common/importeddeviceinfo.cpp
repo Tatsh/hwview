@@ -1,7 +1,7 @@
-#include "importeddeviceinfo.h"
-#include "deviceinfo.h"
+#include <QtCore/QDebug>
 
-#include <QDebug>
+#include "deviceinfo.h"
+#include "importeddeviceinfo.h"
 
 ImportedDeviceInfoPrivate::ImportedDeviceInfoPrivate(const QJsonObject &json)
     : DeviceInfoPrivate() {

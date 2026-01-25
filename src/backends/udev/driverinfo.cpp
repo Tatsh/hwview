@@ -1,7 +1,7 @@
-#include "driverinfo.h"
+#include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
 
-#include <QProcess>
-#include <QRegularExpression>
+#include "driverinfo.h"
 
 DriverSearchResult findDriverFiles(const QString &driverName) {
     DriverSearchResult result;

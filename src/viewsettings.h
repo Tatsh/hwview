@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QString>
 
 /**
  * @brief Singleton class that holds view customization settings.

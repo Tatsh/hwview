@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QFutureWatcher>
-#include <QIcon>
-#include <QStandardItemModel>
+#include <QtCore/QFutureWatcher>
+#include <QtGui/QIcon>
+#include <QtGui/QStandardItemModel>
 #include <QtWidgets/QDialog>
 
 #include "deviceinfo.h"

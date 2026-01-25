@@ -1,7 +1,7 @@
-#include "viewsettings.h"
+#include <QtCore/QSettings>
+#include <QtCore/QStandardPaths>
 
-#include <QSettings>
-#include <QStandardPaths>
+#include "viewsettings.h"
 
 namespace {
 QSettings createSettings() {

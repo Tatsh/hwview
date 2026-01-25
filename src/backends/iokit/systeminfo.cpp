@@ -1,23 +1,23 @@
-#include "systeminfo.h"
+#include <sys/mount.h>
+#include <sys/utsname.h>
+
+#include <QtCore/QDate>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QLocale>
+#include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QTextStream>
+#include <QtCore/QUrl>
+#include <QtGui/QDesktopServices>
+
 #include "driverinfo.h"
 #include "iokitdeviceinfo.h"
 #include "iokitmanager.h"
 #include "iokitmonitor.h"
-
-#include <QDate>
-#include <QDateTime>
-#include <QDesktopServices>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QLocale>
-#include <QProcess>
-#include <QRegularExpression>
-#include <QTextStream>
-#include <QUrl>
-
-#include <sys/mount.h>
-#include <sys/utsname.h>
+#include "systeminfo.h"
 
 bool isComputerEntry(const QString &syspath) {
     return syspath == QStringLiteral("IOService:/");
@@ -65,7 +65,7 @@ QString getComputerDisplayName() {
     return QObject::tr("Intel-based Mac");
 #else
     return QObject::tr("Mac");
-#endif
+#endif // Q_PROCESSOR_ARM_64
 }
 
 QString getComputerSyspath() {

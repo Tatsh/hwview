@@ -3,11 +3,11 @@
 #ifdef DEVMGMT_USE_KDE
 #include <KXmlGuiWindow>
 #else
-#include <QMainWindow>
-#endif
+#include <QtWidgets/QMainWindow>
+#endif // DEVMGMT_USE_KDE
 
-#include <QFutureWatcher>
-#include <QSet>
+#include <QtCore/QFutureWatcher>
+#include <QtCore/QSet>
 
 #include "ui_mainwindow.h"
 
@@ -38,7 +38,7 @@ QT_END_NAMESPACE
 class MainWindow : public KXmlGuiWindow, private Ui::MainWindow {
 #else
 class MainWindow : public QMainWindow, private Ui::MainWindow {
-#endif
+#endif // DEVMGMT_USE_KDE
     Q_OBJECT
 
 public:
@@ -92,7 +92,7 @@ private:
 #ifdef DEVMGMT_USE_KDE
     void setupActions();
     void postSetupMenus();
-#endif
+#endif // DEVMGMT_USE_KDE
 
     QActionGroup *actionGroupView;
     QAction *currentViewAction = nullptr;

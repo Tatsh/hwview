@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QSet>
+#include <QtCore/QSet>
 
 #include "basetreemodel.h"
 

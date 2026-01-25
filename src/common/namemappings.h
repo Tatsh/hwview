@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QHash>
-#include <QString>
+#include <QtCore/QHash>
+#include <QtCore/QString>
 
 /**
  * @brief Manages device name mappings loaded from JSON files.

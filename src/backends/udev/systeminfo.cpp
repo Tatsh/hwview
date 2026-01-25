@@ -1,23 +1,23 @@
-#include "systeminfo.h"
-#include "driverinfo.h"
-#include "udevdeviceinfo.h"
-#include "udevmanager.h"
-#include "udevmonitor.h"
-
-#include <QDate>
-#include <QDateTime>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QLocale>
-#include <QProcess>
-#include <QRegularExpression>
-#include <QTextStream>
-#include <QUrl>
-
 #include <fcntl.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+
+#include <QtCore/QDate>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QLocale>
+#include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QTextStream>
+#include <QtCore/QUrl>
+
+#include "driverinfo.h"
+#include "systeminfo.h"
+#include "udevdeviceinfo.h"
+#include "udevmanager.h"
+#include "udevmonitor.h"
 
 namespace {
 
@@ -106,7 +106,7 @@ QString getComputerDisplayName() {
         return QObject::tr("ACPI ARM-based PC");
 #else
         return QObject::tr("ACPI-based PC");
-#endif
+#endif // Q_PROCESSOR_X86_64
     }
 
     if (dtInfo.exists() && dtInfo.isDir()) {

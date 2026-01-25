@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QDialog>
+#include <QtWidgets/QDialog>
 
 QT_BEGIN_NAMESPACE
 class QCheckBox;

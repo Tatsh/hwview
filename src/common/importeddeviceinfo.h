@@ -2,7 +2,7 @@
 
 #include "deviceinfo_p.h"
 
-#include <QJsonObject>
+#include <QtCore/QJsonObject>
 
 /**
  * @brief Implementation for devices loaded from JSON export files.

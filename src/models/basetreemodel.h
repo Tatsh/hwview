@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QAbstractItemModel>
+#include <QtCore/QAbstractItemModel>
 
 #include "node.h"
 

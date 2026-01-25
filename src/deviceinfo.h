@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QString>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QString>
 
 #include <memory>
 

@@ -1,9 +1,9 @@
-#include "customizedialog.h"
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QVBoxLayout>
 
-#include <QCheckBox>
-#include <QDialogButtonBox>
-#include <QGroupBox>
-#include <QVBoxLayout>
+#include "customizedialog.h"
 
 CustomizeDialog::CustomizeDialog(QWidget *parent) : QDialog(parent) {
     setWindowTitle(tr("Customize View"));

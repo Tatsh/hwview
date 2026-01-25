@@ -1,6 +1,6 @@
-#include "udevmonitor.h"
+#include <QtCore/QSocketNotifier>
 
-#include <QSocketNotifier>
+#include "udevmonitor.h"
 
 UdevMonitor::UdevMonitor(struct udev *ctx, QObject *parent) : DeviceMonitor(parent), ctx_(ctx) {
 }

@@ -1,14 +1,14 @@
+#include <QtCore/QFile>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QMutexLocker>
+#include <QtNetwork/QHostInfo>
+
 #include "devicecache.h"
 #include "devicemonitor.h"
 #include "systeminfo.h"
 #include "viewsettings.h"
-
-#include <QFile>
-#include <QHostInfo>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QMutexLocker>
 
 DeviceCache &DeviceCache::instance() {
     static DeviceCache cache;

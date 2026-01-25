@@ -1,20 +1,21 @@
-#include "systeminfo.h"
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QLocale>
+#include <QtCore/QProcess>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QTextStream>
+
+#include <windows.h>
+
+#include <cfgmgr32.h>
+
 #include "driverinfo.h"
 #include "setupapideviceinfo.h"
 #include "setupapimanager.h"
 #include "setupapimonitor.h"
-
-#include <QDateTime>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QLocale>
-#include <QProcess>
-#include <QRegularExpression>
-#include <QTextStream>
-
-#include <cfgmgr32.h>
-#include <windows.h>
+#include "systeminfo.h"
 
 bool isComputerEntry(const QString &syspath) {
     // Windows: The computer entry can be empty, the root tree, or the ACPI HAL

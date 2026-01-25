@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QList>
-#include <QMap>
-#include <QString>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QString>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>

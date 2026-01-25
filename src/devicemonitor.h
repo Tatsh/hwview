@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QObject>
-
 #include <expected>
+
+#include <QtCore/QObject>
 
 /**
  * @brief Error codes for device monitor operations.

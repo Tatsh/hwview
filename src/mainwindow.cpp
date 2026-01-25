@@ -1,20 +1,19 @@
-#include <QFileDialog>
-#include <QHeaderView>
-#include <QIcon>
-#include <QKeyEvent>
-#include <QKeySequence>
-#include <QMenu>
-#include <QMenuBar>
-#include <QMessageBox>
-#include <QProcess>
-#include <QProgressDialog>
-#include <QStandardPaths>
-#include <QUrl>
-#include <QWhatsThis>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
+#include <QtCore/QStandardPaths>
+#include <QtCore/QUrl>
 #include <QtGui/QAction>
 #include <QtGui/QActionGroup>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QIcon>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QKeySequence>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QProgressDialog>
+#include <QtWidgets/QWhatsThis>
 
 #ifdef DEVMGMT_USE_KDE
 #include <KAboutApplicationDialog>
@@ -24,7 +23,7 @@
 #include <KLocalizedString>
 #include <KShortcutsDialog>
 #include <KStandardAction>
-#endif
+#endif // DEVMGMT_USE_KDE
 
 #include "customizedialog.h"
 #include "devicecache.h"
@@ -122,7 +121,7 @@ MainWindow::MainWindow() {
     setupActions();
 #else
     setupMenus();
-#endif
+#endif // DEVMGMT_USE_KDE
 
     // Devices and Printers - open platform-specific printers settings
     connect(actionDevicesAndPrinters, &QAction::triggered, []() { openPrintersSettings(); });
@@ -140,7 +139,7 @@ MainWindow::MainWindow() {
     // Don't use setupGUI() as it replaces the menubar from .ui file
     // Instead, manually set up KDE-specific menus
     postSetupMenus();
-#endif
+#endif // DEVMGMT_USE_KDE
 }
 
 void MainWindow::switchToModel(QAbstractItemModel *model, int depth) {
@@ -219,7 +218,7 @@ void MainWindow::about() {
                        tr("About Device Manager"),
                        tr("View and manage device hardware settings and "
                           "driver software installed on your computer."));
-#endif
+#endif // DEVMGMT_USE_KDE
 }
 
 void MainWindow::openPropertiesForIndex(const QModelIndex &index) {
@@ -263,7 +262,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     return KXmlGuiWindow::eventFilter(watched, event);
 #else
     return QMainWindow::eventFilter(watched, event);
-#endif
+#endif // DEVMGMT_USE_KDE
 }
 
 void MainWindow::toggleShowHiddenDevices(bool checked) {
@@ -508,7 +507,7 @@ bool MainWindow::loadExportFile(const QString &filePath) {
     if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
         exportAction->setEnabled(false);
     }
-#endif
+#endif // DEVMGMT_USE_KDE
     if (menuAction) {
         menuAction->setEnabled(false);
     }
@@ -520,7 +519,7 @@ bool MainWindow::loadExportFile(const QString &filePath) {
     setWindowTitle(tr("%1 - %2").arg(fi.fileName(), DeviceCache::hostname()));
 #else
     setWindowTitle(tr("%1 - %2 —  Device Manager").arg(fi.fileName(), DeviceCache::hostname()));
-#endif
+#endif // DEVMGMT_USE_KDE
 
     // Refresh the current view
     refreshCurrentView();
@@ -541,7 +540,7 @@ void MainWindow::returnToLiveView() {
     if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
         exportAction->setEnabled(true);
     }
-#endif
+#endif // DEVMGMT_USE_KDE
     if (menuAction) {
         menuAction->setEnabled(true);
     }
@@ -552,7 +551,7 @@ void MainWindow::returnToLiveView() {
     setWindowTitle(QString());
 #else
     setWindowTitle(tr("Device Manager"));
-#endif
+#endif // DEVMGMT_USE_KDE
 
     // Refresh the current view
     refreshCurrentView();
@@ -809,7 +808,7 @@ void MainWindow::postSetupMenus() {
     auto *kdeHelpMenu = new KHelpMenu(this, KAboutData::applicationData());
     menuHelp->addAction(kdeHelpMenu->action(KHelpMenu::menuAboutKDE));
 }
-#endif
+#endif // DEVMGMT_USE_KDE
 
 void MainWindow::setupMenus() {
 #ifndef DEVMGMT_USE_KDE
@@ -836,5 +835,5 @@ void MainWindow::setupMenus() {
     if (menuHelp) {
         menuHelp->removeAction(actionHelpTopics);
     }
-#endif
+#endif // DEVMGMT_USE_KDE
 }

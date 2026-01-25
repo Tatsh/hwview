@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QList>
-#include <QString>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QList>
+#include <QtCore/QString>
 
 class DeviceInfo;
 

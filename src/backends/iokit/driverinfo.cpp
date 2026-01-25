@@ -1,10 +1,10 @@
-#include "driverinfo.h"
+#include <QtCore/QDir>
+#include <QtCore/QDirIterator>
+#include <QtCore/QFile>
+#include <QtCore/QProcess>
+#include <QtCore/QSettings>
 
-#include <QDir>
-#include <QDirIterator>
-#include <QFile>
-#include <QProcess>
-#include <QSettings>
+#include "driverinfo.h"
 
 namespace {
 

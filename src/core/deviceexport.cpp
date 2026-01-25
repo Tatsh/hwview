@@ -1,13 +1,13 @@
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDateTime>
+#include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QLocale>
+#include <QtCore/QSysInfo>
+
 #include "deviceexport.h"
 #include "deviceinfo.h"
 #include "systeminfo.h"
-
-#include <QCoreApplication>
-#include <QDateTime>
-#include <QFile>
-#include <QJsonDocument>
-#include <QLocale>
-#include <QSysInfo>
 
 bool DeviceExport::exportToFile(const QString &filePath,
                                 const QList<DeviceInfo> &devices,

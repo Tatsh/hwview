@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QList>
-#include <QMap>
 #include <memory>
+
+#include <QtCore/QList>
+#include <QtCore/QMap>
 
 #include <libudev.h>
 

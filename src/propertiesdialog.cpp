@@ -1,31 +1,29 @@
-#include "propertiesdialog.h"
+#include <QtConcurrent/QtConcurrent>
+#include <QtCore/QDateTime>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QLocale>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QUrl>
+#include <QtGui/QClipboard>
+#include <QtGui/QShortcut>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTableView>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QVBoxLayout>
+
 #include "devicecache.h"
 #include "driverdetailsdialog.h"
+#include "propertiesdialog.h"
 #include "systeminfo.h"
-
-#include <QApplication>
-#include <QCheckBox>
-#include <QClipboard>
-#include <QComboBox>
-#include <QDateTime>
-#include <QDialogButtonBox>
-#include <QFile>
-#include <QFileInfo>
-#include <QGroupBox>
-#include <QHeaderView>
-#include <QLabel>
-#include <QListWidget>
-#include <QLocale>
-#include <QProcess>
-#include <QPushButton>
-#include <QRegularExpression>
-#include <QShortcut>
-#include <QTableView>
-#include <QTextStream>
-#include <QTreeWidget>
-#include <QUrl>
-#include <QVBoxLayout>
-#include <QtConcurrent>
 
 PropertiesDialog::PropertiesDialog(QWidget *parent)
     : QDialog(parent), deviceInfo_(nullptr), eventsModel_(nullptr) {

@@ -1,4 +1,4 @@
-#include <QStack>
+#include <QtCore/QStack>
 
 #include "const_strings.h"
 #include "devicecache.h"

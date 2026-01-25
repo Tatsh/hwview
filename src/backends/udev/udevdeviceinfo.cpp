@@ -1,10 +1,10 @@
-#include "udevdeviceinfo.h"
+#include <QtCore/QDebug>
+#include <QtCore/QList>
+#include <QtCore/QRegularExpression>
+
 #include "common/const_strings_udev.h"
 #include "deviceinfo.h"
-
-#include <QDebug>
-#include <QList>
-#include <QRegularExpression>
+#include "udevdeviceinfo.h"
 
 namespace props = strings::udev::propertyNames;
 

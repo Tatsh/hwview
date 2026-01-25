@@ -1,21 +1,48 @@
-#include <QApplication>
-#include <QCommandLineParser>
-#include <QHostInfo>
-#include <QIcon>
-#include <QSize>
-#include <QTextStream>
+#include <QtCore/QCommandLineParser>
+#include <QtCore/QTextStream>
+#include <QtNetwork/QHostInfo>
 
+#ifndef DEVMGMT_HEADLESS
+#include <QtCore/QSize>
+#include <QtGui/QIcon>
+#include <QtWidgets/QApplication>
 #ifdef DEVMGMT_USE_KDE
 #include <KAboutData>
 #include <KLocalizedString>
-#endif
+#endif // DEVMGMT_USE_KDE
+#endif // DEVMGMT_HEADLESS
 
 #include "deviceexport.h"
 #include "deviceinfo.h"
+#ifndef DEVMGMT_HEADLESS
 #include "mainwindow.h"
+#endif // DEVMGMT_HEADLESS
 #include "systeminfo.h"
 
 namespace {
+
+/**
+ * @brief Set application metadata.
+ */
+void setAppMetadata() {
+    QCoreApplication::setOrganizationName(QStringLiteral("Tatsh"));
+    QCoreApplication::setApplicationName(QStringLiteral("Device Manager"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.0.1"));
+}
+
+/**
+ * @brief Set up common command line parser options.
+ * @param parser Command line parser to configure.
+ */
+void setupParser(QCommandLineParser &parser) {
+    parser.setApplicationDescription(
+        QCoreApplication::translate("main", "View and manage device hardware settings."));
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addOption({{QStringLiteral("e"), QStringLiteral("export")},
+                      QCoreApplication::translate("main", "Export device data to <file> and exit."),
+                      QStringLiteral("file")});
+}
 
 /**
  * @brief Perform headless export to file.
@@ -44,49 +71,30 @@ int performExport(const QString &filePath) {
 } // namespace
 
 int main(int argc, char *argv[]) {
-    // Check for --export option before creating QApplication
-    // This allows headless operation without display
-    for (int i = 1; i < argc; ++i) {
-        if (qstrcmp(argv[i], "--export") == 0 || qstrcmp(argv[i], "-e") == 0) {
-            // Headless mode - use QCoreApplication
-            QCoreApplication app(argc, argv);
-            QCoreApplication::setOrganizationName(QStringLiteral("Tatsh"));
-            QCoreApplication::setApplicationName(QStringLiteral("Device Manager"));
-            QCoreApplication::setApplicationVersion(QStringLiteral("0.0.1"));
+    QCommandLineParser parser;
 
-            QCommandLineParser parser;
-            parser.setApplicationDescription(
-                QCoreApplication::translate("main", "View and manage device hardware settings."));
-            parser.addHelpOption();
-            parser.addVersionOption();
+#ifdef DEVMGMT_HEADLESS
+    QCoreApplication app(argc, argv);
+    setAppMetadata();
+    setupParser(parser);
+    parser.process(app);
 
-            QCommandLineOption exportOption(
-                {QStringLiteral("e"), QStringLiteral("export")},
-                QCoreApplication::translate("main", "Export device data to <file> and exit."),
-                QStringLiteral("file"));
-            parser.addOption(exportOption);
-
-            parser.process(app);
-
-            QString exportPath = parser.value(exportOption);
-            if (exportPath.isEmpty()) {
-                QTextStream err(stderr);
-                err << QStringLiteral("Error: --export requires a file path.") << Qt::endl;
-                return 1;
-            }
-
-            // Ensure file has correct extension
-            if (!exportPath.endsWith(QLatin1String(DeviceExport::FILE_EXTENSION),
-                                     Qt::CaseInsensitive)) {
-                exportPath += QLatin1String(DeviceExport::FILE_EXTENSION);
-            }
-
-            return performExport(exportPath);
-        }
+    QString exportPath = parser.value(QStringLiteral("export"));
+    if (exportPath.isEmpty()) {
+        QTextStream err(stderr);
+        err << QStringLiteral("Error: --export requires a file path.") << Qt::endl;
+        return 1;
     }
 
-    // GUI mode
+    // Ensure file has correct extension.
+    if (!exportPath.endsWith(QLatin1String(DeviceExport::FILE_EXTENSION), Qt::CaseInsensitive)) {
+        exportPath += QLatin1String(DeviceExport::FILE_EXTENSION);
+    }
+
+    return performExport(exportPath);
+#else
     QApplication app(argc, argv);
+    setAppMetadata();
 
 #ifdef DEVMGMT_USE_KDE
     KLocalizedString::setApplicationDomain(QByteArrayLiteral("devmgmt"));
@@ -98,28 +106,34 @@ int main(int argc, char *argv[]) {
                          i18n("(c) 2024-2026 Tatsh"));
     aboutData.addAuthor(i18n("Tatsh"),
                         i18n("Developer"),
-                        QStringLiteral("tatsh@tatsh.net"),
+                        QStringLiteral("audvare@gmail.com"),
                         QStringLiteral(DEVMGMT_WEBSITE_URL));
     aboutData.setHomepage(QStringLiteral(DEVMGMT_WEBSITE_URL));
     aboutData.setBugAddress(QByteArrayLiteral(DEVMGMT_WEBSITE_URL "/issues"));
     aboutData.setOrganizationDomain(QByteArrayLiteral("tat.sh"));
     KAboutData::setApplicationData(aboutData);
-#else
-    QCoreApplication::setOrganizationName(QStringLiteral("Tatsh"));
-    QCoreApplication::setApplicationName(QStringLiteral("Device Manager"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.0.1"));
-#endif
+#endif // DEVMGMT_USE_KDE
 
-    // Parse command line arguments
-    QCommandLineParser parser;
-    parser.setApplicationDescription(
-        QCoreApplication::translate("main", "View and manage device hardware settings."));
-    parser.addHelpOption();
-    parser.addVersionOption();
+    setupParser(parser);
     parser.addPositionalArgument(QStringLiteral("file"),
                                  QCoreApplication::translate("main", "Export file to open."),
                                  QStringLiteral("[file]"));
     parser.process(app);
+
+    // Handle --export option.
+    if (parser.isSet(QStringLiteral("export"))) {
+        QString exportPath = parser.value(QStringLiteral("export"));
+        if (exportPath.isEmpty()) {
+            QTextStream err(stderr);
+            err << QStringLiteral("Error: --export requires a file path.") << Qt::endl;
+            return 1;
+        }
+        if (!exportPath.endsWith(QLatin1String(DeviceExport::FILE_EXTENSION),
+                                 Qt::CaseInsensitive)) {
+            exportPath += QLatin1String(DeviceExport::FILE_EXTENSION);
+        }
+        return performExport(exportPath);
+    }
 
     QIcon appIcon;
     appIcon.addFile(QStringLiteral(":/icons/icon_16.png"), QSize(16, 16));
@@ -134,11 +148,12 @@ int main(int argc, char *argv[]) {
     mainWin->setAttribute(Qt::WA_DeleteOnClose);
     mainWin->show();
 
-    // If a file was passed as an argument, try to open it
+    // If a file was passed as an argument, try to open it.
     const QStringList args = parser.positionalArguments();
     if (!args.isEmpty()) {
         mainWin->loadExportFile(args.first());
     }
 
     return app.exec();
+#endif // DEVMGMT_HEADLESS
 }

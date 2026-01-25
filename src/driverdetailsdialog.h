@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QDialog>
-#include <QFutureWatcher>
-#include <QIcon>
-#include <QLabel>
-#include <QListWidget>
-#include <QString>
+#include <QtCore/QFutureWatcher>
+#include <QtCore/QString>
+#include <QtGui/QIcon>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
 
 struct DriverSearchResult;
 

@@ -1,6 +1,6 @@
-#include "models/node.h"
-
 #include <algorithm>
+
+#include "models/node.h"
 
 Node::Node(const QList<QVariant> &data, Node *parent, NodeType nodeType)
     : itemData(data), parentItem_(parent), type_(nodeType) {

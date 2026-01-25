@@ -1,14 +1,15 @@
-#include "driverinfo.h"
+#include <QtCore/QDir>
+#include <QtCore/QDirIterator>
+#include <QtCore/QFile>
+#include <QtCore/QSettings>
 
-#include <QDir>
-#include <QDirIterator>
-#include <QFile>
-#include <QSettings>
+#include <windows.h>
 
 #include <softpub.h>
 #include <wincrypt.h>
-#include <windows.h>
 #include <wintrust.h>
+
+#include "driverinfo.h"
 
 DriverSearchResult findDriverFiles(const QString &driverName) {
     DriverSearchResult result;

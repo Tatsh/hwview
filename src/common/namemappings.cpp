@@ -1,12 +1,12 @@
-#include "namemappings.h"
+#include <QtCore/QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtCore/QLocale>
+#include <QtCore/QStandardPaths>
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QLocale>
-#include <QStandardPaths>
+#include "namemappings.h"
 
 NameMappings &NameMappings::instance() {
     static NameMappings mappings;

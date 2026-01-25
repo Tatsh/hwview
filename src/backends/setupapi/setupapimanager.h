@@ -1,12 +1,14 @@
 #pragma once
 
-#include <QList>
-#include <QString>
 #include <functional>
+
+#include <QtCore/QList>
+#include <QtCore/QString>
+
+#include <windows.h>
 
 #include <cfgmgr32.h>
 #include <setupapi.h>
-#include <windows.h>
 
 class DeviceInfo;
 
