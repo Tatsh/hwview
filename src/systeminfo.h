@@ -10,9 +10,9 @@
  * @brief Property mapping for Details tab - maps display names to property keys.
  */
 struct PropertyMapping {
-    QString displayName;
-    QString propertyKey;
-    bool isMultiValue;
+    QString displayName; ///< User-visible property name.
+    QString propertyKey; ///< Internal property key for lookup.
+    bool isMultiValue;   ///< Whether the property can have multiple values.
 };
 
 /**
@@ -66,11 +66,11 @@ QStringList convertToHardwareIds(const QString &propertyKey, const QString &valu
  * comprehensive module information for the driver details dialog.
  */
 struct BasicDriverInfo {
-    QString provider;
-    QString version;
-    QString signer;
-    QString date;
-    bool hasDriverFiles = false;
+    QString provider;            ///< Driver provider or vendor name.
+    QString version;             ///< Driver version string.
+    QString signer;              ///< Digital signature signer.
+    QString date;                ///< Driver date or build date.
+    bool hasDriverFiles = false; ///< Whether driver files were found.
 };
 
 /**
@@ -88,11 +88,11 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver);
  * @brief Information about a built-in driver for display purposes.
  */
 struct BuiltinDriverInfo {
-    QString provider;
-    QString version;
-    QString copyright;
-    QString signer;
-    QString builtinMessage; ///< Localized message like "(Built-in kernel module)"
+    QString provider;       ///< Driver provider name.
+    QString version;        ///< Kernel version string.
+    QString copyright;      ///< Copyright notice.
+    QString signer;         ///< Signature signer.
+    QString builtinMessage; ///< Localized message like "(Built-in kernel module)".
 };
 
 /**
@@ -105,10 +105,10 @@ BuiltinDriverInfo getBuiltinDriverInfo();
  * @brief Driver file details for the driver details dialog.
  */
 struct DriverFileDetails {
-    QString provider;
-    QString version;
-    QString copyright;
-    QString signer;
+    QString provider;  ///< Driver provider or vendor.
+    QString version;   ///< Driver version string.
+    QString copyright; ///< Copyright notice.
+    QString signer;    ///< Digital signature signer.
 };
 
 /**
@@ -251,11 +251,11 @@ QString lookupUsbVendor(const QString &vendorId);
  * @brief Query parameters for device event search.
  */
 struct DeviceEventQuery {
-    QString syspath;
-    QString devnode;
-    QString deviceName;
-    QString vendorId;
-    QString modelId;
+    QString syspath;    ///< Device system path.
+    QString devnode;    ///< Device node path (e.g., /dev/sda).
+    QString deviceName; ///< Human-readable device name.
+    QString vendorId;   ///< Vendor ID for matching.
+    QString modelId;    ///< Model/product ID for matching.
 };
 
 /**
@@ -276,8 +276,8 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query);
  * @brief Parsed event with separated timestamp and message.
  */
 struct ParsedEvent {
-    QString timestamp;
-    QString message;
+    QString timestamp; ///< Event timestamp.
+    QString message;   ///< Event message content.
 };
 
 /**
@@ -291,9 +291,9 @@ ParsedEvent parseEventLine(const QString &line);
  * @brief Hardware resource information.
  */
 struct ResourceInfo {
-    QString type;
-    QString setting;
-    QString iconName;
+    QString type;     ///< Resource type (e.g., "IRQ", "Memory", "I/O Port").
+    QString setting;  ///< Resource value or range.
+    QString iconName; ///< Icon name for display.
 };
 
 /**
@@ -308,8 +308,8 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
  * @brief DMA channel information.
  */
 struct DmaChannelInfo {
-    QString channel;
-    QString name;
+    QString channel; ///< DMA channel number.
+    QString name;    ///< Device using this channel.
 };
 
 /**
@@ -322,10 +322,10 @@ QList<DmaChannelInfo> getSystemDmaChannels();
  * @brief I/O port range with hierarchy support.
  */
 struct IoPortInfo {
-    QString rangeStart;
-    QString rangeEnd;
-    QString name;
-    int indentLevel = 0;
+    QString rangeStart;  ///< Starting port address (hex).
+    QString rangeEnd;    ///< Ending port address (hex).
+    QString name;        ///< Device or region name.
+    int indentLevel = 0; ///< Hierarchy level for nested regions.
 };
 
 /**
@@ -338,9 +338,9 @@ QList<IoPortInfo> getSystemIoPorts();
  * @brief IRQ information.
  */
 struct IrqInfo {
-    QString irqNumber;
-    QString irqType;
-    QString deviceName;
+    QString irqNumber;  ///< IRQ number.
+    QString irqType;    ///< IRQ type (e.g., "IO-APIC", "PCI-MSI").
+    QString deviceName; ///< Device using this IRQ.
 };
 
 /**
@@ -353,10 +353,10 @@ QList<IrqInfo> getSystemIrqs();
  * @brief Memory range with hierarchy support.
  */
 struct MemoryRangeInfo {
-    QString rangeStart;
-    QString rangeEnd;
-    QString name;
-    int indentLevel = 0;
+    QString rangeStart;  ///< Starting memory address (hex).
+    QString rangeEnd;    ///< Ending memory address (hex).
+    QString name;        ///< Device or region name.
+    int indentLevel = 0; ///< Hierarchy level for nested regions.
 };
 
 /**
@@ -369,11 +369,11 @@ QList<MemoryRangeInfo> getSystemMemoryRanges();
  * @brief System uname information for export.
  */
 struct UnameInfo {
-    QString sysname;
-    QString release;
-    QString version;
-    QString machine;
-    bool valid = false;
+    QString sysname;    ///< Operating system name (e.g., "Linux").
+    QString release;    ///< Kernel release version.
+    QString version;    ///< Kernel version and build info.
+    QString machine;    ///< Hardware architecture (e.g., "x86_64").
+    bool valid = false; ///< Whether uname call succeeded.
 };
 
 /**
@@ -403,12 +403,12 @@ QHash<QString, QString> getExportDeviceProperties(const DeviceInfo &info);
  * @brief Device resource for export.
  */
 struct ExportResourceInfo {
-    QString type;
-    QString displayValue;
-    QString start;
-    QString end;
-    QString flags;
-    int value = 0;
+    QString type;         ///< Resource type identifier.
+    QString displayValue; ///< Human-readable resource value.
+    QString start;        ///< Resource start address or number.
+    QString end;          ///< Resource end address (for ranges).
+    QString flags;        ///< Resource flags or attributes.
+    int value = 0;        ///< Numeric value (e.g., IRQ number).
 };
 
 /**
@@ -422,21 +422,21 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath);
  * @brief Driver information for export.
  */
 struct ExportDriverInfo {
-    bool hasDriver = false;
-    QString name;
-    QString filename;
-    QString author;
-    QString version;
-    QString license;
-    QString description;
-    QString signer;
-    QString srcversion;
-    QString vermagic;
-    QString date;
-    QString bundleIdentifier;
-    QString provider;
-    bool isOutOfTree = false;
-    bool isBuiltin = false;
+    bool hasDriver = false;   ///< Whether the device has a driver.
+    QString name;             ///< Driver/module name.
+    QString filename;         ///< Path to driver file.
+    QString author;           ///< Driver author.
+    QString version;          ///< Driver version string.
+    QString license;          ///< License type.
+    QString description;      ///< Driver description.
+    QString signer;           ///< Digital signature signer.
+    QString srcversion;       ///< Source version hash.
+    QString vermagic;         ///< Kernel version magic string.
+    QString date;             ///< Driver date.
+    QString bundleIdentifier; ///< macOS bundle identifier.
+    QString provider;         ///< Driver provider/vendor.
+    bool isOutOfTree = false; ///< Whether driver is out-of-tree (external).
+    bool isBuiltin = false;   ///< Whether driver is built into kernel.
 };
 
 /**

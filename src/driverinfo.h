@@ -7,24 +7,24 @@
  * @brief Information about a driver/kernel module.
  */
 struct DriverInfo {
-    QString filename;
-    QString version;
-    QString author;
-    QString description;
-    QString license;
-    QString srcversion;
-    QString alias;
-    QString depends;
-    QString signer;
-    QString sigKey;
+    QString filename;    ///< Path to the driver file.
+    QString version;     ///< Driver version string.
+    QString author;      ///< Driver author or maintainer.
+    QString description; ///< Human-readable driver description.
+    QString license;     ///< License type (e.g., "GPL").
+    QString srcversion;  ///< Source version hash.
+    QString alias;       ///< Module alias patterns.
+    QString depends;     ///< Comma-separated list of dependencies.
+    QString signer;      ///< Module signature signer.
+    QString sigKey;      ///< Module signature key identifier.
 };
 
 /**
  * @brief Result of searching for driver files.
  */
 struct DriverSearchResult {
-    QStringList paths;
-    bool isBuiltin = false;
+    QStringList paths;      ///< List of paths to driver files.
+    bool isBuiltin = false; ///< Whether the driver is built into the kernel.
 };
 
 /**

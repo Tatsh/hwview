@@ -138,23 +138,23 @@ inline QString softwareDeviceDisplayName(const QString &name) {
  * @brief HID bus type constants from Linux @c input.h.
  */
 namespace hidBusTypes {
-constexpr int BUS_PCI = 0x01;       ///< PCI bus
-constexpr int BUS_USB = 0x03;       ///< USB bus
-constexpr int BUS_BLUETOOTH = 0x05; ///< Bluetooth
-constexpr int BUS_VIRTUAL = 0x06;   ///< Virtual device
-constexpr int BUS_I2C = 0x18;       ///< I2C HID
-constexpr int BUS_HOST = 0x19;      ///< Host bus
+constexpr int BUS_PCI = 0x01;       ///< PCI bus.
+constexpr int BUS_USB = 0x03;       ///< USB bus.
+constexpr int BUS_BLUETOOTH = 0x05; ///< Bluetooth.
+constexpr int BUS_VIRTUAL = 0x06;   ///< Virtual device.
+constexpr int BUS_I2C = 0x18;       ///< I2C HID.
+constexpr int BUS_HOST = 0x19;      ///< Host bus.
 } // namespace hidBusTypes
 
 /**
  * @brief Parsed HID device ID information.
  */
 struct HidDeviceId {
-    int busType = 0;    ///< Bus type (see @c hidBusTypes)
-    QString vendorId;   ///< Vendor ID as hex string
-    QString productId;  ///< Product ID as hex string
-    QString instance;   ///< Instance number
-    bool valid = false; ///< Whether parsing succeeded
+    int busType = 0;    ///< Bus type (see @c hidBusTypes).
+    QString vendorId;   ///< Vendor ID as hex string.
+    QString productId;  ///< Product ID as hex string.
+    QString instance;   ///< Instance number.
+    bool valid = false; ///< Whether parsing succeeded.
 };
 
 /**

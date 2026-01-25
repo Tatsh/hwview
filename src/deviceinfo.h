@@ -15,23 +15,23 @@ class DeviceInfoPrivate;
  * display.
  */
 enum class DeviceCategory {
-    Unknown,                       ///< Unknown or unclassified device
-    AudioInputsAndOutputs,         ///< Audio input/output devices
-    Batteries,                     ///< Battery and power supply devices
-    Computer,                      ///< The computer itself
-    DiskDrives,                    ///< Hard disk and solid state drives
-    DisplayAdapters,               ///< Graphics cards and display adapters
-    DvdCdromDrives,                ///< Optical disc drives
-    HumanInterfaceDevices,         ///< Generic HID devices
-    Keyboards,                     ///< Keyboard devices
-    MiceAndOtherPointingDevices,   ///< Mice, touchpads, and pointing devices
-    NetworkAdapters,               ///< Network interface cards
-    SoftwareDevices,               ///< Virtual and software-based devices
-    SoundVideoAndGameControllers,  ///< Multimedia controllers
-    StorageControllers,            ///< Storage host controllers
-    StorageVolumes,                ///< Disk partitions and volumes
-    SystemDevices,                 ///< System and bridge devices
-    UniversalSerialBusControllers, ///< USB host controllers
+    Unknown,                       ///< Unknown or unclassified device.
+    AudioInputsAndOutputs,         ///< Audio input/output devices.
+    Batteries,                     ///< Battery and power supply devices.
+    Computer,                      ///< The computer itself.
+    DiskDrives,                    ///< Hard disk and solid state drives.
+    DisplayAdapters,               ///< Graphics cards and display adapters.
+    DvdCdromDrives,                ///< Optical disc drives.
+    HumanInterfaceDevices,         ///< Generic HID devices.
+    Keyboards,                     ///< Keyboard devices.
+    MiceAndOtherPointingDevices,   ///< Mice, touchpads, and pointing devices.
+    NetworkAdapters,               ///< Network interface cards.
+    SoftwareDevices,               ///< Virtual and software-based devices.
+    SoundVideoAndGameControllers,  ///< Multimedia controllers.
+    StorageControllers,            ///< Storage host controllers.
+    StorageVolumes,                ///< Disk partitions and volumes.
+    SystemDevices,                 ///< System and bridge devices.
+    UniversalSerialBusControllers, ///< USB host controllers.
 };
 
 /**

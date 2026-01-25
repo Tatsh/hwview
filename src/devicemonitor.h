@@ -8,18 +8,18 @@
  * @brief Error codes for device monitor operations.
  */
 enum class DeviceMonitorError {
-    None,                      ///< No error
-    NotificationPortFailed,    ///< Failed to create notification port (macOS)
-    RunLoopSourceFailed,       ///< Failed to get run loop source (macOS)
-    MatchingDictionaryFailed,  ///< Failed to create matching dictionary (macOS)
-    AddNotificationFailed,     ///< Failed to register for add notifications (macOS)
-    RemoveNotificationFailed,  ///< Failed to register for remove notifications (macOS)
-    MonitorCreationFailed,     ///< Failed to create udev monitor (Linux)
-    MonitorEnableFailed,       ///< Failed to enable udev monitor receiving (Linux)
-    FileDescriptorFailed,      ///< Failed to get file descriptor (Linux)
-    WindowClassRegisterFailed, ///< Failed to register window class (Windows)
-    WindowCreationFailed,      ///< Failed to create message window (Windows)
-    DeviceNotificationFailed,  ///< Failed to register device notification (Windows)
+    None,                      ///< No error.
+    NotificationPortFailed,    ///< Failed to create notification port (macOS).
+    RunLoopSourceFailed,       ///< Failed to get run loop source (macOS).
+    MatchingDictionaryFailed,  ///< Failed to create matching dictionary (macOS).
+    AddNotificationFailed,     ///< Failed to register for add notifications (macOS).
+    RemoveNotificationFailed,  ///< Failed to register for remove notifications (macOS).
+    MonitorCreationFailed,     ///< Failed to create udev monitor (Linux).
+    MonitorEnableFailed,       ///< Failed to enable udev monitor receiving (Linux).
+    FileDescriptorFailed,      ///< Failed to get file descriptor (Linux).
+    WindowClassRegisterFailed, ///< Failed to register window class (Windows).
+    WindowCreationFailed,      ///< Failed to create message window (Windows).
+    DeviceNotificationFailed,  ///< Failed to register device notification (Windows).
 };
 
 /**
@@ -28,8 +28,8 @@ enum class DeviceMonitorError {
  * This class defines the interface for monitoring device add/remove events. Platform-specific
  * implementations (e.g., @c UdevMonitor on Linux) inherit from this class.
  *
- * On platforms without device monitoring support, no implementation is provided and @c DeviceCache
- * will not create a monitor.
+ * On platforms without device monitoring support, no implementation is provided and
+ * @c DeviceCache will not create a monitor.
  */
 class DeviceMonitor : public QObject {
     Q_OBJECT

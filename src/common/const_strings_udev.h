@@ -13,35 +13,36 @@ namespace udev {
  * @brief udev property name constants.
  */
 namespace propertyNames {
-constexpr char DEVNAME[] = "DEVNAME";                               ///< Device node name
-constexpr char DEVPATH[] = "DEVPATH";                               ///< Device path in sysfs
-constexpr char DEVTYPE[] = "DEVTYPE";                               ///< Device type
-constexpr char DM_NAME[] = "DM_NAME";                               ///< Device mapper name
-constexpr char DRIVER[] = "DRIVER";                                 ///< Driver name
-constexpr char HID_NAME[] = "HID_NAME";                             ///< HID device name
-constexpr char HID_ID[] = "HID_ID";                                 ///< HID device ID
-constexpr char HID_PHYS[] = "HID_PHYS";                             ///< HID physical path
-constexpr char HID_UNIQ[] = "HID_UNIQ";                             ///< HID unique ID
-constexpr char ID_CDROM[] = "ID_CDROM";                             ///< CD-ROM indicator
-constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";                       ///< Filesystem label
-constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME";         ///< Partition name
-constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID";         ///< Partition table UUID
-constexpr char ID_INPUT_KEYBOARD[] = "ID_INPUT_KEYBOARD";           ///< Keyboard indicator
-constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";                 ///< Mouse indicator
-constexpr char ID_MODEL[] = "ID_MODEL";                             ///< Device model
-constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE"; ///< Model from hwdb
-constexpr char ID_PCI_CLASS_FROM_DATABASE[] = "ID_PCI_CLASS_FROM_DATABASE"; ///< PCI class from hwdb
+constexpr char DEVNAME[] = "DEVNAME";                               ///< Device node name.
+constexpr char DEVPATH[] = "DEVPATH";                               ///< Device path in sysfs.
+constexpr char DEVTYPE[] = "DEVTYPE";                               ///< Device type.
+constexpr char DM_NAME[] = "DM_NAME";                               ///< Device mapper name.
+constexpr char DRIVER[] = "DRIVER";                                 ///< Driver name.
+constexpr char HID_NAME[] = "HID_NAME";                             ///< HID device name.
+constexpr char HID_ID[] = "HID_ID";                                 ///< HID device ID.
+constexpr char HID_PHYS[] = "HID_PHYS";                             ///< HID physical path.
+constexpr char HID_UNIQ[] = "HID_UNIQ";                             ///< HID unique ID.
+constexpr char ID_CDROM[] = "ID_CDROM";                             ///< CD-ROM indicator.
+constexpr char ID_FS_LABEL[] = "ID_FS_LABEL";                       ///< Filesystem label.
+constexpr char ID_PART_ENTRY_NAME[] = "ID_PART_ENTRY_NAME";         ///< Partition name.
+constexpr char ID_PART_TABLE_UUID[] = "ID_PART_TABLE_UUID";         ///< Partition table UUID.
+constexpr char ID_INPUT_KEYBOARD[] = "ID_INPUT_KEYBOARD";           ///< Keyboard indicator.
+constexpr char ID_INPUT_MOUSE[] = "ID_INPUT_MOUSE";                 ///< Mouse indicator.
+constexpr char ID_MODEL[] = "ID_MODEL";                             ///< Device model.
+constexpr char ID_MODEL_FROM_DATABASE[] = "ID_MODEL_FROM_DATABASE"; ///< Model from hwdb.
+constexpr char ID_PCI_CLASS_FROM_DATABASE[] =
+    "ID_PCI_CLASS_FROM_DATABASE"; ///< PCI class from hwdb.
 constexpr char ID_PCI_INTERFACE_FROM_DATABASE[] =
-    "ID_PCI_INTERFACE_FROM_DATABASE";                                             ///< PCI interface
-constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] = "ID_PCI_SUBCLASS_FROM_DATABASE"; ///< PCI subclass
-constexpr char ID_TYPE[] = "ID_TYPE";                                             ///< ID type
-constexpr char ID_USB_VENDOR[] = "ID_USB_VENDOR";                     ///< USB vendor name
-constexpr char ID_VENDOR[] = "ID_VENDOR";                             ///< Vendor name
-constexpr char ID_VENDOR_ENC[] = "ID_VENDOR_ENC";                     ///< Encoded vendor name
-constexpr char ID_VENDOR_FROM_DATABASE[] = "ID_VENDOR_FROM_DATABASE"; ///< Vendor from hwdb
-constexpr char MODALIAS[] = "MODALIAS";                               ///< Module alias
-constexpr char NAME[] = "NAME";                                       ///< Device name
-constexpr char SUBSYSTEM[] = "SUBSYSTEM";                             ///< Subsystem name
+    "ID_PCI_INTERFACE_FROM_DATABASE"; ///< PCI interface.
+constexpr char ID_PCI_SUBCLASS_FROM_DATABASE[] = "ID_PCI_SUBCLASS_FROM_DATABASE"; ///< PCI subclass.
+constexpr char ID_TYPE[] = "ID_TYPE";                                             ///< ID type.
+constexpr char ID_USB_VENDOR[] = "ID_USB_VENDOR";                     ///< USB vendor name.
+constexpr char ID_VENDOR[] = "ID_VENDOR";                             ///< Vendor name.
+constexpr char ID_VENDOR_ENC[] = "ID_VENDOR_ENC";                     ///< Encoded vendor name.
+constexpr char ID_VENDOR_FROM_DATABASE[] = "ID_VENDOR_FROM_DATABASE"; ///< Vendor from hwdb.
+constexpr char MODALIAS[] = "MODALIAS";                               ///< Module alias.
+constexpr char NAME[] = "NAME";                                       ///< Device name.
+constexpr char SUBSYSTEM[] = "SUBSYSTEM";                             ///< Subsystem name.
 } // namespace propertyNames
 
 /**
