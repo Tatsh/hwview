@@ -34,7 +34,6 @@
         'CMakeLists.txt',
         'man/devmgmt.1',
         'sh.tat.devmgmt.yml',
-        'src/cli/main.cpp',
         'src/main.cpp',
       ],
     },
