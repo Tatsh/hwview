@@ -501,6 +501,14 @@ bool MainWindow::loadExportFile(const QString &filePath) {
     actionReturnToLive->setEnabled(true);
     actionExport->setEnabled(false);
     actionScanForHardwareChanges->setEnabled(false);
+#ifdef DEVMGMT_USE_KDE
+    if (auto *refreshAction = actionCollection()->action(QStringLiteral("view_refresh"))) {
+        refreshAction->setEnabled(false);
+    }
+    if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
+        exportAction->setEnabled(false);
+    }
+#endif
     if (menuAction) {
         menuAction->setEnabled(false);
     }
@@ -526,6 +534,14 @@ void MainWindow::returnToLiveView() {
     actionReturnToLive->setEnabled(false);
     actionExport->setEnabled(true);
     actionScanForHardwareChanges->setEnabled(true);
+#ifdef DEVMGMT_USE_KDE
+    if (auto *refreshAction = actionCollection()->action(QStringLiteral("view_refresh"))) {
+        refreshAction->setEnabled(true);
+    }
+    if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
+        exportAction->setEnabled(true);
+    }
+#endif
     if (menuAction) {
         menuAction->setEnabled(true);
     }
@@ -687,6 +703,7 @@ void MainWindow::postSetupMenus() {
             QIcon::fromTheme(QStringLiteral("document-export")), i18n("&Export..."), this);
         exportAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_E));
         connect(exportAction, &QAction::triggered, this, &MainWindow::exportDeviceData);
+        actionCollection()->addAction(QStringLiteral("file_export"), exportAction);
         menuFile->addAction(exportAction);
 
         menuFile->addSeparator();
