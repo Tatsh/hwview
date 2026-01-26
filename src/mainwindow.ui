@@ -45,7 +45,6 @@
                 <addaction name="separator" />
                 <addaction name="actionReturnToLive" />
                 <addaction name="separator" />
-                <addaction name="actionOptions" />
                 <addaction name="actionExit" />
             </widget>
             <widget class="QMenu" name="menuAction">
@@ -116,11 +115,6 @@
         <action name="actionExit">
             <property name="text">
                 <string>Exit</string>
-            </property>
-        </action>
-        <action name="actionOptions">
-            <property name="text">
-                <string>Options...</string>
             </property>
         </action>
         <action name="actionUpdateDriver">
