@@ -22,10 +22,10 @@ void DevicesByDriverModel::buildTree() {
 
     // Map from driver name to list of device indices
     QMap<QString, QVector<int>> devicesByDriver;
-    bool showHidden = DeviceCache::instance().showHiddenDevices();
+    auto showHidden = DeviceCache::instance().showHiddenDevices();
 
     // Build index by driver
-    for (int i = 0; i < allDevices.size(); ++i) {
+    for (auto i = 0; i < allDevices.size(); ++i) {
         const DeviceInfo &info = allDevices.at(i);
         // Skip hidden devices unless show hidden is enabled
         if (info.isHidden() && !showHidden) {
@@ -35,7 +35,7 @@ void DevicesByDriverModel::buildTree() {
             continue;
         }
 
-        QString driver = info.driver();
+        auto driver = info.driver();
         if (driver.isEmpty()) {
             driver = tr("(No driver)");
         }
@@ -45,8 +45,8 @@ void DevicesByDriverModel::buildTree() {
 
     // Create nodes for each driver and its devices
     for (auto it = devicesByDriver.constBegin(); it != devicesByDriver.constEnd(); ++it) {
-        const QString &driverName = it.key();
-        const QVector<int> &deviceIndices = it.value();
+        const auto &driverName = it.key();
+        const auto &deviceIndices = it.value();
 
         // Create driver category node
         auto *driverNode = new Node({driverName}, hostnameItem);
@@ -54,15 +54,15 @@ void DevicesByDriverModel::buildTree() {
         hostnameItem->appendChild(driverNode);
 
         // Sort device indices by name
-        QVector<int> sortedIndices = deviceIndices;
+        auto sortedIndices = deviceIndices;
         std::sort(sortedIndices.begin(), sortedIndices.end(), [&allDevices](int a, int b) {
             return allDevices.at(a).name() < allDevices.at(b).name();
         });
 
         // Add devices under this driver
-        for (int idx : sortedIndices) {
+        for (auto idx : sortedIndices) {
             const DeviceInfo &info = allDevices.at(idx);
-            QString rawName = info.name();
+            auto rawName = info.name();
             if (rawName.isEmpty()) {
                 // Fall back to syspath basename
                 const QString &syspath = info.syspath();
@@ -74,7 +74,7 @@ void DevicesByDriverModel::buildTree() {
                 }
             }
             // Convert to display name if available
-            QString name = s::softwareDeviceDisplayName(rawName);
+            auto name = s::softwareDeviceDisplayName(rawName);
 
             auto *deviceNode = new Node({name}, driverNode, NodeType::Device);
             deviceNode->setSyspath(info.syspath());

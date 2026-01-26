@@ -39,7 +39,7 @@ void IOKitDeviceInfoPrivate::extractIOKitProperties(io_service_t service) {
     driver_ = IOKitManager::getMatchedDriver(service);
 
     // Get BSD name (e.g., "disk0", "en0")
-    QString bsdName = IOKitManager::getBSDName(service);
+    auto bsdName = IOKitManager::getBSDName(service);
     if (!bsdName.isEmpty()) {
         devnode_ = QStringLiteral("/dev/") + bsdName;
     }
@@ -57,7 +57,7 @@ void IOKitDeviceInfoPrivate::setNameFromIOKit(io_service_t service) {
 
     if (name_.isEmpty()) {
         // Fallback to vendor + class name
-        QString vendor = IOKitManager::getVendorName(service);
+        auto vendor = IOKitManager::getVendorName(service);
         if (!vendor.isEmpty()) {
             name_ = vendor + QStringLiteral(" ") + platformClassName_;
         } else {

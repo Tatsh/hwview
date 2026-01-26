@@ -45,17 +45,17 @@ public:
     /**
      * @brief File extension for export files.
      */
-    static constexpr const char *FILE_EXTENSION = ".dmexport";
+    static constexpr const auto *FILE_EXTENSION = ".dmexport";
 
     /**
      * @brief MIME type for export files.
      */
-    static constexpr const char *MIME_TYPE = "application/x-devmgmt-export";
+    static constexpr const auto *MIME_TYPE = "application/x-devmgmt-export";
 
     /**
      * @brief Current export format version.
      */
-    static constexpr int FORMAT_VERSION = 1;
+    static constexpr auto FORMAT_VERSION = 1;
 
     /**
      * @brief Serializes a DeviceInfo object to JSON.

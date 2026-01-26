@@ -54,10 +54,10 @@ int performExport(const QString &filePath) {
     QTextStream err(stderr);
 
     out << QStringLiteral("Enumerating devices...") << Qt::endl;
-    QList<DeviceInfo> devices = enumerateAllDevices();
+    auto devices = enumerateAllDevices();
     out << QStringLiteral("Found %1 devices.").arg(devices.size()) << Qt::endl;
 
-    QString hostname = QHostInfo::localHostName();
+    auto hostname = QHostInfo::localHostName();
     out << QStringLiteral("Exporting to: %1").arg(filePath) << Qt::endl;
 
     if (DeviceExport::exportToFile(filePath, devices, hostname)) {
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     setupParser(parser);
     parser.process(app);
 
-    QString exportPath = parser.value(QStringLiteral("export"));
+    auto exportPath = parser.value(QStringLiteral("export"));
     if (exportPath.isEmpty()) {
         QTextStream err(stderr);
         err << QStringLiteral("Error: --export requires a file path.") << Qt::endl;
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
     // Handle --export option.
     if (parser.isSet(QStringLiteral("export"))) {
-        QString exportPath = parser.value(QStringLiteral("export"));
+        auto exportPath = parser.value(QStringLiteral("export"));
         if (exportPath.isEmpty()) {
             QTextStream err(stderr);
             err << QStringLiteral("Error: --export requires a file path.") << Qt::endl;
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     mainWin->show();
 
     // If a file was passed as an argument, try to open it.
-    const QStringList args = parser.positionalArguments();
+    const auto args = parser.positionalArguments();
     if (!args.isEmpty()) {
         mainWin->loadExportFile(args.first());
     }

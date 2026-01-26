@@ -24,7 +24,7 @@ std::expected<void, DeviceMonitorError> SetupApiMonitor::start() {
     wc.lpszClassName = kWindowClassName;
 
     if (!RegisterClassExW(&wc)) {
-        DWORD error = GetLastError();
+        auto error = GetLastError();
         if (error != ERROR_CLASS_ALREADY_EXISTS) {
             return std::unexpected(DeviceMonitorError::WindowClassRegisterFailed);
         }

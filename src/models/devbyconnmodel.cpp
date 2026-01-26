@@ -17,13 +17,13 @@ DevicesByConnectionModel::DevicesByConnectionModel(QObject *parent)
 }
 
 QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *rawName) const {
-    QString name = info.name();
-    QString subsystem = info.subsystem();
-    bool addSubsystemPrefix = false;
+    auto name = info.name();
+    auto subsystem = info.subsystem();
+    auto addSubsystemPrefix = false;
 
     if (name.isEmpty()) {
         // Fall back to syspath basename
-        QString syspath = info.syspath();
+        auto syspath = info.syspath();
         auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));
         if (lastSlash >= 0) {
             name = syspath.mid(lastSlash + 1);
@@ -59,11 +59,11 @@ QString DevicesByConnectionModel::getNodeName(const DeviceInfo &info, QString *r
 void DevicesByConnectionModel::collectAncestorSyspaths(const QSet<QString> &deviceSyspaths,
                                                        QSet<QString> &allSyspaths) const {
     // For each device syspath, add all ancestor syspaths to maintain the hierarchy
-    for (const QString &syspath : deviceSyspaths) {
+    for (auto &syspath : deviceSyspaths) {
         allSyspaths.insert(syspath);
 
         // Walk up the syspath to add ancestors
-        QString current = syspath;
+        auto current = syspath;
         while (true) {
             auto lastSlash = current.lastIndexOf(QLatin1Char('/'));
             if (lastSlash <= 0) {
@@ -85,7 +85,7 @@ void DevicesByConnectionModel::buildTree() {
 
     // Use cached devices - filter in memory
     QSet<QString> validSyspaths;
-    bool showHidden = DeviceCache::instance().showHiddenDevices();
+    auto showHidden = DeviceCache::instance().showHiddenDevices();
 
     // Build filter set
     for (const DeviceInfo &info : allDevices) {
@@ -104,7 +104,7 @@ void DevicesByConnectionModel::buildTree() {
 
     // Collect devices to display (store indices to avoid pointer issues)
     QVector<int> deviceIndicesToDisplay;
-    for (int i = 0; i < allDevices.size(); ++i) {
+    for (auto i = 0; i < allDevices.size(); ++i) {
         if (expandedSyspaths.contains(allDevices.at(i).syspath())) {
             deviceIndicesToDisplay.append(i);
         }
@@ -120,7 +120,7 @@ void DevicesByConnectionModel::buildTree() {
     QHash<QString, Node *> nodeMap;
 
     // Build the tree
-    for (int idx : deviceIndicesToDisplay) {
+    for (auto idx : deviceIndicesToDisplay) {
         const DeviceInfo &info = allDevices.at(idx);
         const QString &syspath = info.syspath();
         if (syspath.isEmpty()) {
@@ -137,7 +137,7 @@ void DevicesByConnectionModel::buildTree() {
 
         // Create node for this device
         QString rawName;
-        QString name = getNodeName(info, &rawName);
+        auto name = getNodeName(info, &rawName);
         auto *node = new Node({name, info.driver()}, parentNode, NodeType::Device);
         node->setSyspath(info.syspath());
         node->setIsHidden(info.isHidden());

@@ -28,7 +28,7 @@ std::expected<void, DeviceMonitorError> UdevMonitor::start() {
     }
 
     // Get the file descriptor for the monitor
-    int fd = udev_monitor_get_fd(monitor_);
+    auto fd = udev_monitor_get_fd(monitor_);
     if (fd < 0) {
         udev_monitor_unref(monitor_);
         monitor_ = nullptr;
@@ -80,7 +80,7 @@ void UdevMonitor::onUdevEvent() {
     // Check if this is an add or remove action
     const char *action = udev_device_get_action(dev);
     if (action) {
-        QString actionStr = QString::fromLatin1(action);
+        auto actionStr = QString::fromLatin1(action);
         if (actionStr == QLatin1String("add") || actionStr == QLatin1String("remove")) {
             Q_EMIT deviceChanged();
         }

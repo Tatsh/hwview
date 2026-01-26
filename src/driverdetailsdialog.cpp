@@ -48,7 +48,7 @@ DriverDetailsDialog::DriverDetailsDialog(QWidget *parent) : QDialog(parent) {
     auto *detailsLayout = new QGridLayout();
     detailsLayout->setColumnStretch(1, 1);
 
-    int row = 0;
+    auto row = 0;
 
     labelProvider_ = new QLabel(tr("Provider:"), this);
     labelProviderValue_ = new QLabel(this);
@@ -124,7 +124,7 @@ void DriverDetailsDialog::populateDriverFiles() {
             this,
             &DriverDetailsDialog::onDriverFilesFound);
 
-    QString driverName = driverName_;
+    auto driverName = driverName_;
     fileSearchWatcher_->setFuture(
         QtConcurrent::run([driverName]() { return findDriverFiles(driverName); }));
 }
@@ -136,19 +136,19 @@ void DriverDetailsDialog::onDriverFilesFound() {
         return;
     }
 
-    DriverSearchResult result = fileSearchWatcher_->result();
+    auto result = fileSearchWatcher_->result();
     fileSearchWatcher_->deleteLater();
     fileSearchWatcher_ = nullptr;
 
     if (result.paths.isEmpty()) {
         if (result.isBuiltin) {
-            BuiltinDriverInfo builtinInfo = getBuiltinDriverInfo();
+            auto builtinInfo = getBuiltinDriverInfo();
             listDriverFiles_->addItem(builtinInfo.builtinMessage);
         } else {
             listDriverFiles_->addItem(tr("(Driver file not found)"));
         }
     } else {
-        for (const QString &path : result.paths) {
+        for (const auto &path : result.paths) {
             auto *item = new QListWidgetItem(formatDriverPath(path));
             item->setData(Qt::UserRole, path);
             listDriverFiles_->addItem(item);
@@ -170,10 +170,10 @@ void DriverDetailsDialog::onFileSelectionChanged() {
         return;
     }
 
-    QString driverPath = item->data(Qt::UserRole).toString();
+    auto driverPath = item->data(Qt::UserRole).toString();
     if (driverPath.isEmpty()) {
         // Built-in driver - show platform defaults
-        BuiltinDriverInfo builtinInfo = getBuiltinDriverInfo();
+        auto builtinInfo = getBuiltinDriverInfo();
         labelProviderValue_->setText(builtinInfo.provider);
         labelFileVersionValue_->setText(builtinInfo.version);
         labelCopyrightValue_->setText(builtinInfo.copyright);

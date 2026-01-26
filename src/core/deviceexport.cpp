@@ -45,7 +45,7 @@ QJsonObject DeviceExport::createExportData(const QList<DeviceInfo> &devices,
     // All devices with full properties (including hidden devices)
     // The viewer can reconstruct any view from this complete device list
     QJsonArray devicesArray;
-    for (const DeviceInfo &info : devices) {
+    for (const auto &info : devices) {
         devicesArray.append(serializeDevice(info));
     }
     root[QStringLiteral("devices")] = devicesArray;

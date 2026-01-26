@@ -29,7 +29,7 @@ void SetupApiManager::enumerateAllDevices(
 void SetupApiManager::enumerateDevicesOfClass(
     const GUID *classGuid, std::function<void(HDEVINFO, SP_DEVINFO_DATA *)> callback) const {
 
-    HDEVINFO devInfo = SetupDiGetClassDevsW(classGuid, nullptr, nullptr, DIGCF_PRESENT);
+    auto devInfo = SetupDiGetClassDevsW(classGuid, nullptr, nullptr, DIGCF_PRESENT);
 
     if (devInfo == INVALID_HANDLE_VALUE) {
         return;
@@ -124,7 +124,7 @@ QString SetupApiManager::getDeviceClassName(HDEVINFO devInfo, SP_DEVINFO_DATA *d
 
 QString SetupApiManager::getDeviceFriendlyName(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData) {
     // Try friendly name first
-    QString name = getDeviceRegistryProperty(devInfo, devInfoData, SPDRP_FRIENDLYNAME);
+    auto name = getDeviceRegistryProperty(devInfo, devInfoData, SPDRP_FRIENDLYNAME);
 
     if (name.isEmpty()) {
         // Fall back to device description

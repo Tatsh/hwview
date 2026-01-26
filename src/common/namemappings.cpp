@@ -19,7 +19,7 @@ NameMappings::NameMappings() {
 
 QString NameMappings::systemLocale() const {
     // Get locale in format like "en-US", "de-DE", "ja-JP"
-    QString localeName = QLocale::system().name(); // Returns "en_US" format
+    auto localeName = QLocale::system().name(); // Returns "en_US" format
     localeName.replace(QLatin1Char('_'), QLatin1Char('-'));
     return localeName;
 }
@@ -31,11 +31,11 @@ void NameMappings::reload() {
     softwareDevice_.clear();
     acpiDevice_.clear();
 
-    QString locale = systemLocale();
+    auto locale = systemLocale();
 
     // Load from data/ directory adjacent to the executable first (lowest priority)
     // This allows running the application without installation during development
-    QString appDir = QCoreApplication::applicationDirPath();
+    auto appDir = QCoreApplication::applicationDirPath();
     loadFromDirectory(appDir + QStringLiteral("/data"), locale);
     // Also check parent directories (for when binary is in build/src/ or build/src/viewer/)
     loadFromDirectory(appDir + QStringLiteral("/../data"), locale);
@@ -46,12 +46,11 @@ void NameMappings::reload() {
     // On Linux: /usr/share, /usr/local/share, etc.
     // On Windows: C:/ProgramData, etc.
     // On macOS: /Library/Application Support, etc.
-    QStringList systemPaths =
-        QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    auto systemPaths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
 
     // Load from system locations (in reverse order so higher priority paths override)
     for (auto i = systemPaths.size() - 1; i >= 0; --i) {
-        QString dirPath = systemPaths.at(i) + QStringLiteral("/devmgmt");
+        auto dirPath = systemPaths.at(i) + QStringLiteral("/devmgmt");
         loadFromDirectory(dirPath, locale);
     }
 
@@ -59,7 +58,7 @@ void NameMappings::reload() {
     // On Linux: ~/.local/share/devmgmt
     // On Windows: C:/Users/<USER>/AppData/Local/devmgmt
     // On macOS: ~/Library/Application Support/devmgmt
-    QString userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    auto userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
                        QStringLiteral("/devmgmt");
     loadFromDirectory(userPath, locale);
 }
@@ -72,9 +71,9 @@ void NameMappings::loadFromDirectory(const QString &dirPath, const QString &loca
 
     // Load default file first (en-US)
     // Try name-mappings.en-US.json first, fall back to name-mappings.json
-    QString defaultLocalePath = dirPath + QStringLiteral("/name-mappings.") +
-                                QLatin1String(kDefaultLocale) + QStringLiteral(".json");
-    QString defaultPath = dirPath + QStringLiteral("/name-mappings.json");
+    auto defaultLocalePath = dirPath + QStringLiteral("/name-mappings.") +
+                             QLatin1String(kDefaultLocale) + QStringLiteral(".json");
+    auto defaultPath = dirPath + QStringLiteral("/name-mappings.json");
 
     if (QFile::exists(defaultLocalePath)) {
         loadFromFile(defaultLocalePath);
@@ -84,7 +83,7 @@ void NameMappings::loadFromDirectory(const QString &dirPath, const QString &loca
 
     // Load locale-specific file if different from default
     if (locale != QLatin1String(kDefaultLocale)) {
-        QString localePath =
+        auto localePath =
             dirPath + QStringLiteral("/name-mappings.") + locale + QStringLiteral(".json");
         if (QFile::exists(localePath)) {
             loadFromFile(localePath);
@@ -99,22 +98,22 @@ void NameMappings::loadFromFile(const QString &filePath) {
     }
 
     QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+    auto doc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
     if (error.error != QJsonParseError::NoError || !doc.isObject()) {
         return;
     }
 
-    QJsonObject root = doc.object();
+    auto root = doc.object();
 
     // Load GUID to category mappings
     if (root.contains(QStringLiteral("guid-to-category"))) {
-        QJsonObject mappings = root.value(QStringLiteral("guid-to-category")).toObject();
+        auto mappings = root.value(QStringLiteral("guid-to-category")).toObject();
         for (auto it = mappings.begin(); it != mappings.end(); ++it) {
             if (it.value().isString()) {
                 // Normalize GUID to lowercase for consistent lookup
-                QString guid = it.key().toLower();
+                auto guid = it.key().toLower();
                 guidToCategory_.insert(guid, it.value().toString());
             }
         }
@@ -122,11 +121,11 @@ void NameMappings::loadFromFile(const QString &filePath) {
 
     // Load HID vendor mappings
     if (root.contains(QStringLiteral("hid-vendor"))) {
-        QJsonObject mappings = root.value(QStringLiteral("hid-vendor")).toObject();
+        auto mappings = root.value(QStringLiteral("hid-vendor")).toObject();
         for (auto it = mappings.begin(); it != mappings.end(); ++it) {
             if (it.value().isString()) {
                 // Normalize to lowercase for consistent lookup
-                QString vendorId = it.key().toLower();
+                auto vendorId = it.key().toLower();
                 hidVendor_.insert(vendorId, it.value().toString());
             }
         }
@@ -134,11 +133,11 @@ void NameMappings::loadFromFile(const QString &filePath) {
 
     // Load HID bus type mappings
     if (root.contains(QStringLiteral("hid-bus-type"))) {
-        QJsonObject mappings = root.value(QStringLiteral("hid-bus-type")).toObject();
+        auto mappings = root.value(QStringLiteral("hid-bus-type")).toObject();
         for (auto it = mappings.begin(); it != mappings.end(); ++it) {
             if (it.value().isString()) {
                 bool ok;
-                int busType = it.key().toInt(&ok);
+                auto busType = it.key().toInt(&ok);
                 if (ok) {
                     hidBusType_.insert(busType, it.value().toString());
                 }
@@ -148,7 +147,7 @@ void NameMappings::loadFromFile(const QString &filePath) {
 
     // Load software device mappings
     if (root.contains(QStringLiteral("software-device"))) {
-        QJsonObject mappings = root.value(QStringLiteral("software-device")).toObject();
+        auto mappings = root.value(QStringLiteral("software-device")).toObject();
         for (auto it = mappings.begin(); it != mappings.end(); ++it) {
             if (it.value().isString()) {
                 softwareDevice_.insert(it.key(), it.value().toString());
@@ -158,11 +157,11 @@ void NameMappings::loadFromFile(const QString &filePath) {
 
     // Load ACPI device mappings
     if (root.contains(QStringLiteral("acpi-device"))) {
-        QJsonObject mappings = root.value(QStringLiteral("acpi-device")).toObject();
+        auto mappings = root.value(QStringLiteral("acpi-device")).toObject();
         for (auto it = mappings.begin(); it != mappings.end(); ++it) {
             if (it.value().isString()) {
                 // Store with uppercase key for consistent lookup
-                QString pnpId = it.key().toUpper();
+                auto pnpId = it.key().toUpper();
                 acpiDevice_.insert(pnpId, it.value().toString());
             }
         }
@@ -171,13 +170,13 @@ void NameMappings::loadFromFile(const QString &filePath) {
 
 QString NameMappings::categoryNameFromGuid(const QString &guidString) const {
     // Normalize to lowercase for lookup
-    QString normalizedGuid = guidString.toLower();
+    auto normalizedGuid = guidString.toLower();
     return guidToCategory_.value(normalizedGuid, QStringLiteral("Other devices"));
 }
 
 QString NameMappings::hidVendorName(const QString &vendorId) const {
     // Normalize to lowercase for lookup
-    QString normalizedId = vendorId.toLower();
+    auto normalizedId = vendorId.toLower();
     return hidVendor_.value(normalizedId);
 }
 
@@ -191,6 +190,6 @@ QString NameMappings::softwareDeviceDisplayName(const QString &deviceName) const
 
 QString NameMappings::acpiDeviceDisplayName(const QString &pnpId) const {
     // Normalize to uppercase for lookup
-    QString normalizedId = pnpId.toUpper();
+    auto normalizedId = pnpId.toUpper();
     return acpiDevice_.value(normalizedId);
 }

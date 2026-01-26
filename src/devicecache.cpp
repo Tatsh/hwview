@@ -20,7 +20,7 @@ const QString &DeviceCache::hostname() {
     if (instance().viewerMode_ && !instance().importedHostname_.isEmpty()) {
         return instance().importedHostname_;
     }
-    static QString cachedHostname = QHostInfo::localHostName();
+    static auto cachedHostname = QHostInfo::localHostName();
     return cachedHostname;
 }
 
@@ -47,8 +47,8 @@ void DeviceCache::enumerate() {
     devices_ = enumerateAllDevices();
 
     // Build the syspath index
-    for (int i = 0; i < devices_.size(); ++i) {
-        const QString &syspath = devices_.at(i).syspath();
+    for (auto i = 0; i < devices_.size(); ++i) {
+        const auto &syspath = devices_.at(i).syspath();
         if (!syspath.isEmpty()) {
             syspathIndex_.insert(syspath, i);
         }
@@ -111,14 +111,14 @@ bool DeviceCache::loadFromFile(const QString &filePath) {
     }
 
     QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &error);
+    auto doc = QJsonDocument::fromJson(file.readAll(), &error);
     file.close();
 
     if (error.error != QJsonParseError::NoError || !doc.isObject()) {
         return false;
     }
 
-    QJsonObject root = doc.object();
+    auto root = doc.object();
 
     // Verify this is a valid export file by checking for required fields
     if (!root.contains(QStringLiteral("formatVersion")) ||
@@ -151,10 +151,10 @@ bool DeviceCache::loadFromFile(const QString &filePath) {
     systemResources_ = root[QStringLiteral("systemResources")].toObject();
 
     // Load devices
-    QJsonArray devicesArray = root[QStringLiteral("devices")].toArray();
+    auto devicesArray = root[QStringLiteral("devices")].toArray();
     devices_.reserve(devicesArray.size());
 
-    for (const QJsonValue val : devicesArray) {
+    for (const auto val : devicesArray) {
         if (!val.isObject()) {
             continue;
         }

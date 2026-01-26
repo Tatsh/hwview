@@ -30,7 +30,7 @@ void DriversByTypeModel::finalizeCategory(Node *&category) {
 void DriversByTypeModel::buildTree() {
     // Collect unique drivers by category
     QMap<QString, QSet<QString>> driversByCategory;
-    bool showHidden = DeviceCache::instance().showHiddenDevices();
+    auto showHidden = DeviceCache::instance().showHiddenDevices();
 
     for (const DeviceInfo &info : DeviceCache::instance().allDevices()) {
         // Skip hidden devices unless show hidden is enabled
@@ -38,7 +38,7 @@ void DriversByTypeModel::buildTree() {
             continue;
         }
 
-        QString driver = info.driver();
+        auto driver = info.driver();
         if (driver.isEmpty()) {
             continue;
         }
@@ -107,7 +107,7 @@ void DriversByTypeModel::buildTree() {
         categoryNode->setIcon(s::categoryIcons::forCategory(categoryName));
 
         // Sort drivers
-        QStringList sortedDrivers = drivers.values();
+        auto sortedDrivers = drivers.values();
         std::sort(sortedDrivers.begin(), sortedDrivers.end());
 
         for (const QString &driver : sortedDrivers) {

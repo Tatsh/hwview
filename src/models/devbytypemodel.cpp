@@ -102,8 +102,8 @@ void DevicesByTypeModel::buildTree() {
     universalSerialBusControllersItem->setIcon(s::categoryIcons::usbControllers());
 
     // Add computer info using platform-specific backend
-    QString computerName = getComputerDisplayName();
-    QString computerSyspath = getComputerSyspath();
+    auto computerName = getComputerDisplayName();
+    auto computerSyspath = getComputerSyspath();
 
     auto *acpiNode = new Node({computerName, s::empty()}, computerItem, NodeType::Device);
     if (!computerSyspath.isEmpty()) {
@@ -114,7 +114,7 @@ void DevicesByTypeModel::buildTree() {
 
     static const QRegularExpression kBeginningWithSlashDevRe(QStringLiteral("^/dev/"));
 
-    bool showHidden = DeviceCache::instance().showHiddenDevices();
+    auto showHidden = DeviceCache::instance().showHiddenDevices();
 
     // Single pass through all cached devices - use pre-computed category for fast classification
     for (const DeviceInfo &info : DeviceCache::instance().allDevices()) {
@@ -124,8 +124,8 @@ void DevicesByTypeModel::buildTree() {
         }
 
         Node *parentNode = nullptr;
-        QString rawName = info.name();
-        QString displayName = rawName;
+        auto rawName = info.name();
+        auto displayName = rawName;
 
         // Use pre-computed category for O(1) classification
         switch (info.category()) {
@@ -160,7 +160,7 @@ void DevicesByTypeModel::buildTree() {
 
         case DeviceCategory::StorageVolumes: {
             // Try to get a display name: partition label, filesystem label, or device name
-            QString volumeName = info.propertyValue(us::propertyNames::ID_PART_ENTRY_NAME);
+            auto volumeName = info.propertyValue(us::propertyNames::ID_PART_ENTRY_NAME);
             if (volumeName.isEmpty()) {
                 volumeName = info.propertyValue(us::propertyNames::ID_FS_LABEL);
             }

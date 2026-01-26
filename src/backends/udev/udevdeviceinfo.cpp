@@ -10,9 +10,9 @@ namespace props = strings::udev::propertyNames;
 
 static const QRegularExpression quoteAtBeginning(QStringLiteral("^\""));
 static const QRegularExpression quoteAtEnd(QStringLiteral("\"$"));
-static const QString underscore = QStringLiteral("_");
-static const QString singleSpace = QStringLiteral(" ");
-static const QString empty;
+static const auto underscore = QStringLiteral("_");
+static const auto singleSpace = QStringLiteral(" ");
+static const auto empty = QStringLiteral("");
 
 UdevDeviceInfoPrivate::UdevDeviceInfoPrivate(udev *ctx, const char *syspath)
     : DeviceInfoPrivate(), ctx_(ctx), dev_(nullptr) {

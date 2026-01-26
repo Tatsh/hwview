@@ -110,7 +110,7 @@ QString IOKitManager::getClassName(io_service_t service) {
 
 QString IOKitManager::getMatchedDriver(io_service_t service) {
     // Try to get the IOMatchedBundleIdentifier (the kext that matched this device)
-    QString driver = getStringProperty(service, CFSTR("IOMatchedPersonality"));
+    auto driver = getStringProperty(service, CFSTR("IOMatchedPersonality"));
     if (driver.isEmpty()) {
         // Try CFBundleIdentifier from the matched personality
         CFTypeRef personality = IORegistryEntryCreateCFProperty(
@@ -152,7 +152,7 @@ QString IOKitManager::getProductName(io_service_t service) {
     };
 
     for (auto key : productKeys) {
-        QString name = getStringProperty(service, key);
+        auto name = getStringProperty(service, key);
         if (!name.isEmpty()) {
             return name;
         }
@@ -177,7 +177,7 @@ QString IOKitManager::getVendorName(io_service_t service) {
     };
 
     for (auto key : vendorKeys) {
-        QString vendor = getStringProperty(service, key);
+        auto vendor = getStringProperty(service, key);
         if (!vendor.isEmpty()) {
             return vendor;
         }

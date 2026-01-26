@@ -22,7 +22,7 @@ namespace strings {
  * @returns Reference to the cached string.
  */
 inline const QString &digit1() {
-    static const QString s = QStringLiteral("1");
+    static const auto s = QStringLiteral("1");
     return s;
 }
 
@@ -40,7 +40,7 @@ inline const QString &empty() {
  * @returns Reference to the cached string.
  */
 inline const QString &singleSpace() {
-    static const QString s = QStringLiteral(" ");
+    static const auto s = QStringLiteral(" ");
     return s;
 }
 
@@ -49,7 +49,7 @@ inline const QString &singleSpace() {
  * @returns Reference to the cached string.
  */
 inline const QString &underscore() {
-    static const QString s = QStringLiteral("_");
+    static const auto s = QStringLiteral("_");
     return s;
 }
 
@@ -69,30 +69,30 @@ inline QString hidVendorName(const QString &vendorId) {
  */
 inline QString softwareDeviceDisplayName(const QString &name) {
     // Strip /dev/ prefix if present
-    QString shortName = name;
+    auto shortName = name;
     if (shortName.startsWith(QStringLiteral("/dev/"))) {
         shortName = shortName.mid(5);
     }
 
     // Handle input/event* devices
     if (shortName.startsWith(QStringLiteral("input/event"))) {
-        QString num = shortName.mid(11);
+        auto num = shortName.mid(11);
         return QStringLiteral("Input event %1").arg(num);
     }
     // Handle input/mouse* devices
     if (shortName.startsWith(QStringLiteral("input/mouse"))) {
-        QString num = shortName.mid(11);
+        auto num = shortName.mid(11);
         return QStringLiteral("Input mouse %1").arg(num);
     }
     // Handle i2c-N devices
     if (shortName.startsWith(QStringLiteral("i2c-"))) {
-        QString num = shortName.mid(4);
+        auto num = shortName.mid(4);
         return QStringLiteral("I²C Adapter %1").arg(num);
     }
     // Handle SCSI host adapters (hostN)
     if (shortName.startsWith(QStringLiteral("host"))) {
-        QString num = shortName.mid(4);
-        bool ok = false;
+        auto num = shortName.mid(4);
+        auto ok = false;
         num.toInt(&ok);
         if (ok) {
             return QStringLiteral("SCSI Host Adapter %1").arg(num);
@@ -100,19 +100,19 @@ inline QString softwareDeviceDisplayName(const QString &name) {
     }
     // Handle SCSI targets (targetX:Y:Z)
     if (shortName.startsWith(QStringLiteral("target"))) {
-        QString target = shortName.mid(6);
+        auto target = shortName.mid(6);
         return QStringLiteral("SCSI Target %1").arg(target);
     }
 
     // Parse HID device names like "PNP0C50:00 06CB:7E7E Mouse"
     static const QRegularExpression hidNameRe(
-        QStringLiteral("^(?:PNP[0-9A-Fa-f]{4}|ACPI[0-9A-Fa-f]{4}):[0-9A-Fa-f]+\\s+"
-                       "([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})(?:\\s+(.+))?$"));
+        QStringLiteral(R"(^(?:PNP[0-9A-Fa-f]{4}|ACPI[0-9A-Fa-f]{4}):[0-9A-Fa-f]+\s+)"
+                       R"(([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})(?:\s+(.+))?$)"));
     auto hidMatch = hidNameRe.match(shortName);
     if (hidMatch.hasMatch()) {
-        QString vendorId = hidMatch.captured(1);
-        QString deviceType = hidMatch.captured(3).trimmed();
-        QString vendorName = hidVendorName(vendorId);
+        auto vendorId = hidMatch.captured(1);
+        auto deviceType = hidMatch.captured(3).trimmed();
+        auto vendorName = hidVendorName(vendorId);
 
         if (!vendorName.isEmpty()) {
             if (!deviceType.isEmpty()) {
@@ -126,7 +126,7 @@ inline QString softwareDeviceDisplayName(const QString &name) {
     }
 
     // Look up in JSON mappings
-    QString displayName = NameMappings::instance().softwareDeviceDisplayName(shortName);
+    auto displayName = NameMappings::instance().softwareDeviceDisplayName(shortName);
     if (!displayName.isEmpty()) {
         return displayName;
     }
@@ -138,12 +138,12 @@ inline QString softwareDeviceDisplayName(const QString &name) {
  * @brief HID bus type constants from Linux @c input.h.
  */
 namespace hidBusTypes {
-constexpr int BUS_PCI = 0x01;       ///< PCI bus.
-constexpr int BUS_USB = 0x03;       ///< USB bus.
-constexpr int BUS_BLUETOOTH = 0x05; ///< Bluetooth.
-constexpr int BUS_VIRTUAL = 0x06;   ///< Virtual device.
-constexpr int BUS_I2C = 0x18;       ///< I2C HID.
-constexpr int BUS_HOST = 0x19;      ///< Host bus.
+constexpr auto BUS_PCI = 0x01;       ///< PCI bus.
+constexpr auto BUS_USB = 0x03;       ///< USB bus.
+constexpr auto BUS_BLUETOOTH = 0x05; ///< Bluetooth.
+constexpr auto BUS_VIRTUAL = 0x06;   ///< Virtual device.
+constexpr auto BUS_I2C = 0x18;       ///< I2C HID.
+constexpr auto BUS_HOST = 0x19;      ///< Host bus.
 } // namespace hidBusTypes
 
 /**
@@ -169,9 +169,9 @@ struct HidDeviceId {
 inline HidDeviceId parseHidDeviceId(const QString &path) {
     HidDeviceId result;
     static const QRegularExpression hidIdRe(
-        QStringLiteral("([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\\.([0-9A-Fa-f]+)"));
+        QStringLiteral(R"(([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\.([0-9A-Fa-f]+))"));
 
-    for (const QString &component : path.split(QLatin1Char('/'))) {
+    for (const auto &component : path.split(QLatin1Char('/'))) {
         auto match = hidIdRe.match(component);
         if (match.hasMatch()) {
             bool ok;
@@ -201,11 +201,11 @@ inline QString hidBusTypeName(int busType) {
  * @returns The I2C bus number, or @c -1 if not found.
  */
 inline int parseI2cBusNumber(const QString &path) {
-    static const QRegularExpression i2cBusRe(QStringLiteral("/i2c-(\\d+)(?:/|$)"));
+    static const QRegularExpression i2cBusRe(QStringLiteral(R"(/i2c-(\d+)(?:/|$))"));
     auto match = i2cBusRe.match(path);
     if (match.hasMatch()) {
         bool ok;
-        int bus = match.captured(1).toInt(&ok);
+        auto bus = match.captured(1).toInt(&ok);
         if (ok) {
             return bus;
         }
@@ -224,20 +224,20 @@ inline QString acpiDeviceDisplayName(const QString &devPath, const QString &fall
     if (lastSlash < 0) {
         return fallbackName;
     }
-    QString lastComponent = devPath.mid(lastSlash + 1);
+    auto lastComponent = devPath.mid(lastSlash + 1);
 
     auto colonPos = lastComponent.indexOf(QLatin1Char(':'));
-    QString pnpId = colonPos > 0 ? lastComponent.left(colonPos) : lastComponent;
+    auto pnpId = colonPos > 0 ? lastComponent.left(colonPos) : lastComponent;
 
     // Look up in JSON mappings
-    QString displayName = NameMappings::instance().acpiDeviceDisplayName(pnpId);
+    auto displayName = NameMappings::instance().acpiDeviceDisplayName(pnpId);
     if (!displayName.isEmpty()) {
         return displayName;
     }
 
     // Fallback: capitalize simple names like "battery" -> "Battery"
     if (!fallbackName.isEmpty()) {
-        QString result = fallbackName;
+        auto result = fallbackName;
         result[0] = result[0].toUpper();
         return result;
     }

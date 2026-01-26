@@ -18,7 +18,7 @@ namespace categoryIcons {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &audioInputs() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("audio-card"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("audio-card"));
     return icon;
 }
 
@@ -27,7 +27,7 @@ inline const QIcon &audioInputs() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &batteries() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("battery-ups"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("battery-ups"));
     return icon;
 }
 
@@ -36,7 +36,7 @@ inline const QIcon &batteries() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &computer() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("computer"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("computer"));
     return icon;
 }
 
@@ -45,7 +45,7 @@ inline const QIcon &computer() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &diskDrives() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
     return icon;
 }
 
@@ -54,7 +54,7 @@ inline const QIcon &diskDrives() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &displayAdapters() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("video-display"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("video-display"));
     return icon;
 }
 
@@ -63,7 +63,7 @@ inline const QIcon &displayAdapters() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &dvdCdromDrives() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-optical"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-optical"));
     return icon;
 }
 
@@ -72,7 +72,7 @@ inline const QIcon &dvdCdromDrives() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &hid() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("input-tablet"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("input-tablet"));
     return icon;
 }
 
@@ -81,7 +81,7 @@ inline const QIcon &hid() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &ideAtapiControllers() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
     return icon;
 }
 
@@ -90,7 +90,7 @@ inline const QIcon &ideAtapiControllers() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &keyboards() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("input-keyboard"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("input-keyboard"));
     return icon;
 }
 
@@ -99,7 +99,7 @@ inline const QIcon &keyboards() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &mice() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("input-mouse"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("input-mouse"));
     return icon;
 }
 
@@ -108,7 +108,7 @@ inline const QIcon &mice() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &monitor() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("monitor"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("monitor"));
     return icon;
 }
 
@@ -117,7 +117,7 @@ inline const QIcon &monitor() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &networkAdapters() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("network-wired"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("network-wired"));
     return icon;
 }
 
@@ -126,7 +126,7 @@ inline const QIcon &networkAdapters() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &networkWireless() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("network-wireless"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("network-wireless"));
     return icon;
 }
 
@@ -135,7 +135,7 @@ inline const QIcon &networkWireless() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &other() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("preferences-other"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("preferences-other"));
     return icon;
 }
 
@@ -144,7 +144,7 @@ inline const QIcon &other() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &printer() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("printer"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("printer"));
     return icon;
 }
 
@@ -153,7 +153,7 @@ inline const QIcon &printer() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &processors() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("preferences-devices-cpu"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("preferences-devices-cpu"));
     return icon;
 }
 
@@ -162,7 +162,7 @@ inline const QIcon &processors() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &soundVideoGameControllers() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("preferences-desktop-sound"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("preferences-desktop-sound"));
     return icon;
 }
 
@@ -171,7 +171,7 @@ inline const QIcon &soundVideoGameControllers() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &storageControllers() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-harddisk"));
     return icon;
 }
 
@@ -180,7 +180,7 @@ inline const QIcon &storageControllers() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &storageVolumes() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-partition"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-partition"));
     return icon;
 }
 
@@ -189,7 +189,7 @@ inline const QIcon &storageVolumes() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &systemDevices() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("computer"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("computer"));
     return icon;
 }
 
@@ -198,7 +198,7 @@ inline const QIcon &systemDevices() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &thunderbolt() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("thunderbolt"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("thunderbolt"));
     return icon;
 }
 
@@ -207,7 +207,7 @@ inline const QIcon &thunderbolt() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &usbControllers() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("drive-removable-media-usb"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("drive-removable-media-usb"));
     return icon;
 }
 
@@ -216,7 +216,7 @@ inline const QIcon &usbControllers() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &cardReader() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("media-flash-sd-mmc"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("media-flash-sd-mmc"));
     return icon;
 }
 
@@ -225,7 +225,7 @@ inline const QIcon &cardReader() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &camera() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("camera-web"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("camera-web"));
     return icon;
 }
 
@@ -234,7 +234,7 @@ inline const QIcon &camera() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &bluetooth() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("preferences-system-bluetooth"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("preferences-system-bluetooth"));
     return icon;
 }
 
@@ -243,7 +243,7 @@ inline const QIcon &bluetooth() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &dma() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("memory"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("memory"));
     return icon;
 }
 
@@ -252,7 +252,7 @@ inline const QIcon &dma() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &ioPorts() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("network-connect"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("network-connect"));
     return icon;
 }
 
@@ -261,7 +261,7 @@ inline const QIcon &ioPorts() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &irq() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("dialog-warning"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("dialog-warning"));
     return icon;
 }
 
@@ -270,7 +270,7 @@ inline const QIcon &irq() {
  * @returns Reference to the cached icon.
  */
 inline const QIcon &memory() {
-    static const QIcon icon = QIcon::fromTheme(QStringLiteral("memory"));
+    static const auto icon = QIcon::fromTheme(QStringLiteral("memory"));
     return icon;
 }
 

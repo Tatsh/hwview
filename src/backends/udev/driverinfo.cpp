@@ -10,7 +10,7 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
     modinfo.start(QStringLiteral("modinfo"),
                   {QStringLiteral("-F"), QStringLiteral("filename"), driverName});
     if (modinfo.waitForFinished(3000)) {
-        QString filename = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
+        auto filename = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
         if (!filename.isEmpty() && filename != QStringLiteral("(builtin)")) {
             result.paths << filename;
         } else if (filename == QStringLiteral("(builtin)")) {
@@ -22,15 +22,15 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
     modinfo.start(QStringLiteral("modinfo"),
                   {QStringLiteral("-F"), QStringLiteral("depends"), driverName});
     if (modinfo.waitForFinished(3000)) {
-        QString depends = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
+        auto depends = QString::fromUtf8(modinfo.readAllStandardOutput()).trimmed();
         if (!depends.isEmpty()) {
-            QStringList depList = depends.split(QStringLiteral(","), Qt::SkipEmptyParts);
-            for (const QString &dep : depList) {
+            auto depList = depends.split(QStringLiteral(","), Qt::SkipEmptyParts);
+            for (const auto &dep : depList) {
                 QProcess depInfo;
                 depInfo.start(QStringLiteral("modinfo"),
                               {QStringLiteral("-F"), QStringLiteral("filename"), dep.trimmed()});
                 if (depInfo.waitForFinished(3000)) {
-                    QString depFile = QString::fromUtf8(depInfo.readAllStandardOutput()).trimmed();
+                    auto depFile = QString::fromUtf8(depInfo.readAllStandardOutput()).trimmed();
                     if (!depFile.isEmpty() && depFile != QStringLiteral("(builtin)") &&
                         !result.paths.contains(depFile)) {
                         result.paths << depFile;
@@ -48,13 +48,13 @@ DriverInfo getDriverInfo(const QString &driverPath) {
     info.filename = driverPath;
 
     // Extract module name from path
-    QString moduleName = driverPath;
+    auto moduleName = driverPath;
     auto lastSlash = moduleName.lastIndexOf(QLatin1Char('/'));
     if (lastSlash >= 0) {
         moduleName = moduleName.mid(lastSlash + 1);
     }
     // Remove .ko, .ko.gz, .ko.xz, .ko.zst extensions
-    moduleName.remove(QRegularExpression(QStringLiteral("\\.ko(\\.gz|\\.xz|\\.zst)?$")));
+    moduleName.remove(QRegularExpression(QStringLiteral(R"(\.ko(\.gz|\.xz|\.zst)?$)")));
 
     QProcess modinfo;
     modinfo.start(QStringLiteral("modinfo"), {moduleName});
@@ -62,17 +62,17 @@ DriverInfo getDriverInfo(const QString &driverPath) {
         return info;
     }
 
-    QString output = QString::fromUtf8(modinfo.readAllStandardOutput());
-    QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+    auto output = QString::fromUtf8(modinfo.readAllStandardOutput());
+    auto lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
 
-    for (const QString &line : lines) {
+    for (const auto &line : lines) {
         auto colonIdx = line.indexOf(QLatin1Char(':'));
         if (colonIdx < 0) {
             continue;
         }
 
-        QString key = line.left(colonIdx).trimmed();
-        QString value = line.mid(colonIdx + 1).trimmed();
+        auto key = line.left(colonIdx).trimmed();
+        auto value = line.mid(colonIdx + 1).trimmed();
 
         if (key == QStringLiteral("filename")) {
             info.filename = value;

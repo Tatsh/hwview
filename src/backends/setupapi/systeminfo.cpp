@@ -19,8 +19,8 @@
 
 bool isComputerEntry(const QString &syspath) {
     // Windows: The computer entry can be empty, the root tree, or the ACPI HAL
-    return syspath.isEmpty() || syspath == QStringLiteral("HTREE\\ROOT\\0") ||
-           syspath == QStringLiteral("ACPI_HAL\\PNP0C08\\0");
+    return syspath.isEmpty() || syspath == QStringLiteral(R"(HTREE\ROOT\0)") ||
+           syspath == QStringLiteral(R"(ACPI_HAL\PNP0C08\0)");
 }
 
 QString getComputerDisplayName() {
@@ -54,7 +54,16 @@ QString getComputerDisplayName() {
 }
 
 QString getComputerSyspath() {
-    return QStringLiteral("ACPI_HAL\\PNP0C08\\0");
+    return QStringLiteral(R"(ACPI_HAL\PNP0C08\0)");
+}
+
+QString getHostname() {
+    wchar_t buffer[MAX_COMPUTERNAME_LENGTH + 1];
+    DWORD size = MAX_COMPUTERNAME_LENGTH + 1;
+    if (GetComputerNameW(buffer, &size)) {
+        return QString::fromWCharArray(buffer);
+    }
+    return QStringLiteral("unknown");
 }
 
 void openPrintersSettings() {
@@ -92,15 +101,15 @@ QString formatDriverPath(const QString &path) {
 
 QString getDeviceDisplayName(const DeviceInfo &info) {
     // On Windows, prefer FriendlyName, then DeviceDesc
-    QString friendlyName = info.propertyValue("FriendlyName");
+    auto friendlyName = info.propertyValue("FriendlyName");
     if (!friendlyName.isEmpty()) {
         return friendlyName;
     }
 
-    QString deviceDesc = info.propertyValue("DeviceDesc");
+    auto deviceDesc = info.propertyValue("DeviceDesc");
     if (!deviceDesc.isEmpty()) {
         // DeviceDesc may have format "Description;Provider" - take first part
-        int semicolon = deviceDesc.indexOf(QLatin1Char(';'));
+        auto semicolon = deviceDesc.indexOf(QLatin1Char(';'));
         if (semicolon > 0) {
             return deviceDesc.left(semicolon);
         }
@@ -156,7 +165,7 @@ QString getKernelBuildDate() {
                              &size) == ERROR_SUCCESS) {
             RegCloseKey(hKey);
             // InstallDate is a Unix timestamp
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(installDate);
+            auto dt = QDateTime::fromSecsSinceEpoch(installDate);
             return QLocale().toString(dt.date(), QLocale::ShortFormat);
         }
         RegCloseKey(hKey);
@@ -173,7 +182,7 @@ QString translateDevicePath(const QString &devpath) {
     // Format: BUS\VEN_XXXX&DEV_YYYY&SUBSYS_ZZZZ&REV_WW\Instance
 
     // Check for PCI device
-    if (devpath.startsWith(QStringLiteral("PCI\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(PCI\)"), Qt::CaseInsensitive)) {
         QRegularExpression pciVenDevRe(QStringLiteral("VEN_([0-9A-Fa-f]{4})&DEV_([0-9A-Fa-f]{4})"));
         auto match = pciVenDevRe.match(devpath);
         if (match.hasMatch()) {
@@ -183,7 +192,7 @@ QString translateDevicePath(const QString &devpath) {
     }
 
     // Check for USB device
-    if (devpath.startsWith(QStringLiteral("USB\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(USB\)"), Qt::CaseInsensitive)) {
         QRegularExpression usbVidPidRe(QStringLiteral("VID_([0-9A-Fa-f]{4})&PID_([0-9A-Fa-f]{4})"));
         auto match = usbVidPidRe.match(devpath);
         if (match.hasMatch()) {
@@ -193,36 +202,36 @@ QString translateDevicePath(const QString &devpath) {
     }
 
     // Check for HID device
-    if (devpath.startsWith(QStringLiteral("HID\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(HID\)"), Qt::CaseInsensitive)) {
         return QObject::tr("HID-compliant device");
     }
 
     // Check for ACPI device
-    if (devpath.startsWith(QStringLiteral("ACPI\\"), Qt::CaseInsensitive) ||
-        devpath.startsWith(QStringLiteral("ACPI_HAL\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(ACPI\)"), Qt::CaseInsensitive) ||
+        devpath.startsWith(QStringLiteral(R"(ACPI_HAL\)"), Qt::CaseInsensitive)) {
         return QObject::tr("On ACPI-compliant system");
     }
 
     // Check for root-enumerated device
-    if (devpath.startsWith(QStringLiteral("ROOT\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(ROOT\)"), Qt::CaseInsensitive)) {
         return QObject::tr("On system board");
     }
 
     // Check for storage device
-    if (devpath.contains(QStringLiteral("SCSI\\"), Qt::CaseInsensitive) ||
-        devpath.contains(QStringLiteral("IDE\\"), Qt::CaseInsensitive) ||
-        devpath.contains(QStringLiteral("STORAGE\\"), Qt::CaseInsensitive)) {
+    if (devpath.contains(QStringLiteral(R"(SCSI\)"), Qt::CaseInsensitive) ||
+        devpath.contains(QStringLiteral(R"(IDE\)"), Qt::CaseInsensitive) ||
+        devpath.contains(QStringLiteral(R"(STORAGE\)"), Qt::CaseInsensitive)) {
         return QObject::tr("On storage controller");
     }
 
     // Check for display device
-    if (devpath.startsWith(QStringLiteral("DISPLAY\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(DISPLAY\)"), Qt::CaseInsensitive)) {
         return QObject::tr("On display adapter");
     }
 
     // Check for software device
-    if (devpath.startsWith(QStringLiteral("SWD\\"), Qt::CaseInsensitive) ||
-        devpath.startsWith(QStringLiteral("SW\\"), Qt::CaseInsensitive)) {
+    if (devpath.startsWith(QStringLiteral(R"(SWD\)"), Qt::CaseInsensitive) ||
+        devpath.startsWith(QStringLiteral(R"(SW\)"), Qt::CaseInsensitive)) {
         return QObject::tr("Software device");
     }
 
@@ -236,8 +245,8 @@ QString getMountPoint(const QString &devnode) {
 
     // On Windows, volumes have mount points like "C:\" or volume GUIDs
     // Check if this is a volume device
-    QString syspath = devnode;
-    if (!syspath.contains(QStringLiteral("STORAGE\\VOLUME"), Qt::CaseInsensitive) &&
+    auto syspath = devnode;
+    if (!syspath.contains(QStringLiteral(R"(STORAGE\VOLUME)"), Qt::CaseInsensitive) &&
         !syspath.contains(QStringLiteral("Volume{"), Qt::CaseInsensitive)) {
         return {};
     }
@@ -253,7 +262,7 @@ QString getMountPoint(const QString &devnode) {
 
     QString result;
     do {
-        size_t len = wcslen(volumeName);
+        auto len = wcslen(volumeName);
         if (len > 0 && volumeName[len - 1] == L'\\') {
             volumeName[len - 1] = L'\0';
         }
@@ -288,7 +297,7 @@ DeviceEventQuery buildEventQuery(const DeviceInfo &info) {
     query.devnode = info.devnode();
     query.deviceName = info.name();
     // Windows: extract vendor/product IDs from hardware IDs if present
-    QString hwId = info.propertyValue("HardwareID");
+    auto hwId = info.propertyValue("HardwareID");
     // Hardware IDs like "USB\VID_046D&PID_C52B" contain vendor and product IDs
     static QRegularExpression vidRegex(QStringLiteral("VID_([0-9A-Fa-f]{4})"));
     static QRegularExpression pidRegex(QStringLiteral("PID_([0-9A-Fa-f]{4})"));
@@ -312,7 +321,7 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
     }
 
     if (!query.deviceName.isEmpty() && query.deviceName.length() >= 8) {
-        QString nameSearch = query.deviceName.left(20).trimmed();
+        auto nameSearch = query.deviceName.left(20).trimmed();
         auto lastSpace = nameSearch.lastIndexOf(QLatin1Char(' '));
         if (lastSpace > 8) {
             nameSearch = nameSearch.left(lastSpace);
@@ -332,12 +341,12 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
 
     wevtutil.start(QStringLiteral("wevtutil"), args);
     if (wevtutil.waitForFinished(10000)) {
-        QString output = QString::fromUtf8(wevtutil.readAllStandardOutput());
-        QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+        auto output = QString::fromUtf8(wevtutil.readAllStandardOutput());
+        auto lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
 
-        for (const QString &line : lines) {
-            bool matches = false;
-            for (const QString &term : searchTerms) {
+        for (const auto &line : lines) {
+            auto matches = false;
+            for (const auto &term : searchTerms) {
                 if (line.contains(term, Qt::CaseInsensitive)) {
                     matches = true;
                     break;
@@ -360,13 +369,12 @@ ParsedEvent parseEventLine(const QString &line) {
 
     // Windows wevtutil text output format
     QRegularExpression winDateRe(
-        QStringLiteral("Date:\\s*(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})"));
-    QRegularExpressionMatch match = winDateRe.match(line);
+        QStringLiteral(R"(Date:\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}))"));
+    auto match = winDateRe.match(line);
 
     if (match.hasMatch()) {
-        QString dateTimeStr = match.captured(1);
-        QDateTime dateTime =
-            QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss"));
+        auto dateTimeStr = match.captured(1);
+        auto dateTime = QDateTime::fromString(dateTimeStr, QStringLiteral("yyyy-MM-dd HH:mm:ss"));
         if (dateTime.isValid()) {
             result.timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
         } else {
@@ -374,8 +382,8 @@ ParsedEvent parseEventLine(const QString &line) {
         }
         result.message = line;
     } else {
-        QRegularExpression winMsgRe(QStringLiteral("(?:Message|Description):\\s*(.+)"));
-        QRegularExpressionMatch msgMatch = winMsgRe.match(line);
+        QRegularExpression winMsgRe(QStringLiteral(R"((?:Message|Description):\s*(.+))"));
+        auto msgMatch = winMsgRe.match(line);
         if (msgMatch.hasMatch()) {
             result.message = msgMatch.captured(1).trimmed();
         } else {
@@ -432,7 +440,7 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                 switch (resType) {
                 case ResType_IRQ: {
                     auto *irqData = reinterpret_cast<IRQ_RESOURCE *>(data.data());
-                    QString setting =
+                    auto setting =
                         QStringLiteral("0x%1 (%2)")
                             .arg(irqData->IRQ_Header.IRQD_Alloc_Num, 8, 16, QLatin1Char('0'))
                             .arg(irqData->IRQ_Header.IRQD_Alloc_Num)
@@ -446,10 +454,10 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                     DWORDLONG start = memData->MEM_Header.MD_Alloc_Base;
                     DWORDLONG end = memData->MEM_Header.MD_Alloc_End;
                     if (start != 0 || end != 0) {
-                        QString setting = QStringLiteral("%1 - %2")
-                                              .arg(start, 16, 16, QLatin1Char('0'))
-                                              .arg(end, 16, 16, QLatin1Char('0'))
-                                              .toUpper();
+                        auto setting = QStringLiteral("%1 - %2")
+                                           .arg(start, 16, 16, QLatin1Char('0'))
+                                           .arg(end, 16, 16, QLatin1Char('0'))
+                                           .toUpper();
                         resources.append({QObject::tr("Memory Range"),
                                           setting,
                                           QStringLiteral("drive-harddisk")});
@@ -458,13 +466,13 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                 }
                 case ResType_IO: {
                     auto *ioData = reinterpret_cast<IO_RESOURCE *>(data.data());
-                    DWORDLONG start = ioData->IO_Header.IOD_Alloc_Base;
-                    DWORDLONG end = ioData->IO_Header.IOD_Alloc_End;
+                    auto start = ioData->IO_Header.IOD_Alloc_Base;
+                    auto end = ioData->IO_Header.IOD_Alloc_End;
                     if (start != 0 || end != 0) {
-                        QString setting = QStringLiteral("%1 - %2")
-                                              .arg(start, 8, 16, QLatin1Char('0'))
-                                              .arg(end, 8, 16, QLatin1Char('0'))
-                                              .toUpper();
+                        auto setting = QStringLiteral("%1 - %2")
+                                           .arg(start, 8, 16, QLatin1Char('0'))
+                                           .arg(end, 8, 16, QLatin1Char('0'))
+                                           .toUpper();
                         resources.append(
                             {QObject::tr("I/O Range"), setting, QStringLiteral("drive-harddisk")});
                     }
@@ -472,7 +480,7 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                 }
                 case ResType_DMA: {
                     auto *dmaData = reinterpret_cast<DMA_RESOURCE *>(data.data());
-                    QString setting = QString::number(dmaData->DMA_Header.DD_Alloc_Chan);
+                    auto setting = QString::number(dmaData->DMA_Header.DD_Alloc_Chan);
                     resources.append(
                         {QObject::tr("DMA"), setting, QStringLiteral("preferences-other")});
                     break;
@@ -562,7 +570,7 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
         return info;
     }
 
-    QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+    auto driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
     HKEY hKey;
     std::wstring keyPath = driverKeyPath.toStdWString();
 
@@ -603,7 +611,7 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
             hKey, L"InfPath", nullptr, &type, reinterpret_cast<LPBYTE>(value), &valueSize) ==
             ERROR_SUCCESS &&
         type == REG_SZ) {
-        QString infPath = QString::fromWCharArray(value);
+        auto infPath = QString::fromWCharArray(value);
         if (infPath.startsWith(QStringLiteral("oem"), Qt::CaseInsensitive)) {
             info.signer = info.provider;
         } else {
@@ -662,7 +670,7 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
     }
 
     // On Windows, manufacturer is typically available directly
-    QString manufacturer = info.propertyValue("Manufacturer");
+    auto manufacturer = info.propertyValue("Manufacturer");
     return manufacturer;
 }
 
@@ -681,7 +689,7 @@ QHash<QString, QString> getExportDeviceProperties(const DeviceInfo &info) {
 
     // Windows-specific properties
     auto addIfNotEmpty = [&](const QString &key, const char *propName) {
-        QString value = info.propertyValue(propName);
+        auto value = info.propertyValue(propName);
         if (!value.isEmpty()) {
             properties[key] = value;
         }
@@ -709,7 +717,7 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath) {
 ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     ExportDriverInfo driverInfo;
 
-    QString driver = info.driver();
+    auto driver = info.driver();
     if (driver.isEmpty()) {
         driverInfo.hasDriver = false;
         return driverInfo;
@@ -719,9 +727,9 @@ ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     driverInfo.name = driver;
 
     // Windows driver info from registry
-    QString driverKeyPath = QStringLiteral("SYSTEM\\CurrentControlSet\\Control\\Class\\") + driver;
+    auto driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
     HKEY hKey;
-    std::wstring keyPath = driverKeyPath.toStdWString();
+    auto keyPath = driverKeyPath.toStdWString();
 
     if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, keyPath.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
         wchar_t value[256];

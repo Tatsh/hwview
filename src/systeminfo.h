@@ -193,6 +193,15 @@ bool hasDriverInfo(const DeviceInfo &info);
 QString getComputerDisplayName();
 
 /**
+ * @brief Get the local hostname.
+ *
+ * Returns the hostname of the local machine without requiring Qt6::Network.
+ *
+ * @returns Local hostname, or "unknown" if it cannot be determined.
+ */
+QString getHostname();
+
+/**
  * @brief Get the syspath for the Computer entry.
  *
  * Returns the platform-specific path used to identify the root computer node

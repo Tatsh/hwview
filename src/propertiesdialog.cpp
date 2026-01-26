@@ -116,7 +116,7 @@ void PropertiesDialog::setDeviceSyspath(const QString &syspath) {
     }
 
     // Check if this is the Computer root entry
-    bool computerEntry = isComputerEntry(syspath);
+    auto computerEntry = isComputerEntry(syspath);
 
     QString deviceName;
     if (computerEntry) {
@@ -142,11 +142,11 @@ void PropertiesDialog::setDeviceSyspath(const QString &syspath) {
         labelLocationValue->setToolTip(QString());
 
         // Hide Events and Details tabs
-        int detailsIndex = tabWidget->indexOf(tabDetails);
+        auto detailsIndex = tabWidget->indexOf(tabDetails);
         if (detailsIndex >= 0) {
             tabWidget->removeTab(detailsIndex);
         }
-        int eventsIndex = tabWidget->indexOf(tab); // Events tab is named "tab" in UI
+        auto eventsIndex = tabWidget->indexOf(tab); // Events tab is named "tab" in UI
         if (eventsIndex >= 0) {
             tabWidget->removeTab(eventsIndex);
         }
@@ -167,7 +167,7 @@ void PropertiesDialog::setDeviceSyspath(const QString &syspath) {
 
 void PropertiesDialog::setCategoryIcon(const QIcon &icon) {
     categoryIcon_ = icon;
-    QPixmap pixmap = icon.pixmap(32, 32);
+    auto pixmap = icon.pixmap(32, 32);
 
     // Set icon on all tabs
     labelIconGeneral->setPixmap(pixmap);
@@ -181,13 +181,13 @@ void PropertiesDialog::populateGeneralTab() {
         return;
 
     // Device type - use category name matching "Devices by type" view
-    QString deviceType = getDeviceCategory();
+    auto deviceType = getDeviceCategory();
     if (!deviceType.isEmpty()) {
         labelDeviceTypeValue->setText(deviceType);
     }
 
     // Manufacturer
-    QString manufacturer = getDeviceManufacturer(*deviceInfo_);
+    auto manufacturer = getDeviceManufacturer(*deviceInfo_);
     if (manufacturer.isEmpty()) {
         // For storage volumes, show N/A; for others, show Unknown
         if (deviceInfo_->category() == DeviceCategory::StorageVolumes) {
@@ -199,7 +199,7 @@ void PropertiesDialog::populateGeneralTab() {
     labelManufacturerValue->setText(manufacturer);
 
     // Location - translate syspath to human-readable form
-    QString location = translateDevicePath(deviceInfo_->syspath());
+    auto location = translateDevicePath(deviceInfo_->syspath());
     if (location.isEmpty()) {
         location = tr("Unknown");
     }
@@ -207,7 +207,7 @@ void PropertiesDialog::populateGeneralTab() {
     labelLocationValue->setToolTip(deviceInfo_->syspath());
 
     // Device status - if the device exists and has a driver, it's working
-    QString driver = deviceInfo_->driver();
+    auto driver = deviceInfo_->driver();
     if (!driver.isEmpty()) {
         textEditDeviceStatus->setPlainText(tr("This device is working properly."));
     } else {
@@ -219,7 +219,7 @@ void PropertiesDialog::populateDriverTab() {
     if (!deviceInfo_)
         return;
 
-    QString driver = deviceInfo_->driver();
+    auto driverName = deviceInfo_->driver();
 
     if (!hasDriverInfo(*deviceInfo_)) {
         labelDriverProviderValue->setText(tr("(No driver)"));
@@ -251,7 +251,7 @@ void PropertiesDialog::populateDriverTab() {
             &PropertiesDialog::onDriverInfoLoaded);
 
     driverInfoWatcher_->setFuture(
-        QtConcurrent::run([driver]() { return getBasicDriverInfo(driver); }));
+        QtConcurrent::run([driverName]() { return getBasicDriverInfo(driverName); }));
 }
 
 void PropertiesDialog::onDriverInfoLoaded() {
@@ -285,7 +285,7 @@ void PropertiesDialog::populateDetailsTab() {
     // Clear the combo box and rebuild with only properties that have values
     comboBoxDetailsProperty->clear();
 
-    for (const PropertyMapping &mapping : propertyMappings_) {
+    for (const auto &mapping : propertyMappings_) {
         QString value;
 
         // Handle special properties that aren't direct property lookups
@@ -325,7 +325,7 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
     if (index < 0 || !deviceInfo_)
         return;
 
-    QString propertyKey = comboBoxDetailsProperty->currentData().toString();
+    auto propertyKey = comboBoxDetailsProperty->currentData().toString();
     QString value;
 
     // Handle special properties
@@ -344,13 +344,13 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
     if (!value.isEmpty()) {
         // For multi-value properties, split by newline or semicolon
         if (value.contains(QStringLiteral("\n"))) {
-            QStringList values = value.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
-            for (const QString &v : values) {
+            auto values = value.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+            for (const auto &v : values) {
                 listWidgetDetailsPropertyValue->addItem(v.trimmed());
             }
         } else if (value.contains(QStringLiteral(";"))) {
-            QStringList values = value.split(QStringLiteral(";"), Qt::SkipEmptyParts);
-            for (const QString &v : values) {
+            auto values = value.split(QStringLiteral(";"), Qt::SkipEmptyParts);
+            for (const auto &v : values) {
                 listWidgetDetailsPropertyValue->addItem(v.trimmed());
             }
         } else {
@@ -359,8 +359,8 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
     }
 
     // Add Windows-style hardware IDs if applicable (on non-Windows platforms)
-    QStringList hardwareIds = convertToHardwareIds(propertyKey, value);
-    for (const QString &hwId : hardwareIds) {
+    auto hardwareIds = convertToHardwareIds(propertyKey, value);
+    for (const auto &hwId : hardwareIds) {
         listWidgetDetailsPropertyValue->addItem(hwId);
     }
 }
@@ -427,7 +427,7 @@ void PropertiesDialog::onEventsLoaded() {
     tableViewEvents->resizeColumnsToContents();
 
     // Select the first event
-    QModelIndex firstIndex = eventsModel_->index(0, 0);
+    auto firstIndex = eventsModel_->index(0, 0);
     tableViewEvents->setCurrentIndex(firstIndex);
     onEventSelectionChanged(firstIndex, QModelIndex());
 }
@@ -442,13 +442,12 @@ void PropertiesDialog::onEventSelectionChanged(const QModelIndex &current,
     }
 
     // Get the full message from the selected row
-    int row = current.row();
+    auto row = current.row();
     QStandardItem *timestampItem = eventsModel_->item(row, 0);
     QStandardItem *messageItem = eventsModel_->item(row, 1);
 
     if (timestampItem && messageItem) {
-        QString info =
-            QStringLiteral("%1\n\n%2").arg(timestampItem->text()).arg(messageItem->text());
+        auto info = QStringLiteral("%1\n\n%2").arg(timestampItem->text()).arg(messageItem->text());
         textEditEventsInfo->setPlainText(info);
     }
 }
@@ -457,7 +456,7 @@ void PropertiesDialog::onDriverDetailsClicked() {
     if (!deviceInfo_)
         return;
 
-    QString driver = deviceInfo_->driver();
+    auto driver = deviceInfo_->driver();
     if (driver.isEmpty()) {
         return;
     }
@@ -485,7 +484,7 @@ void PropertiesDialog::onViewAllEventsClicked() {
     auto *model = new QStandardItemModel(&dialog);
     model->setHorizontalHeaderLabels({tr("Timestamp"), tr("Event")});
 
-    for (const QString &eventLine : allEvents_) {
+    for (const auto &eventLine : allEvents_) {
         ParsedEvent event = parseEventLine(eventLine);
 
         QList<QStandardItem *> row;
@@ -524,7 +523,7 @@ void PropertiesDialog::onCopyDevicePath() {
 void PropertiesDialog::createResourcesTab() {
     // Remove existing resources tab if present
     if (resourcesTab_) {
-        int index = tabWidget->indexOf(resourcesTab_);
+        auto index = tabWidget->indexOf(resourcesTab_);
         if (index >= 0) {
             tabWidget->removeTab(index);
         }
@@ -550,10 +549,10 @@ void PropertiesDialog::createResourcesTab() {
             this,
             &PropertiesDialog::onResourcesLoaded);
 
-    QString syspath = deviceInfo_->syspath();
-    QString driver = deviceInfo_->driver();
-    resourcesWatcher_->setFuture(
-        QtConcurrent::run([syspath, driver]() { return getDeviceResources(syspath, driver); }));
+    auto syspath = deviceInfo_->syspath();
+    auto driverName = deviceInfo_->driver();
+    resourcesWatcher_->setFuture(QtConcurrent::run(
+        [syspath, driverName]() { return getDeviceResources(syspath, driverName); }));
 }
 
 void PropertiesDialog::onResourcesLoaded() {
@@ -601,7 +600,7 @@ void PropertiesDialog::onResourcesLoaded() {
     resourceTree->setRootIsDecorated(false);
     resourceTree->setAlternatingRowColors(true);
 
-    for (const ResourceInfo &res : resources) {
+    for (const auto &res : resources) {
         auto *item = new QTreeWidgetItem(resourceTree);
         item->setIcon(0, QIcon::fromTheme(res.iconName));
         item->setText(0, res.type);

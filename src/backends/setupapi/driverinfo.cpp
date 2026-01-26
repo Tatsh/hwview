@@ -15,22 +15,22 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
     DriverSearchResult result;
 
     // Check registry for driver image path
-    QString regPath =
-        QStringLiteral("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\") + driverName;
+    auto regPath =
+        QStringLiteral(R"(HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\)") + driverName;
     QSettings reg(regPath, QSettings::NativeFormat);
 
-    QString imagePath = reg.value(QStringLiteral("ImagePath")).toString();
+    auto imagePath = reg.value(QStringLiteral("ImagePath")).toString();
     if (!imagePath.isEmpty()) {
         // Expand environment variables and normalize path
-        if (imagePath.startsWith(QStringLiteral("\\SystemRoot\\"))) {
-            imagePath.replace(QStringLiteral("\\SystemRoot\\"),
+        if (imagePath.startsWith(QStringLiteral(R"(\SystemRoot\)"))) {
+            imagePath.replace(QStringLiteral(R"(\SystemRoot\)"),
                               QDir::toNativeSeparators(QDir::rootPath()) +
-                                  QStringLiteral("Windows\\"));
-        } else if (imagePath.startsWith(QStringLiteral("System32\\")) ||
-                   imagePath.startsWith(QStringLiteral("system32\\"))) {
-            imagePath = QDir::toNativeSeparators(QDir::rootPath()) + QStringLiteral("Windows\\") +
+                                  QStringLiteral(R"(Windows\)"));
+        } else if (imagePath.startsWith(QStringLiteral(R"(System32\)")) ||
+                   imagePath.startsWith(QStringLiteral(R"(system32\)"))) {
+            imagePath = QDir::toNativeSeparators(QDir::rootPath()) + QStringLiteral(R"(Windows\)") +
                         imagePath;
-        } else if (imagePath.startsWith(QStringLiteral("\\??\\"))) {
+        } else if (imagePath.startsWith(QStringLiteral(R"(\??\)"))) {
             imagePath = imagePath.mid(4);
         }
 
@@ -43,18 +43,18 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
 
     // If not found in registry, check common driver locations
     if (result.paths.isEmpty()) {
-        QString sysName = driverName;
+        auto sysName = driverName;
         if (!sysName.endsWith(QStringLiteral(".sys"), Qt::CaseInsensitive)) {
             sysName += QStringLiteral(".sys");
         }
 
-        QStringList searchDirs = {
+        auto searchDirs = QStringList{
             QDir::rootPath() + QStringLiteral("Windows/System32/drivers"),
             QDir::rootPath() + QStringLiteral("Windows/System32/DriverStore/FileRepository"),
         };
 
-        for (const QString &searchDir : searchDirs) {
-            QString directPath = searchDir + QLatin1Char('/') + sysName;
+        for (const auto &searchDir : searchDirs) {
+            auto directPath = searchDir + QLatin1Char('/') + sysName;
             if (QFile::exists(directPath)) {
                 result.paths << directPath;
                 break;
@@ -63,7 +63,7 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
 
         // Search DriverStore subdirectories if not found directly
         if (result.paths.isEmpty()) {
-            QString driverStore =
+            auto driverStore =
                 QDir::rootPath() + QStringLiteral("Windows/System32/DriverStore/FileRepository");
             QDirIterator it(driverStore, {sysName}, QDir::Files, QDirIterator::Subdirectories);
             while (it.hasNext()) {
@@ -84,7 +84,7 @@ DriverInfo getDriverInfo(const QString &driverPath) {
 
     // Get file version info size
     DWORD dummy;
-    DWORD versionInfoSize = GetFileVersionInfoSizeW(wpath.c_str(), &dummy);
+    auto versionInfoSize = GetFileVersionInfoSizeW(wpath.c_str(), &dummy);
 
     if (versionInfoSize > 0) {
         QByteArray versionData(static_cast<int>(versionInfoSize), '\0');
@@ -170,7 +170,7 @@ DriverInfo getDriverInfo(const QString &driverPath) {
     fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
     fileInfo.pcwszFilePath = wpath.c_str();
 
-    GUID policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    auto policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
 
     WINTRUST_DATA trustData;
     memset(&trustData, 0, sizeof(trustData));
@@ -181,17 +181,17 @@ DriverInfo getDriverInfo(const QString &driverPath) {
     trustData.pFile = &fileInfo;
     trustData.dwStateAction = WTD_STATEACTION_VERIFY;
 
-    LONG status = WinVerifyTrust(nullptr, &policyGUID, &trustData);
+    auto status = WinVerifyTrust(nullptr, &policyGUID, &trustData);
 
     if (status == ERROR_SUCCESS) {
         CRYPT_PROVIDER_DATA *provData = WTHelperProvDataFromStateData(trustData.hWVTStateData);
         if (provData) {
             CRYPT_PROVIDER_SGNR *signer = WTHelperGetProvSignerFromChain(provData, 0, FALSE, 0);
             if (signer && signer->pasCertChain && signer->csCertChain > 0) {
-                PCCERT_CONTEXT cert = signer->pasCertChain[0].pCert;
+                auto cert = signer->pasCertChain[0].pCert;
                 if (cert) {
                     wchar_t subjectName[256];
-                    DWORD subjectLen = CertGetNameStringW(
+                    auto subjectLen = CertGetNameStringW(
                         cert, CERT_NAME_SIMPLE_DISPLAY_TYPE, 0, nullptr, subjectName, 256);
                     if (subjectLen > 1) {
                         info.signer = QString::fromWCharArray(subjectName);

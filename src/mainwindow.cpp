@@ -240,7 +240,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
     if (watched == treeView && event->type() == QEvent::KeyPress) {
         auto *keyEvent = static_cast<QKeyEvent *>(event);
         if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
-            QModelIndex index = treeView->currentIndex();
+            auto index = treeView->currentIndex();
             if (index.isValid()) {
                 auto *node = static_cast<Node *>(index.internalPointer());
                 if (node->type() == NodeType::Device) {
@@ -408,16 +408,16 @@ void MainWindow::showCustomizeDialog() {
 
 void MainWindow::exportDeviceData() {
     // Generate default filename with hostname and timestamp
-    QString defaultName =
+    auto defaultName =
         QStringLiteral("%1_%2%3")
             .arg(DeviceCache::hostname())
             .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyyMMdd_HHmmss")))
             .arg(QLatin1String(DeviceExport::FILE_EXTENSION));
 
-    QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    QString defaultPath = defaultDir + QLatin1Char('/') + defaultName;
+    auto defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    auto defaultPath = defaultDir + QLatin1Char('/') + defaultName;
 
-    QString filePath =
+    auto filePath =
         QFileDialog::getSaveFileName(this,
                                      tr("Export Device Data"),
                                      defaultPath,
@@ -451,7 +451,7 @@ void MainWindow::exportDeviceData() {
                 progressDialog->close();
                 progressDialog->deleteLater();
 
-                bool success = watcher->result();
+                auto success = watcher->result();
                 watcher->deleteLater();
 
                 if (!success) {
@@ -462,8 +462,8 @@ void MainWindow::exportDeviceData() {
             });
 
     // Capture device data before starting the background thread
-    QList<DeviceInfo> devices = DeviceCache::instance().allDevices();
-    QString hostname = DeviceCache::hostname();
+    auto devices = DeviceCache::instance().allDevices();
+    auto hostname = DeviceCache::hostname();
 
     auto future = QtConcurrent::run([filePath, devices, hostname]() {
         return DeviceExport::exportToFile(filePath, devices, hostname);
@@ -472,9 +472,9 @@ void MainWindow::exportDeviceData() {
 }
 
 void MainWindow::openExportFile() {
-    QString defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    auto defaultDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 
-    QString filePath =
+    auto filePath =
         QFileDialog::getOpenFileName(this,
                                      tr("Open Device Manager Export"),
                                      defaultDir,
@@ -561,7 +561,7 @@ void MainWindow::applyViewSettings() {
     auto &settings = ViewSettings::instance();
 
     // Driver column only applies to "Devices by type" view - other views only have 1 column
-    bool showDriverColumn = settings.showDriverColumn() && currentViewAction == actionDevicesByType;
+    auto showDriverColumn = settings.showDriverColumn() && currentViewAction == actionDevicesByType;
 
     // Show/hide driver column (column 1)
     if (showDriverColumn) {
@@ -580,7 +580,7 @@ void MainWindow::applyViewSettings() {
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
         // Hide any additional columns that may exist
-        for (int i = 1; i < treeView->header()->count(); ++i) {
+        for (auto i = 1; i < treeView->header()->count(); ++i) {
             treeView->setColumnHidden(i, true);
         }
     }
@@ -611,16 +611,16 @@ void MainWindow::collectExpandedPaths(const QModelIndex &parent,
         return;
     }
 
-    int rowCount = model->rowCount(parent);
-    for (int row = 0; row < rowCount; ++row) {
-        QModelIndex index = model->index(row, 0, parent);
+    auto rowCount = model->rowCount(parent);
+    for (auto row = 0; row < rowCount; ++row) {
+        auto index = model->index(row, 0, parent);
         if (!index.isValid()) {
             continue;
         }
 
         // Build the path using the display name
-        QString name = model->data(index, Qt::DisplayRole).toString();
-        QString path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
+        auto name = model->data(index, Qt::DisplayRole).toString();
+        auto path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
 
         if (treeView->isExpanded(index)) {
             expandedPaths.insert(path);
@@ -645,16 +645,16 @@ void MainWindow::expandMatchingPaths(const QModelIndex &parent,
         return;
     }
 
-    int rowCount = model->rowCount(parent);
-    for (int row = 0; row < rowCount; ++row) {
-        QModelIndex index = model->index(row, 0, parent);
+    auto rowCount = model->rowCount(parent);
+    for (auto row = 0; row < rowCount; ++row) {
+        auto index = model->index(row, 0, parent);
         if (!index.isValid()) {
             continue;
         }
 
         // Build the path using the display name
-        QString name = model->data(index, Qt::DisplayRole).toString();
-        QString path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
+        auto name = model->data(index, Qt::DisplayRole).toString();
+        auto path = parentPath.isEmpty() ? name : parentPath + QStringLiteral("/") + name;
 
         if (expandedPaths.contains(path)) {
             treeView->expand(index);

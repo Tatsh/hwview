@@ -86,12 +86,12 @@ void Node::setRawName(const QString &name) {
 void Node::sortChildren() {
     std::sort(childItems.begin(), childItems.end(), [](const Node *a, const Node *b) {
         // Sort alphabetically by the first column (name)
-        QString nameA = a->data(0).toString().toLower();
-        QString nameB = b->data(0).toString().toLower();
+        auto nameA = a->data(0).toString().toLower();
+        auto nameB = b->data(0).toString().toLower();
         return nameA < nameB;
     });
     // Update row indices after sorting
-    for (int i = 0; i < childItems.size(); ++i) {
+    for (auto i = 0; i < childItems.size(); ++i) {
         childItems[i]->row_ = i;
     }
 }

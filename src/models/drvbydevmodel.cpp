@@ -22,16 +22,16 @@ void DriversByDeviceModel::buildTree() {
 
     // Map from driver name to list of device indices
     QMap<QString, QVector<int>> devicesByDriver;
-    bool showHidden = DeviceCache::instance().showHiddenDevices();
+    auto showHidden = DeviceCache::instance().showHiddenDevices();
 
-    for (int i = 0; i < allDevices.size(); ++i) {
+    for (auto i = 0; i < allDevices.size(); ++i) {
         const DeviceInfo &info = allDevices.at(i);
         // Skip hidden devices unless show hidden is enabled
         if (info.isHidden() && !showHidden) {
             continue;
         }
 
-        QString driver = info.driver();
+        auto driver = info.driver();
         if (driver.isEmpty()) {
             continue;
         }
@@ -48,15 +48,15 @@ void DriversByDeviceModel::buildTree() {
         driverNode->setIcon(s::categoryIcons::forDriver(driverName));
 
         // Sort device indices by name
-        QVector<int> sortedIndices = deviceIndices;
+        auto sortedIndices = deviceIndices;
         std::sort(sortedIndices.begin(), sortedIndices.end(), [&allDevices](int a, int b) {
             return allDevices.at(a).name() < allDevices.at(b).name();
         });
 
         // Add devices under this driver
-        for (int idx : sortedIndices) {
+        for (auto idx : sortedIndices) {
             const DeviceInfo &info = allDevices.at(idx);
-            QString rawName = info.name();
+            auto rawName = info.name();
             if (rawName.isEmpty()) {
                 const QString &syspath = info.syspath();
                 auto lastSlash = syspath.lastIndexOf(QLatin1Char('/'));

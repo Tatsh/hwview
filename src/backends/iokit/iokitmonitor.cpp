@@ -106,7 +106,7 @@ void IOKitMonitor::deviceAddedCallback(void *refcon, io_iterator_t iterator) {
     auto *monitor = static_cast<IOKitMonitor *>(refcon);
 
     // Drain the iterator to re-arm the notification and count devices
-    bool hasDevices = false;
+    auto hasDevices = false;
     io_service_t service;
     while ((service = IOIteratorNext(iterator)) != 0) {
         hasDevices = true;
@@ -122,7 +122,7 @@ void IOKitMonitor::deviceRemovedCallback(void *refcon, io_iterator_t iterator) {
     auto *monitor = static_cast<IOKitMonitor *>(refcon);
 
     // Drain the iterator to re-arm the notification and count devices
-    bool hasDevices = false;
+    auto hasDevices = false;
     io_service_t service;
     while ((service = IOIteratorNext(iterator)) != 0) {
         hasDevices = true;

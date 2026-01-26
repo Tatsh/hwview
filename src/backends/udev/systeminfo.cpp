@@ -22,8 +22,8 @@
 namespace {
 
 // HID bus type constants from Linux input.h
-constexpr int BUS_USB = 0x03;
-constexpr int BUS_I2C = 0x18;
+constexpr auto BUS_USB = 0x03;
+constexpr auto BUS_I2C = 0x18;
 
 struct HidDeviceId {
     int busType = 0;
@@ -36,9 +36,9 @@ struct HidDeviceId {
 HidDeviceId parseHidDeviceId(const QString &path) {
     HidDeviceId result;
     static const QRegularExpression hidIdRe(
-        QStringLiteral("([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\\.([0-9A-Fa-f]+)"));
+        QStringLiteral(R"(([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4}):([0-9A-Fa-f]{4})\.([0-9A-Fa-f]+))"));
 
-    for (const QString &component : path.split(QLatin1Char('/'))) {
+    for (const auto &component : path.split(QLatin1Char('/'))) {
         auto match = hidIdRe.match(component);
         if (match.hasMatch()) {
             bool ok;
@@ -73,11 +73,11 @@ QString hidBusTypeName(int busType) {
 }
 
 int parseI2cBusNumber(const QString &path) {
-    static const QRegularExpression i2cBusRe(QStringLiteral("/i2c-(\\d+)(?:/|$)"));
+    static const QRegularExpression i2cBusRe(QStringLiteral(R"(/i2c-(\d+)(?:/|$))"));
     auto match = i2cBusRe.match(path);
     if (match.hasMatch()) {
         bool ok;
-        int bus = match.captured(1).toInt(&ok);
+        auto bus = match.captured(1).toInt(&ok);
         if (ok) {
             return bus;
         }
@@ -120,6 +120,14 @@ QString getComputerSyspath() {
     return QStringLiteral("/sys/devices/virtual/dmi/id");
 }
 
+QString getHostname() {
+    char buffer[256];
+    if (gethostname(buffer, sizeof(buffer)) == 0) {
+        return QString::fromLocal8Bit(buffer);
+    }
+    return QStringLiteral("unknown");
+}
+
 void openPrintersSettings() {
     // Linux/KDE: Open System Settings printers page
     QProcess::startDetached(QStringLiteral("systemsettings"),
@@ -146,11 +154,11 @@ DriverFileDetails getDriverFileDetails(const QString &driverPath, const QString 
     DriverFileDetails details;
 
     // Check if this is an nvidia module
-    QString moduleName = driverPath.section(QLatin1Char('/'), -1);
-    bool isNvidia = moduleName.startsWith(QStringLiteral("nvidia"));
+    auto moduleName = driverPath.section(QLatin1Char('/'), -1);
+    auto isNvidia = moduleName.startsWith(QStringLiteral("nvidia"));
 
     // Get driver info from the existing function
-    DriverInfo info = getDriverInfo(driverPath);
+    auto info = getDriverInfo(driverPath);
 
     if (isNvidia) {
         details.provider = QStringLiteral("NVIDIA Corporation");
@@ -179,14 +187,14 @@ QString formatDriverPath(const QString &path) {
 }
 
 QString getDeviceDisplayName(const DeviceInfo &info) {
-    QString name = info.name();
-    QString subsystem = info.subsystem();
+    auto name = info.name();
+    auto subsystem = info.subsystem();
 
     // For storage volumes, try partition label or filesystem label
     if (subsystem == QStringLiteral("block")) {
-        QString devtype = info.propertyValue("DEVTYPE");
+        auto devtype = info.propertyValue("DEVTYPE");
         if (devtype == QStringLiteral("partition")) {
-            QString partName = info.propertyValue("ID_PART_ENTRY_NAME");
+            auto partName = info.propertyValue("ID_PART_ENTRY_NAME");
             if (partName.isEmpty()) {
                 partName = info.propertyValue("ID_FS_LABEL");
             }
@@ -197,19 +205,19 @@ QString getDeviceDisplayName(const DeviceInfo &info) {
     }
 
     // Strip /dev/ prefix for display
-    QString shortName = name;
+    auto shortName = name;
     if (shortName.startsWith(QStringLiteral("/dev/"))) {
         shortName = shortName.mid(5);
     }
 
     // Handle input/event* devices
     if (shortName.startsWith(QStringLiteral("input/event"))) {
-        QString num = shortName.mid(11);
+        auto num = shortName.mid(11);
         return QObject::tr("Input event %1").arg(num);
     }
     // Handle input/mouse* devices
     if (shortName.startsWith(QStringLiteral("input/mouse"))) {
-        QString num = shortName.mid(11);
+        auto num = shortName.mid(11);
         return QObject::tr("Input mouse %1").arg(num);
     }
 
@@ -244,7 +252,7 @@ QString getDeviceDisplayName(const DeviceInfo &info) {
     if (subsystem == QStringLiteral("hid")) {
         auto hidId = parseHidDeviceId(info.syspath());
         if (hidId.valid) {
-            QString busName = hidBusTypeName(hidId.busType);
+            auto busName = hidBusTypeName(hidId.busType);
             if (!busName.isEmpty()) {
                 return QObject::tr("%1 HID device").arg(busName);
             }
@@ -254,7 +262,7 @@ QString getDeviceDisplayName(const DeviceInfo &info) {
 
     // Battery/ACPI device names
     if (info.category() == DeviceCategory::Batteries) {
-        QString devPath = info.propertyValue("DEVPATH");
+        auto devPath = info.propertyValue("DEVPATH");
         if (devPath.contains(QStringLiteral("PNP0C0A")) ||
             devPath.contains(QStringLiteral("battery"))) {
             return QObject::tr("Microsoft ACPI-Compliant Control Method Battery");
@@ -273,11 +281,11 @@ bool hasDriverInfo(const DeviceInfo &info) {
         return true;
     }
 
-    QString subsystem = info.subsystem();
-    QString devName = info.name();
-    QString devNode = info.devnode();
-    QString shortName = devName.startsWith(QStringLiteral("/dev/")) ? devName.mid(5) : devName;
-    QString shortNode = devNode.startsWith(QStringLiteral("/dev/")) ? devNode.mid(5) : devNode;
+    auto subsystem = info.subsystem();
+    auto devName = info.name();
+    auto devNode = info.devnode();
+    auto shortName = devName.startsWith(QStringLiteral("/dev/")) ? devName.mid(5) : devName;
+    auto shortNode = devNode.startsWith(QStringLiteral("/dev/")) ? devNode.mid(5) : devNode;
 
     // VirtualBox devices are not Linux Foundation
     if (shortName.startsWith(QStringLiteral("vbox"), Qt::CaseInsensitive) ||
@@ -292,7 +300,7 @@ bool hasDriverInfo(const DeviceInfo &info) {
 
     // Storage volume partitions are Linux Foundation devices
     if (subsystem == QStringLiteral("block")) {
-        QString devtype = info.propertyValue("DEVTYPE");
+        auto devtype = info.propertyValue("DEVTYPE");
         if (devtype == QStringLiteral("partition")) {
             return true;
         }
@@ -302,8 +310,8 @@ bool hasDriverInfo(const DeviceInfo &info) {
 }
 
 static QString safeReadSysfsFile(const QString &path) {
-    QByteArray pathBytes = path.toLocal8Bit();
-    int fd = open(pathBytes.constData(), O_RDONLY | O_NONBLOCK);
+    auto pathBytes = path.toLocal8Bit();
+    auto fd = open(pathBytes.constData(), O_RDONLY | O_NONBLOCK);
     if (fd < 0) {
         return {};
     }
@@ -331,25 +339,26 @@ QString getKernelVersion() {
 QString getKernelBuildDate() {
     QFile versionFile(QStringLiteral("/proc/version"));
     if (versionFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QString content = QString::fromUtf8(versionFile.readAll());
+        auto content = QString::fromUtf8(versionFile.readAll());
         versionFile.close();
 
         // Parse build date from /proc/version
         // Format: "Linux version X.X.X (user@host) (gcc ...) #N SMP ... Wed Jan 15 17:42:44 UTC
         // 2025"
-        QRegularExpression dateRe(QStringLiteral("(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\\s+"
-                                                 "(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)"
-                                                 "\\s+"
-                                                 "(\\d{1,2})\\s+"
-                                                 "(\\d{2}):(\\d{2}):(\\d{2})\\s+"
-                                                 "(?:\\w+\\s+)?" // Optional timezone
-                                                 "(\\d{4})"));
+        QRegularExpression dateRe(
+            QStringLiteral(R"((Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s+)"
+                           R"((Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))"
+                           R"(\s+)"
+                           R"((\d{1,2})\s+)"
+                           R"((\d{2}):(\d{2}):(\d{2})\s+)"
+                           R"((?:\w+\s+)?)"
+                           R"((\d{4}))"));
 
-        QRegularExpressionMatch match = dateRe.match(content);
+        auto match = dateRe.match(content);
         if (match.hasMatch()) {
-            QString monthStr = match.captured(2);
-            int day = match.captured(3).toInt();
-            int year = match.captured(7).toInt();
+            auto monthStr = match.captured(2);
+            auto day = match.captured(3).toInt();
+            auto year = match.captured(7).toInt();
 
             static const QStringList months = {QStringLiteral("Jan"),
                                                QStringLiteral("Feb"),
@@ -363,7 +372,7 @@ QString getKernelBuildDate() {
                                                QStringLiteral("Oct"),
                                                QStringLiteral("Nov"),
                                                QStringLiteral("Dec")};
-            int month = static_cast<int>(months.indexOf(monthStr)) + 1;
+            auto month = static_cast<int>(months.indexOf(monthStr)) + 1;
 
             if (month > 0) {
                 QDate date(year, month, day);
@@ -389,13 +398,13 @@ QString translateDevicePath(const QString &devpath) {
 
     // Check for PCI device: extract bus, device, function
     static const QRegularExpression pciRe(
-        QStringLiteral("([0-9a-fA-F]{4}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\\.([0-9a-fA-F])"));
+        QStringLiteral(R"(([0-9a-fA-F]{4}):([0-9a-fA-F]{2}):([0-9a-fA-F]{2})\.([0-9a-fA-F]))"));
 
-    QRegularExpressionMatchIterator it = pciRe.globalMatch(devpath);
-    int pciBus = -1, pciDevice = -1, pciFunction = -1;
+    auto it = pciRe.globalMatch(devpath);
+    auto pciBus = -1, pciDevice = -1, pciFunction = -1;
 
     while (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
+        auto match = it.next();
         bool ok;
         pciBus = match.captured(2).toInt(&ok, 16);
         pciDevice = match.captured(3).toInt(&ok, 16);
@@ -405,8 +414,8 @@ QString translateDevicePath(const QString &devpath) {
     // Check for HID device ID (format: XXXX:VVVV:PPPP.IIII)
     auto hidId = parseHidDeviceId(devpath);
     if (hidId.valid) {
-        QString busName = hidBusTypeName(hidId.busType);
-        int i2cBus = parseI2cBusNumber(devpath);
+        auto busName = hidBusTypeName(hidId.busType);
+        auto i2cBus = parseI2cBusNumber(devpath);
 
         if (hidId.busType == BUS_I2C && i2cBus >= 0) {
             if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
@@ -418,7 +427,7 @@ QString translateDevicePath(const QString &devpath) {
             }
             return QObject::tr("On I²C bus %1").arg(i2cBus);
         } else if (hidId.busType == BUS_USB) {
-            static const QRegularExpression usbReHid(QStringLiteral("/usb(\\d+)/(\\d+)-([\\d.]+)"));
+            static const QRegularExpression usbReHid(QStringLiteral(R"(/usb(\d+)/(\d+)-([\d.]+))"));
             auto usbMatch = usbReHid.match(devpath);
             if (usbMatch.hasMatch()) {
                 return QObject::tr("On USB bus %1, port %2")
@@ -431,16 +440,16 @@ QString translateDevicePath(const QString &devpath) {
     }
 
     // Check for USB device
-    static const QRegularExpression usbRe(QStringLiteral("/usb(\\d+)/(\\d+)-([\\d.]+)"));
+    static const QRegularExpression usbRe(QStringLiteral(R"(/usb(\d+)/(\d+)-([\d.]+))"));
     auto usbMatch = usbRe.match(devpath);
     if (usbMatch.hasMatch()) {
-        QString usbBus = usbMatch.captured(1);
-        QString usbPort = usbMatch.captured(3);
+        auto usbBus = usbMatch.captured(1);
+        auto usbPort = usbMatch.captured(3);
         return QObject::tr("On USB bus %1, port %2").arg(usbBus, usbPort);
     }
 
     // Check for I²C device without HID ID
-    int i2cBus = parseI2cBusNumber(devpath);
+    auto i2cBus = parseI2cBusNumber(devpath);
     if (i2cBus >= 0) {
         if (pciBus >= 0 && pciDevice >= 0 && pciFunction >= 0) {
             return QObject::tr("On I²C bus %1 at PCI bus %2, device %3, function %4")
@@ -454,12 +463,12 @@ QString translateDevicePath(const QString &devpath) {
 
     // Check for SCSI device
     static const QRegularExpression scsiRe(
-        QStringLiteral("/host(\\d+)/target\\d+:(\\d+):(\\d+)/(\\d+):(\\d+):(\\d+):(\\d+)"));
+        QStringLiteral(R"(/host(\d+)/target\d+:(\d+):(\d+)/(\d+):(\d+):(\d+):(\d+))"));
     auto scsiMatch = scsiRe.match(devpath);
     if (scsiMatch.hasMatch()) {
-        QString busNum = scsiMatch.captured(5);
-        QString targetId = scsiMatch.captured(6);
-        QString lun = scsiMatch.captured(7);
+        auto busNum = scsiMatch.captured(5);
+        auto targetId = scsiMatch.captured(6);
+        auto lun = scsiMatch.captured(7);
         return QObject::tr("Bus number %1, target ID %2, LUN %3").arg(busNum, targetId, lun);
     }
 
@@ -468,7 +477,7 @@ QString translateDevicePath(const QString &devpath) {
         QStringLiteral("/(PNP[0-9A-Fa-f]{4}|LNX[A-Z]+|ACPI[0-9A-Fa-f]{4}):([0-9]+)"));
     auto acpiMatch = acpiPnpRe.match(devpath);
     if (acpiMatch.hasMatch()) {
-        QString pnpId = acpiMatch.captured(1);
+        auto pnpId = acpiMatch.captured(1);
         if (pnpId == QStringLiteral("PNP0C0A") || pnpId == QStringLiteral("ACPI0003")) {
             return QObject::tr("On ACPI-compliant system");
         }
@@ -526,7 +535,7 @@ QString getMountPoint(const QString &devnode) {
     }
 
     QFileInfo devnodeInfo(devnode);
-    QString canonicalDevnode = devnodeInfo.canonicalFilePath();
+    auto canonicalDevnode = devnodeInfo.canonicalFilePath();
     if (canonicalDevnode.isEmpty()) {
         canonicalDevnode = devnode;
     }
@@ -536,20 +545,19 @@ QString getMountPoint(const QString &devnode) {
         return {};
     }
 
-    QByteArray allData = mountsFile.readAll();
+    auto allData = mountsFile.readAll();
     mountsFile.close();
 
-    QStringList mountLines =
-        QString::fromUtf8(allData).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    auto mountLines = QString::fromUtf8(allData).split(QLatin1Char('\n'), Qt::SkipEmptyParts);
 
-    for (const QString &line : mountLines) {
-        QStringList parts = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+    for (const auto &line : mountLines) {
+        auto parts = line.split(QLatin1Char(' '), Qt::SkipEmptyParts);
         if (parts.size() >= 2) {
-            QString device = parts.at(0);
-            QString mountPoint = parts.at(1);
+            auto device = parts.at(0);
+            auto mountPoint = parts.at(1);
 
             QFileInfo mountDevInfo(device);
-            QString canonicalMountDev = mountDevInfo.canonicalFilePath();
+            auto canonicalMountDev = mountDevInfo.canonicalFilePath();
             if (canonicalMountDev.isEmpty()) {
                 canonicalMountDev = device;
             }
@@ -557,10 +565,10 @@ QString getMountPoint(const QString &devnode) {
             if (device == devnode || device == canonicalDevnode || canonicalMountDev == devnode ||
                 canonicalMountDev == canonicalDevnode) {
                 // Decode escaped characters
-                mountPoint.replace(QStringLiteral("\\040"), QStringLiteral(" "));
-                mountPoint.replace(QStringLiteral("\\011"), QStringLiteral("\t"));
-                mountPoint.replace(QStringLiteral("\\012"), QStringLiteral("\n"));
-                mountPoint.replace(QStringLiteral("\\134"), QStringLiteral("\\"));
+                mountPoint.replace(QStringLiteral(R"(\040)"), QStringLiteral(" "));
+                mountPoint.replace(QStringLiteral(R"(\011)"), QStringLiteral("\t"));
+                mountPoint.replace(QStringLiteral(R"(\012)"), QStringLiteral("\n"));
+                mountPoint.replace(QStringLiteral(R"(\134)"), QStringLiteral(R"(\)"));
                 return mountPoint;
             }
         }
@@ -583,7 +591,7 @@ QString lookupUsbVendor(const QString &vendorId) {
             QStringLiteral("/var/lib/usbutils/usb.ids"),
         };
 
-        for (const QString &path : usbIdsLocations) {
+        for (const auto &path : usbIdsLocations) {
             QFile file(path);
             if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 continue;
@@ -591,11 +599,11 @@ QString lookupUsbVendor(const QString &vendorId) {
 
             QTextStream in(&file);
             while (!in.atEnd()) {
-                QString line = in.readLine();
+                auto line = in.readLine();
                 if (line.length() >= 6 && !line.startsWith(QLatin1Char('\t')) &&
                     !line.startsWith(QLatin1Char('#'))) {
-                    QString lineVendorId = line.left(4).toLower();
-                    QString name = line.mid(6).trimmed();
+                    auto lineVendorId = line.left(4).toLower();
+                    auto name = line.mid(6).trimmed();
                     if (!name.isEmpty()) {
                         vendorCache.insert(lineVendorId, name);
                     }
@@ -631,7 +639,7 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
     }
 
     if (!query.deviceName.isEmpty() && query.deviceName.length() >= 8) {
-        QString nameSearch = query.deviceName.left(20).trimmed();
+        auto nameSearch = query.deviceName.left(20).trimmed();
         auto lastSpace = nameSearch.lastIndexOf(QLatin1Char(' '));
         if (lastSpace > 8) {
             nameSearch = nameSearch.left(lastSpace);
@@ -640,7 +648,7 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
     }
 
     if (!query.devnode.isEmpty()) {
-        QString shortName = query.devnode;
+        auto shortName = query.devnode;
         if (shortName.startsWith(QStringLiteral("/dev/"))) {
             shortName = shortName.mid(5);
         }
@@ -649,8 +657,8 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
         }
     }
 
-    QRegularExpression pciRe(QStringLiteral("([0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\\.[0-9a-f])"));
-    QRegularExpressionMatch pciMatch = pciRe.match(query.syspath);
+    QRegularExpression pciRe(QStringLiteral(R"(([0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]))"));
+    auto pciMatch = pciRe.match(query.syspath);
     if (pciMatch.hasMatch()) {
         searchTerms << pciMatch.captured(1);
     }
@@ -666,11 +674,11 @@ QStringList queryDeviceEvents(const DeviceEventQuery &query) {
 
     journalctl.start(QStringLiteral("journalctl"), args);
     if (journalctl.waitForFinished(5000)) {
-        QString output = QString::fromUtf8(journalctl.readAllStandardOutput());
-        QStringList lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+        auto output = QString::fromUtf8(journalctl.readAllStandardOutput());
+        auto lines = output.split(QStringLiteral("\n"), Qt::SkipEmptyParts);
 
         for (const QString &line : lines) {
-            bool matches = false;
+            auto matches = false;
             for (const QString &term : searchTerms) {
                 if (line.contains(term, Qt::CaseInsensitive)) {
                     matches = true;
@@ -695,14 +703,14 @@ ParsedEvent parseEventLine(const QString &line) {
     // Parse journalctl output with -o short-iso format
     // Format: "YYYY-MM-DDTHH:MM:SS+ZZZZ hostname kernel: message"
     QRegularExpression isoTimestampRe(
-        QStringLiteral("^(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[+-]\\d{2}:?\\d{2})\\s+"));
-    QRegularExpressionMatch match = isoTimestampRe.match(line);
+        QStringLiteral(R"(^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:?\d{2})\s+)"));
+    auto match = isoTimestampRe.match(line);
 
     if (match.hasMatch()) {
-        QString isoTimestamp = match.captured(1);
-        QString remainder = line.mid(match.capturedEnd());
+        auto isoTimestamp = match.captured(1);
+        auto remainder = line.mid(match.capturedEnd());
 
-        QDateTime dateTime = QDateTime::fromString(isoTimestamp, Qt::ISODate);
+        auto dateTime = QDateTime::fromString(isoTimestamp, Qt::ISODate);
         if (dateTime.isValid()) {
             result.timestamp = QLocale::system().toString(dateTime, QLocale::ShortFormat);
         } else {
@@ -789,13 +797,13 @@ static QString getBlockDeviceManufacturer(const QString &syspath,
     };
 
     // Try device name first
-    QString manufacturer = extractManufacturer(deviceName);
+    auto manufacturer = extractManufacturer(deviceName);
     if (!manufacturer.isEmpty()) {
         return manufacturer;
     }
 
     // Try ID_MODEL property
-    QString model = properties.value(QStringLiteral("ID_MODEL"));
+    auto model = properties.value(QStringLiteral("ID_MODEL"));
     manufacturer = extractManufacturer(model);
     if (!manufacturer.isEmpty()) {
         return manufacturer;
@@ -809,8 +817,8 @@ static QString getBlockDeviceManufacturer(const QString &syspath,
     }
 
     // Try to read vendor from sysfs
-    QString vendorPath = syspath + QStringLiteral("/device/vendor");
-    QString vendor = safeReadSysfsFile(vendorPath);
+    auto vendorPath = syspath + QStringLiteral("/device/vendor");
+    auto vendor = safeReadSysfsFile(vendorPath);
     if (!vendor.isEmpty()) {
         vendor = vendor.trimmed();
 
@@ -858,7 +866,7 @@ static QString getBlockDeviceManufacturer(const QString &syspath,
 
     // Try parent device's vendor
     if (!parentSyspath.isEmpty()) {
-        QString parentVendorPath = parentSyspath + QStringLiteral("/vendor");
+        auto parentVendorPath = parentSyspath + QStringLiteral("/vendor");
         vendor = safeReadSysfsFile(parentVendorPath);
         if (!vendor.isEmpty()) {
             return vendor.trimmed();
@@ -871,7 +879,7 @@ static QString getBlockDeviceManufacturer(const QString &syspath,
 namespace {
 bool isPciDevice(const QString &syspath) {
     static const QRegularExpression pciPathRe(
-        QStringLiteral("/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\\.[0-9a-fA-F]$"));
+        QStringLiteral(R"(/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-9a-fA-F]$)"));
     return pciPathRe.match(syspath).hasMatch();
 }
 } // namespace
@@ -884,33 +892,35 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
     }
 
     // Get IRQ
-    QString irqPath = syspath + QStringLiteral("/irq");
-    QString irq = safeReadSysfsFile(irqPath);
+    auto irqPath = syspath + QStringLiteral("/irq");
+    auto irq = safeReadSysfsFile(irqPath);
     if (!irq.isEmpty() && irq != QStringLiteral("0")) {
-        int irqNum = irq.toInt();
-        QString setting =
+        auto irqNum = irq.toInt();
+        auto setting =
             QStringLiteral("0x%1 (%2)").arg(irqNum, 8, 16, QLatin1Char('0')).arg(irqNum).toUpper();
         resources.append({QObject::tr("IRQ"), setting, QStringLiteral("preferences-other")});
     }
 
     // Get PCI resources
-    QString resourcePath = syspath + QStringLiteral("/resource");
-    QString resourceContent = safeReadSysfsFile(resourcePath);
+    auto resourcePath = syspath + QStringLiteral("/resource");
+    auto resourceContent = safeReadSysfsFile(resourcePath);
     if (!resourceContent.isEmpty()) {
-        static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
-        const QStringList lines = resourceContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+        static const QRegularExpression whitespaceRe(QStringLiteral(R"(\s+)"));
+        const auto lines = resourceContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
         for (const QString &line : lines) {
-            QString trimmedLine = line.trimmed();
+            auto trimmedLine = line.trimmed();
             if (trimmedLine.isEmpty()) {
                 continue;
             }
 
-            QStringList parts = trimmedLine.split(whitespaceRe, Qt::SkipEmptyParts);
+            auto parts = trimmedLine.split(whitespaceRe, Qt::SkipEmptyParts);
             if (parts.size() >= 3) {
-                bool ok1, ok2, ok3;
-                qulonglong start = parts[0].toULongLong(&ok1, 16);
-                qulonglong end = parts[1].toULongLong(&ok2, 16);
-                qulonglong flags = parts[2].toULongLong(&ok3, 16);
+                auto ok1 = false;
+                auto ok2 = false;
+                auto ok3 = false;
+                auto start = parts[0].toULongLong(&ok1, 16);
+                auto end = parts[1].toULongLong(&ok2, 16);
+                auto flags = parts[2].toULongLong(&ok3, 16);
 
                 if (ok1 && ok2 && ok3 && start != 0 && end != 0) {
                     QString type;
@@ -922,10 +932,10 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
                         continue;
                     }
 
-                    QString setting = QStringLiteral("%1 - %2")
-                                          .arg(start, 16, 16, QLatin1Char('0'))
-                                          .arg(end, 16, 16, QLatin1Char('0'))
-                                          .toUpper();
+                    auto setting = QStringLiteral("%1 - %2")
+                                       .arg(start, 16, 16, QLatin1Char('0'))
+                                       .arg(end, 16, 16, QLatin1Char('0'))
+                                       .toUpper();
                     resources.append({type, setting, QStringLiteral("drive-harddisk")});
                 }
             }
@@ -934,15 +944,15 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
 
     // Get DMA
     if (!driver.isEmpty()) {
-        QString dmaContent = safeReadSysfsFile(QStringLiteral("/proc/dma"));
+        auto dmaContent = safeReadSysfsFile(QStringLiteral("/proc/dma"));
         if (!dmaContent.isEmpty()) {
-            static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
-            const QStringList lines = dmaContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+            static const QRegularExpression dmaRe(QStringLiteral(R"(^(\d+):\s*(.*)$)"));
+            const auto lines = dmaContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
             for (const QString &line : lines) {
                 if (line.contains(driver, Qt::CaseInsensitive)) {
                     auto match = dmaRe.match(line);
                     if (match.hasMatch()) {
-                        QString channel = match.captured(1);
+                        auto channel = match.captured(1);
                         resources.append(
                             {QObject::tr("DMA"), channel, QStringLiteral("preferences-other")});
                     }
@@ -957,15 +967,15 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
 QList<DmaChannelInfo> getSystemDmaChannels() {
     QList<DmaChannelInfo> channels;
 
-    QString content = safeReadSysfsFile(QStringLiteral("/proc/dma"));
+    auto content = safeReadSysfsFile(QStringLiteral("/proc/dma"));
     if (content.isEmpty()) {
         return channels;
     }
 
-    static const QRegularExpression dmaRe(QStringLiteral("^(\\d+):\\s*(.*)$"));
-    const QStringList lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    static const QRegularExpression dmaRe(QStringLiteral(R"(^(\d+):\s*(.*)$)"));
+    const auto lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QString &line : lines) {
-        QString trimmed = line.trimmed();
+        auto trimmed = line.trimmed();
         if (trimmed.isEmpty()) {
             continue;
         }
@@ -981,7 +991,7 @@ QList<DmaChannelInfo> getSystemDmaChannels() {
 QList<IoPortInfo> getSystemIoPorts() {
     QList<IoPortInfo> ports;
 
-    QString content = safeReadSysfsFile(QStringLiteral("/proc/ioports"));
+    auto content = safeReadSysfsFile(QStringLiteral("/proc/ioports"));
     if (content.isEmpty()) {
         return ports;
     }
@@ -989,7 +999,7 @@ QList<IoPortInfo> getSystemIoPorts() {
     static const QRegularExpression resourceRe(
         QStringLiteral("^(\\s*)([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
 
-    const QStringList lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const auto lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QString &line : lines) {
         if (line.trimmed().isEmpty()) {
             continue;
@@ -1000,7 +1010,7 @@ QList<IoPortInfo> getSystemIoPorts() {
             continue;
         }
 
-        QString name = match.captured(4);
+        auto name = match.captured(4);
         if (name.isEmpty()) {
             continue;
         }
@@ -1019,17 +1029,17 @@ QList<IoPortInfo> getSystemIoPorts() {
 QList<IrqInfo> getSystemIrqs() {
     QList<IrqInfo> irqs;
 
-    QString content = safeReadSysfsFile(QStringLiteral("/proc/interrupts"));
+    auto content = safeReadSysfsFile(QStringLiteral("/proc/interrupts"));
     if (content.isEmpty()) {
         return irqs;
     }
 
-    QStringList lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    auto lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     if (!lines.isEmpty()) {
         lines.removeFirst(); // Skip header
     }
 
-    static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
+    static const QRegularExpression whitespaceRe(QStringLiteral(R"(\s+)"));
     for (const QString &line : lines) {
         if (line.trimmed().isEmpty()) {
             continue;
@@ -1040,7 +1050,7 @@ QList<IrqInfo> getSystemIrqs() {
             continue;
         }
 
-        QString irqNum = parts[0];
+        auto irqNum = parts[0];
         if (irqNum.endsWith(QLatin1Char(':'))) {
             irqNum.chop(1);
         }
@@ -1048,7 +1058,7 @@ QList<IrqInfo> getSystemIrqs() {
         QString deviceName;
         QString irqType;
 
-        for (int i = 1; i < parts.size(); ++i) {
+        for (auto i = 1; i < parts.size(); ++i) {
             if (parts[i].contains(QStringLiteral("APIC")) ||
                 parts[i].contains(QStringLiteral("PCI")) ||
                 parts[i].contains(QStringLiteral("MSI")) ||
@@ -1083,15 +1093,15 @@ QList<IrqInfo> getSystemIrqs() {
 QList<MemoryRangeInfo> getSystemMemoryRanges() {
     QList<MemoryRangeInfo> ranges;
 
-    QString content = safeReadSysfsFile(QStringLiteral("/proc/iomem"));
+    auto content = safeReadSysfsFile(QStringLiteral("/proc/iomem"));
     if (content.isEmpty()) {
         return ranges;
     }
 
     static const QRegularExpression resourceRe(
-        QStringLiteral("^(\\s*)([0-9a-fA-F]+)-([0-9a-fA-F]+)\\s*:\\s*(.*)$"));
+        QStringLiteral(R"(^(\s*)([0-9a-fA-F]+)-([0-9a-fA-F]+)\s*:\s*(.*)$)"));
 
-    const QStringList lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    const auto lines = content.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
     for (const QString &line : lines) {
         if (line.trimmed().isEmpty()) {
             continue;
@@ -1102,7 +1112,7 @@ QList<MemoryRangeInfo> getSystemMemoryRanges() {
             continue;
         }
 
-        QString name = match.captured(4);
+        auto name = match.captured(4);
         if (name.isEmpty()) {
             continue;
         }
@@ -1154,12 +1164,12 @@ QStringList convertToHardwareIds(const QString &propertyKey, const QString &valu
                                                          "sv([0-9A-Fa-f]{8})sd([0-9A-Fa-f]{8})"));
     auto pciMatch = pciRe.match(value);
     if (pciMatch.hasMatch()) {
-        QString vendorId = pciMatch.captured(1).right(4).toUpper();
-        QString deviceId = pciMatch.captured(2).right(4).toUpper();
-        QString subVendor = pciMatch.captured(3).right(4).toUpper();
-        QString subDevice = pciMatch.captured(4).right(4).toUpper();
-        QString subsys = subVendor + subDevice;
-        result << QStringLiteral("PCI\\VEN_%1&DEV_%2&SUBSYS_%3").arg(vendorId, deviceId, subsys);
+        auto vendorId = pciMatch.captured(1).right(4).toUpper();
+        auto deviceId = pciMatch.captured(2).right(4).toUpper();
+        auto subVendor = pciMatch.captured(3).right(4).toUpper();
+        auto subDevice = pciMatch.captured(4).right(4).toUpper();
+        auto subsys = subVendor + subDevice;
+        result << QStringLiteral(R"(PCI\VEN_%1&DEV_%2&SUBSYS_%3)").arg(vendorId, deviceId, subsys);
     }
 
     // Parse USB modalias: usb:vXXXXpXXXXdXXXX...
@@ -1167,17 +1177,17 @@ QStringList convertToHardwareIds(const QString &propertyKey, const QString &valu
         QStringLiteral("^usb:v([0-9A-Fa-f]{4})p([0-9A-Fa-f]{4})"));
     auto usbMatch = usbRe.match(value);
     if (usbMatch.hasMatch()) {
-        QString vendorId = usbMatch.captured(1).toUpper();
-        QString productId = usbMatch.captured(2).toUpper();
-        result << QStringLiteral("USB\\VID_%1&PID_%2").arg(vendorId, productId);
+        auto vendorId = usbMatch.captured(1).toUpper();
+        auto productId = usbMatch.captured(2).toUpper();
+        result << QStringLiteral(R"(USB\VID_%1&PID_%2)").arg(vendorId, productId);
     }
 
     // Parse ACPI modalias: acpi:PNPXXXX: or acpi:ACPIXXXX:
     static const QRegularExpression acpiRe(QStringLiteral("^acpi:([A-Za-z0-9]+):"));
     auto acpiMatch = acpiRe.match(value);
     if (acpiMatch.hasMatch()) {
-        QString acpiId = acpiMatch.captured(1).toUpper();
-        result << QStringLiteral("ACPI\\%1").arg(acpiId);
+        auto acpiId = acpiMatch.captured(1).toUpper();
+        result << QStringLiteral(R"(ACPI\%1)").arg(acpiId);
     }
 
     // Parse HID modalias: hid:bXXXXgXXXXvXXXXXXXXpXXXXXXXX
@@ -1185,9 +1195,9 @@ QStringList convertToHardwareIds(const QString &propertyKey, const QString &valu
                                                          "v([0-9A-Fa-f]{8})p([0-9A-Fa-f]{8})"));
     auto hidMatch = hidRe.match(value);
     if (hidMatch.hasMatch()) {
-        QString vendorId = hidMatch.captured(2).right(4).toUpper();
-        QString productId = hidMatch.captured(3).right(4).toUpper();
-        result << QStringLiteral("HID\\VID_%1&PID_%2").arg(vendorId, productId);
+        auto vendorId = hidMatch.captured(2).right(4).toUpper();
+        auto productId = hidMatch.captured(3).right(4).toUpper();
+        result << QStringLiteral(R"(HID\VID_%1&PID_%2)").arg(vendorId, productId);
     }
 
     return result;
@@ -1211,8 +1221,8 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
         return info;
     }
 
-    QString output = QString::fromUtf8(modinfo.readAllStandardOutput());
-    QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+    auto output = QString::fromUtf8(modinfo.readAllStandardOutput());
+    auto lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
 
     QString filename, author, version, signer;
 
@@ -1222,8 +1232,8 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
             continue;
         }
 
-        QString key = line.left(colonIdx).trimmed();
-        QString value = line.mid(colonIdx + 1).trimmed();
+        auto key = line.left(colonIdx).trimmed();
+        auto value = line.mid(colonIdx + 1).trimmed();
 
         if (key == QStringLiteral("filename")) {
             filename = value;
@@ -1238,7 +1248,7 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
 
     info.hasDriverFiles = !filename.isEmpty();
 
-    bool isOutOfTree = !filename.isEmpty() && filename != QStringLiteral("(builtin)") &&
+    auto isOutOfTree = !filename.isEmpty() && filename != QStringLiteral("(builtin)") &&
                        !filename.contains(QStringLiteral("/kernel/"));
 
     if (driver == QStringLiteral("nvidia") || driver.startsWith(QStringLiteral("nvidia_"))) {
@@ -1317,7 +1327,7 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         return {};
     }
 
-    QString manufacturer = info.propertyValue("ID_VENDOR_FROM_DATABASE");
+    auto manufacturer = info.propertyValue("ID_VENDOR_FROM_DATABASE");
 
     // For block devices (disk drives, DVD/CD-ROM), try harder to get manufacturer
     if (manufacturer.isEmpty() && info.subsystem() == QStringLiteral("block")) {
@@ -1336,14 +1346,14 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
         manufacturer = info.propertyValue("ID_VENDOR");
     }
     if (manufacturer.isEmpty()) {
-        QString encoded = info.propertyValue("ID_VENDOR_ENC");
+        auto encoded = info.propertyValue("ID_VENDOR_ENC");
         if (!encoded.isEmpty()) {
             manufacturer = QUrl::fromPercentEncoding(encoded.toUtf8());
             manufacturer.replace(QLatin1Char('_'), QLatin1Char(' '));
         }
     }
     if (manufacturer.isEmpty()) {
-        QString syspath = info.syspath();
+        auto syspath = info.syspath();
         QString vendorId;
 
         // Try uhid path: /devices/virtual/misc/uhid/xxxx:yyyy:zzzz
@@ -1356,8 +1366,8 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
 
         // Try USB device path
         if (vendorId.isEmpty()) {
-            static const QRegularExpression usbDevRe(
-                QStringLiteral("[0-9a-fA-F]{4}:([0-9a-fA-F]{4}):[0-9a-fA-F]{4}\\.[0-9a-fA-F]{4}$"));
+            static const QRegularExpression usbDevRe(QStringLiteral(
+                R"([0-9a-fA-F]{4}:([0-9a-fA-F]{4}):[0-9a-fA-F]{4}\.[0-9a-fA-F]{4}$)"));
             match = usbDevRe.match(syspath);
             if (match.hasMatch()) {
                 vendorId = match.captured(1).toLower();
@@ -1388,10 +1398,10 @@ QString getDeviceManufacturer(const DeviceInfo &info) {
     }
 
     // Override manufacturer based on device name for known devices
-    QString devName = info.name();
-    QString devNode = info.devnode();
-    QString shortName = devName.startsWith(QStringLiteral("/dev/")) ? devName.mid(5) : devName;
-    QString shortNode = devNode.startsWith(QStringLiteral("/dev/")) ? devNode.mid(5) : devNode;
+    auto devName = info.name();
+    auto devNode = info.devnode();
+    auto shortName = devName.startsWith(QStringLiteral("/dev/")) ? devName.mid(5) : devName;
+    auto shortNode = devNode.startsWith(QStringLiteral("/dev/")) ? devNode.mid(5) : devNode;
 
     // Oracle/VirtualBox devices
     if (shortName.startsWith(QStringLiteral("vbox"), Qt::CaseInsensitive) ||
@@ -1451,11 +1461,11 @@ QHash<QString, QString> getDistributionInfo() {
     QFile osRelease(QStringLiteral("/etc/os-release"));
     if (osRelease.open(QIODevice::ReadOnly | QIODevice::Text)) {
         while (!osRelease.atEnd()) {
-            QString line = QString::fromUtf8(osRelease.readLine()).trimmed();
+            auto line = QString::fromUtf8(osRelease.readLine()).trimmed();
             auto eqPos = line.indexOf(QLatin1Char('='));
             if (eqPos > 0) {
-                QString key = line.left(eqPos);
-                QString value = line.mid(eqPos + 1);
+                auto key = line.left(eqPos);
+                auto value = line.mid(eqPos + 1);
                 // Remove quotes
                 if (value.startsWith(QLatin1Char('"')) && value.endsWith(QLatin1Char('"'))) {
                     value = value.mid(1, value.length() - 2);
@@ -1478,7 +1488,7 @@ QHash<QString, QString> getExportDeviceProperties(const DeviceInfo &info) {
 
     // Linux-specific property names
     auto addIfNotEmpty = [&](const QString &key, const char *propName) {
-        QString value = info.propertyValue(propName);
+        auto value = info.propertyValue(propName);
         if (!value.isEmpty()) {
             properties[key] = value;
         }
@@ -1503,7 +1513,7 @@ QHash<QString, QString> getExportDeviceProperties(const DeviceInfo &info) {
 
 static bool isPciDeviceForExport(const QString &syspath) {
     static const QRegularExpression pciPathRe(
-        QStringLiteral("/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\\.[0-9a-fA-F]$"));
+        QStringLiteral(R"(/pci[^/]*/[0-9a-fA-F]{4}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}\.[0-9a-fA-F]$)"));
     return pciPathRe.match(syspath).hasMatch();
 }
 
@@ -1515,7 +1525,7 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath) {
     }
 
     // Get IRQ
-    QString irq = safeReadSysfsFile(syspath + QStringLiteral("/irq"));
+    auto irq = safeReadSysfsFile(syspath + QStringLiteral("/irq"));
     if (!irq.isEmpty() && irq != QStringLiteral("0")) {
         ExportResourceInfo res;
         res.type = QStringLiteral("IRQ");
@@ -1526,17 +1536,19 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath) {
     }
 
     // Get PCI resources (memory ranges and I/O ports)
-    QString resourceContent = safeReadSysfsFile(syspath + QStringLiteral("/resource"));
+    auto resourceContent = safeReadSysfsFile(syspath + QStringLiteral("/resource"));
     if (!resourceContent.isEmpty()) {
-        static const QRegularExpression whitespaceRe(QStringLiteral("\\s+"));
-        const QStringList lines = resourceContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+        static const QRegularExpression whitespaceRe(QStringLiteral(R"(\s+)"));
+        const auto lines = resourceContent.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
         for (const QString &line : lines) {
-            QStringList parts = line.trimmed().split(whitespaceRe, Qt::SkipEmptyParts);
+            auto parts = line.trimmed().split(whitespaceRe, Qt::SkipEmptyParts);
             if (parts.size() >= 3) {
-                bool ok1, ok2, ok3;
-                qulonglong start = parts[0].toULongLong(&ok1, 16);
-                qulonglong end = parts[1].toULongLong(&ok2, 16);
-                qulonglong flags = parts[2].toULongLong(&ok3, 16);
+                auto ok1 = false;
+                auto ok2 = false;
+                auto ok3 = false;
+                auto start = parts[0].toULongLong(&ok1, 16);
+                auto end = parts[1].toULongLong(&ok2, 16);
+                auto flags = parts[2].toULongLong(&ok3, 16);
 
                 if (ok1 && ok2 && ok3 && start != 0 && end != 0) {
                     ExportResourceInfo res;
@@ -1569,7 +1581,7 @@ QList<ExportResourceInfo> getExportDeviceResources(const QString &syspath) {
 ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     ExportDriverInfo driverInfo;
 
-    QString driver = info.driver();
+    auto driver = info.driver();
     if (driver.isEmpty()) {
         driverInfo.hasDriver = false;
         return driverInfo;
@@ -1582,17 +1594,17 @@ ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     QProcess modinfo;
     modinfo.start(QStringLiteral("modinfo"), {driver});
     if (modinfo.waitForFinished(3000)) {
-        QString output = QString::fromUtf8(modinfo.readAllStandardOutput());
-        QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+        auto output = QString::fromUtf8(modinfo.readAllStandardOutput());
+        auto lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
 
-        for (const QString &line : lines) {
+        for (const auto &line : lines) {
             auto colonIdx = line.indexOf(QLatin1Char(':'));
             if (colonIdx < 0) {
                 continue;
             }
 
-            QString key = line.left(colonIdx).trimmed();
-            QString value = line.mid(colonIdx + 1).trimmed();
+            auto key = line.left(colonIdx).trimmed();
+            auto value = line.mid(colonIdx + 1).trimmed();
 
             if (key == QStringLiteral("filename")) {
                 driverInfo.filename = value;

@@ -50,7 +50,7 @@ void SetupApiDeviceInfoPrivate::extractWindowsProperties(HDEVINFO devInfo,
     devPath_ = syspath_;
 
     // Get device class GUID for category classification
-    GUID classGuid = SetupApiManager::getDeviceClassGuid(devInfo, devInfoData);
+    auto classGuid = SetupApiManager::getDeviceClassGuid(devInfo, devInfoData);
     category_ = setupapi::classGuidToCategory(classGuid);
 
     // Check if device is marked as hidden

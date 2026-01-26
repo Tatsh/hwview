@@ -9,7 +9,7 @@
 namespace {
 
 QString readBundleIdentifier(const QString &kextPath) {
-    QString plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
+    auto plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
     if (!QFile::exists(plistPath)) {
         plistPath = kextPath + QStringLiteral("/Info.plist");
     }
@@ -35,11 +35,11 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
     // Check if it looks like a bundle identifier
     if (driverName.contains(QLatin1Char('.'))) {
         // First try quick match: derive kext name from bundle ID
-        QString kextName = driverName.section(QLatin1Char('.'), -1) + QStringLiteral(".kext");
-        for (const QString &searchDir : searchDirs) {
-            QString directPath = searchDir + QLatin1Char('/') + kextName;
+        auto kextName = driverName.section(QLatin1Char('.'), -1) + QStringLiteral(".kext");
+        for (const auto &searchDir : searchDirs) {
+            auto directPath = searchDir + QLatin1Char('/') + kextName;
             if (QDir(directPath).exists()) {
-                QString foundId = readBundleIdentifier(directPath);
+                auto foundId = readBundleIdentifier(directPath);
                 if (foundId == driverName) {
                     result.paths << directPath;
                 }
@@ -48,7 +48,7 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
 
         // If quick match failed, do full search
         if (result.paths.isEmpty()) {
-            for (const QString &searchDir : searchDirs) {
+            for (const auto &searchDir : searchDirs) {
                 QDir dir(searchDir);
                 if (!dir.exists()) {
                     continue;
@@ -57,8 +57,8 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
                                 {QStringLiteral("*.kext"), QStringLiteral("*.dext")},
                                 QDir::Dirs | QDir::NoDotAndDotDot);
                 while (it.hasNext()) {
-                    QString kextPath = it.next();
-                    QString foundId = readBundleIdentifier(kextPath);
+                    auto kextPath = it.next();
+                    auto foundId = readBundleIdentifier(kextPath);
                     if (foundId == driverName && !result.paths.contains(kextPath)) {
                         result.paths << kextPath;
                     }
@@ -67,12 +67,12 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
         }
     } else {
         // Driver name might be a kext name directly
-        QString kextName = driverName;
+        auto kextName = driverName;
         if (!kextName.endsWith(QStringLiteral(".kext"))) {
             kextName += QStringLiteral(".kext");
         }
-        for (const QString &searchDir : searchDirs) {
-            QString path = searchDir + QLatin1Char('/') + kextName;
+        for (const auto &searchDir : searchDirs) {
+            auto path = searchDir + QLatin1Char('/') + kextName;
             if (QDir(path).exists()) {
                 result.paths << path;
             }
@@ -92,7 +92,7 @@ DriverInfo getDriverInfo(const QString &kextPath) {
     info.filename = kextPath;
 
     // Read Info.plist from the kext bundle
-    QString plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
+    auto plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
     if (!QFile::exists(plistPath)) {
         plistPath = kextPath + QStringLiteral("/Info.plist");
     }
@@ -109,7 +109,7 @@ DriverInfo getDriverInfo(const QString &kextPath) {
         info.license = plist.value(QStringLiteral("NSHumanReadableCopyright")).toString();
 
         // Try to get author from bundle identifier
-        QString bundleId = plist.value(QStringLiteral("CFBundleIdentifier")).toString();
+        auto bundleId = plist.value(QStringLiteral("CFBundleIdentifier")).toString();
         if (bundleId.startsWith(QStringLiteral("com.apple."))) {
             info.author = QStringLiteral("Apple Inc.");
         } else if (bundleId.startsWith(QStringLiteral("com.nvidia."))) {
@@ -120,9 +120,9 @@ DriverInfo getDriverInfo(const QString &kextPath) {
             info.author = QStringLiteral("Intel Corporation");
         } else {
             // Extract organization from bundle ID (second component)
-            QStringList parts = bundleId.split(QLatin1Char('.'));
+            auto parts = bundleId.split(QLatin1Char('.'));
             if (parts.size() >= 2) {
-                QString org = parts[1];
+                auto org = parts[1];
                 if (!org.isEmpty()) {
                     org[0] = org[0].toUpper();
                     info.author = org;
@@ -136,10 +136,10 @@ DriverInfo getDriverInfo(const QString &kextPath) {
     codesign.start(QStringLiteral("codesign"),
                    {QStringLiteral("-dv"), QStringLiteral("--verbose=2"), kextPath});
     if (codesign.waitForFinished(3000)) {
-        QString output = QString::fromUtf8(codesign.readAllStandardError());
-        QStringList lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
+        auto output = QString::fromUtf8(codesign.readAllStandardError());
+        auto lines = output.split(QLatin1Char('\n'), Qt::SkipEmptyParts);
 
-        for (const QString &line : lines) {
+        for (const auto &line : lines) {
             if (line.startsWith(QStringLiteral("Authority="))) {
                 if (info.signer.isEmpty()) {
                     info.signer = line.mid(10);
