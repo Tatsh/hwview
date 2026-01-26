@@ -1,4 +1,4 @@
-# devmgmt
+# Device Manager
 
 [![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/devmgmt)](https://github.com/Tatsh/devmgmt/tags)
 [![License](https://img.shields.io/github/license/Tatsh/devmgmt)](https://github.com/Tatsh/devmgmt/blob/master/LICENSE.txt)
@@ -12,7 +12,39 @@
 [![@Tatsh](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fpublic.api.bsky.app%2Fxrpc%2Fapp.bsky.actor.getProfile%2F%3Factor%3Ddid%3Aplc%3Auq42idtvuccnmtl57nsucz72%26query%3D%24.followersCount%26style%3Dsocial%26logo%3Dbluesky%26label%3DFollow%2520%40Tatsh&query=%24.followersCount&style=social&logo=bluesky&label=Follow%20%40Tatsh)](https://bsky.app/profile/Tatsh.bsky.social)
 [![Mastodon Follow](https://img.shields.io/mastodon/follow/109370961877277568?domain=hostux.social&style=social)](https://hostux.social/@Tatsh)
 
-Hardware information utility, inspired by Redmond.
+A cross-platform device manager application inspired by Redmond. View hardware devices, drivers, and
+system resources on Linux, macOS, and Windows.
+
+## Features
+
+### Multiple views
+
+- *Devices by type* — categorised view with ability to show drivers in use.
+- *Devices by connection* — hierarchical view showing the device tree.
+- *Devices by driver* — devices grouped by their kernel driver.
+- *Drivers by type* — drivers organised by device category.
+- *Drivers by device* — drivers with their associated devices.
+- *Resources by type* — flat view of system resources (IRQs, I/O ports, memory ranges, DMA
+  channels).
+- *Resources by connection* — resources shown in hierarchy.
+
+### Device properties
+
+Detailed information for each device including:
+
+- General device information (type, manufacturer, location)
+- Driver details (provider, version, digital signer, files)
+- Device-specific properties (hardware IDs, compatible IDs, etc.)
+- System events related to the device
+- Hardware resources (IRQ, memory ranges, I/O ports)
+
+### Export and import
+
+Save device information for later viewing or sharing.
+
+### Headless mode
+
+Command-line export without GUI (build-time option).
 
 ## Installation
 
