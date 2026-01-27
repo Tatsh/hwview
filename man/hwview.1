@@ -1,0 +1,73 @@
+.\" Man page for hwview
+.TH HWVIEW 1 "January 2026" "hwview 0.0.1" "User Commands"
+.SH NAME
+hwview \- cross-platform hardware information viewer
+.SH SYNOPSIS
+.B hwview
+.RI [ options ]
+.SH DESCRIPTION
+.B hwview
+is a cross-platform hardware viewer application that displays hardware devices, drivers,
+and system resources on Linux, macOS, and Windows. It provides a graphical interface
+similar to Windows Device Manager.
+.SH OPTIONS
+.B hwview
+is primarily a graphical application and does not take command-line options in normal use.
+.PP
+When built with the headless option (\fBHWVIEW_CLI_ONLY\fR), it can export device information
+to JSON format without requiring a display.
+.SH VIEWS
+The application provides multiple views for examining system hardware:
+.TP
+.B Devices by type
+Categorised view of devices with ability to show drivers in use.
+.TP
+.B Devices by connection
+Hierarchical view showing the device tree.
+.TP
+.B Devices by driver
+Devices grouped by their kernel driver.
+.TP
+.B Drivers by type
+Drivers organised by device category.
+.TP
+.B Drivers by device
+Drivers with their associated devices.
+.TP
+.B Resources by type
+Flat view of system resources (IRQs, I/O ports, memory ranges, DMA channels).
+.TP
+.B Resources by connection
+Resources shown in hierarchy.
+.SH DEVICE PROPERTIES
+Detailed information is available for each device including:
+.IP \(bu 2
+General device information (type, manufacturer, location)
+.IP \(bu 2
+Driver details (provider, version, digital signer, files)
+.IP \(bu 2
+Device-specific properties (hardware IDs, compatible IDs, etc.)
+.IP \(bu 2
+System events related to the device
+.IP \(bu 2
+Hardware resources (IRQ, memory ranges, I/O ports)
+.SH FILES
+.TP
+.I ${datadir}/hwview/name-mappings.json
+Device name mappings database.
+.SH ENVIRONMENT
+.TP
+.B QT_QPA_PLATFORM
+Can be set to specify the Qt platform plugin (e.g., \fBwayland\fR, \fBxcb\fR).
+.SH AUTHOR
+Written by Tatsh.
+.SH REPORTING BUGS
+Report bugs at <https://github.com/Tatsh/hwview/issues>.
+.SH COPYRIGHT
+Copyright \(co 2025-2026 Tatsh.
+.br
+Licensed under the MIT License.
+.SH SEE ALSO
+.BR lspci (8),
+.BR lsusb (8),
+.BR udevadm (8)

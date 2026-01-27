@@ -22,6 +22,7 @@ btmtk
 btrfs
 btrtl
 btusb
+bugtracker
 buildsystems
 bytearray
 cdrom
@@ -34,6 +35,7 @@ coveragerc
 cpack
 ctad
 customizedialog
+datarootdir
 dbcc
 dbuild
 dcmake
@@ -63,6 +65,7 @@ driverinfo
 drvbydevmodel
 drvbytypemodel
 ehci
+endforeach
 esbenp
 evices
 fasteoi
@@ -120,6 +123,7 @@ jurplel
 kioxia
 kpartgui
 kxmlguidir
+launchable
 lexar
 libc
 libjsonnet
@@ -135,11 +139,14 @@ lpfn
 lpss
 lpsz
 mainwindow
+mandir
 matshita
 mcelog
 mdio
 metadot
+metainfo
 mmconfig
+msys
 msystem
 mwevent
 namemappings

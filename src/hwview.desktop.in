@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=@DISPLAY_NAME@
+GenericName=Hardware Information
+Comment=@PROJECT_DESCRIPTION@
+Exec=hwview
+Icon=sh.tat.@CMAKE_PROJECT_NAME@
+Terminal=false
+Categories=System;Utility;
+Keywords=hardware;device;driver;system;information;
+StartupNotify=true

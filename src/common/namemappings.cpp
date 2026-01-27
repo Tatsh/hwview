@@ -54,13 +54,23 @@ void NameMappings::reload() {
         loadFromDirectory(dirPath, locale);
     }
 
-    // Load from user-specific location last (highest priority, overrides system)
+    // Load from user-specific location (highest priority, overrides system)
     // On Linux: ~/.local/share/hwview
     // On Windows: C:/Users/<USER>/AppData/Local/hwview
     // On macOS: ~/Library/Application Support/hwview
     auto userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
                     QStringLiteral("/hwview");
     loadFromDirectory(userPath, locale);
+
+#ifndef Q_OS_MACOS
+    // On non-macOS, check exe_path/../share/hwview/ for FHS-style installations
+    // This allows the application to find data when installed to any prefix
+    loadFromDirectory(appDir + QStringLiteral("/../share/hwview"), locale);
+#else
+    // On macOS, check the bundle's Resources directory (after user locations)
+    // applicationDirPath() returns AppName.app/Contents/MacOS, Resources is ../Resources
+    loadFromDirectory(appDir + QStringLiteral("/../Resources"), locale);
+#endif
 }
 
 void NameMappings::loadFromDirectory(const QString &dirPath, const QString &locale) {
