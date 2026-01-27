@@ -50,16 +50,16 @@ void NameMappings::reload() {
 
     // Load from system locations (in reverse order so higher priority paths override)
     for (auto i = systemPaths.size() - 1; i >= 0; --i) {
-        auto dirPath = systemPaths.at(i) + QStringLiteral("/devmgmt");
+        auto dirPath = systemPaths.at(i) + QStringLiteral("/hwview");
         loadFromDirectory(dirPath, locale);
     }
 
     // Load from user-specific location last (highest priority, overrides system)
-    // On Linux: ~/.local/share/devmgmt
-    // On Windows: C:/Users/<USER>/AppData/Local/devmgmt
-    // On macOS: ~/Library/Application Support/devmgmt
+    // On Linux: ~/.local/share/hwview
+    // On Windows: C:/Users/<USER>/AppData/Local/hwview
+    // On macOS: ~/Library/Application Support/hwview
     auto userPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-                       QStringLiteral("/devmgmt");
+                    QStringLiteral("/hwview");
     loadFromDirectory(userPath, locale);
 }
 

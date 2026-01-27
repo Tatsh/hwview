@@ -15,7 +15,7 @@
 #include <QtWidgets/QProgressDialog>
 #include <QtWidgets/QWhatsThis>
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
 #include <KAboutApplicationDialog>
 #include <KAboutData>
 #include <KActionCollection>
@@ -23,7 +23,7 @@
 #include <KLocalizedString>
 #include <KShortcutsDialog>
 #include <KStandardAction>
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
 #include "customizedialog.h"
 #include "devicecache.h"
@@ -116,12 +116,12 @@ MainWindow::MainWindow() {
     // Return to live view action
     connect(actionReturnToLive, &QAction::triggered, this, &MainWindow::returnToLiveView);
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     // For KDE, register actions before setupGUI()
     setupActions();
 #else
     setupMenus();
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
     // Devices and Printers - open platform-specific printers settings
     connect(actionDevicesAndPrinters, &QAction::triggered, []() { openPrintersSettings(); });
@@ -135,11 +135,11 @@ MainWindow::MainWindow() {
     // Connect to device monitor for automatic refresh on device changes
     connectDeviceMonitor();
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     // Don't use setupGUI() as it replaces the menubar from .ui file
     // Instead, manually set up KDE-specific menus
     postSetupMenus();
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 }
 
 void MainWindow::switchToModel(QAbstractItemModel *model, int depth) {
@@ -210,15 +210,13 @@ void MainWindow::restoreLastView() {
 }
 
 void MainWindow::about() {
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     KAboutApplicationDialog dialog(KAboutData::applicationData(), this);
     dialog.exec();
 #else
-    QMessageBox::about(this,
-                       tr("About Device Manager"),
-                       tr("View and manage device hardware settings and "
-                          "driver software installed on your computer."));
-#endif // DEVMGMT_USE_KDE
+    QMessageBox::about(
+        this, tr("About Hardware Viewer"), tr("View device information and driver software."));
+#endif // HWVIEW_USE_KDE
 }
 
 void MainWindow::openPropertiesForIndex(const QModelIndex &index) {
@@ -258,11 +256,11 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
             }
         }
     }
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     return KXmlGuiWindow::eventFilter(watched, event);
 #else
     return QMainWindow::eventFilter(watched, event);
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 }
 
 void MainWindow::toggleShowHiddenDevices(bool checked) {
@@ -334,7 +332,7 @@ void MainWindow::scanForHardwareChanges() {
     // Create a modal progress dialog that cannot be cancelled
     scanProgressDialog =
         new QProgressDialog(tr("Scanning for hardware changes..."), QString(), 0, 0, this);
-    scanProgressDialog->setWindowTitle(tr("Device Manager"));
+    scanProgressDialog->setWindowTitle(tr("Hardware Viewer"));
     scanProgressDialog->setWindowModality(Qt::WindowModal);
     scanProgressDialog->setCancelButton(nullptr); // No cancel button
     scanProgressDialog->setMinimumDuration(0);    // Show immediately
@@ -421,7 +419,7 @@ void MainWindow::exportDeviceData() {
         QFileDialog::getSaveFileName(this,
                                      tr("Export Device Data"),
                                      defaultPath,
-                                     tr("Device Manager Export (*%1);;All Files (*)")
+                                     tr("Hardware Viewer Export (*%1);;All Files (*)")
                                          .arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
 
     if (filePath.isEmpty()) {
@@ -436,7 +434,7 @@ void MainWindow::exportDeviceData() {
     // Show progress dialog
     auto *progressDialog =
         new QProgressDialog(tr("Exporting device data..."), QString(), 0, 0, this);
-    progressDialog->setWindowTitle(tr("Device Manager"));
+    progressDialog->setWindowTitle(tr("Hardware Viewer"));
     progressDialog->setWindowModality(Qt::WindowModal);
     progressDialog->setCancelButton(nullptr);
     progressDialog->setMinimumDuration(0);
@@ -476,9 +474,9 @@ void MainWindow::openExportFile() {
 
     auto filePath =
         QFileDialog::getOpenFileName(this,
-                                     tr("Open Device Manager Export"),
+                                     tr("Open Hardware Viewer Export"),
                                      defaultDir,
-                                     tr("Device Manager Export (*%1);;All Files (*)")
+                                     tr("Hardware Viewer Export (*%1);;All Files (*)")
                                          .arg(QLatin1String(DeviceExport::FILE_EXTENSION)));
 
     if (filePath.isEmpty()) {
@@ -500,26 +498,26 @@ bool MainWindow::loadExportFile(const QString &filePath) {
     actionReturnToLive->setEnabled(true);
     actionExport->setEnabled(false);
     actionScanForHardwareChanges->setEnabled(false);
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     if (auto *refreshAction = actionCollection()->action(QStringLiteral("view_refresh"))) {
         refreshAction->setEnabled(false);
     }
     if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
         exportAction->setEnabled(false);
     }
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
     if (menuAction) {
         menuAction->setEnabled(false);
     }
 
     // Update window title
     QFileInfo fi(filePath);
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     // KDE appends " -- <app name>" automatically, so just set the document part
     setWindowTitle(tr("%1 - %2").arg(fi.fileName(), DeviceCache::hostname()));
 #else
-    setWindowTitle(tr("%1 - %2 —  Device Manager").arg(fi.fileName(), DeviceCache::hostname()));
-#endif // DEVMGMT_USE_KDE
+    setWindowTitle(tr("%1 - %2 —  Hardware Viewer").arg(fi.fileName(), DeviceCache::hostname()));
+#endif // HWVIEW_USE_KDE
 
     // Refresh the current view
     refreshCurrentView();
@@ -533,25 +531,25 @@ void MainWindow::returnToLiveView() {
     actionReturnToLive->setEnabled(false);
     actionExport->setEnabled(true);
     actionScanForHardwareChanges->setEnabled(true);
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     if (auto *refreshAction = actionCollection()->action(QStringLiteral("view_refresh"))) {
         refreshAction->setEnabled(true);
     }
     if (auto *exportAction = actionCollection()->action(QStringLiteral("file_export"))) {
         exportAction->setEnabled(true);
     }
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
     if (menuAction) {
         menuAction->setEnabled(true);
     }
 
     // Restore window title
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     // KDE appends " -- <app name>" automatically, so clear the document part
     setWindowTitle(QString());
 #else
-    setWindowTitle(tr("Device Manager"));
-#endif // DEVMGMT_USE_KDE
+    setWindowTitle(tr("Hardware Viewer"));
+#endif // HWVIEW_USE_KDE
 
     // Refresh the current view
     refreshCurrentView();
@@ -664,7 +662,7 @@ void MainWindow::expandMatchingPaths(const QModelIndex &parent,
     }
 }
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
 void MainWindow::setupActions() {
     // For KDE, add actions to the action collection for shortcut management
 
@@ -677,10 +675,10 @@ void MainWindow::setupActions() {
     // Clear the F5 shortcut from the original action to avoid conflict
     actionScanForHardwareChanges->setShortcut(QKeySequence());
 
-    // Create Configure Device Manager action for Settings menu
+    // Create Configure Hardware Viewer action for Settings menu
     auto *configureAction =
         KStandardAction::preferences(this, &MainWindow::showCustomizeDialog, this);
-    configureAction->setText(i18n("Configure Device Manager..."));
+    configureAction->setText(i18n("Configure Hardware Viewer..."));
     actionCollection()->addAction(KStandardAction::name(KStandardAction::Preferences),
                                   configureAction);
 }
@@ -758,7 +756,7 @@ void MainWindow::postSetupMenus() {
     });
     settingsMenu->addAction(configureShortcutsAction);
 
-    // Configure Device Manager...
+    // Configure Hardware Viewer...
     auto *configureAction =
         actionCollection()->action(KStandardAction::name(KStandardAction::Preferences));
     if (configureAction) {
@@ -773,9 +771,9 @@ void MainWindow::postSetupMenus() {
 
     // Handbook
     auto *handbookAction = new QAction(
-        QIcon::fromTheme(QStringLiteral("help-contents")), i18n("Device Manager &Handbook"), this);
+        QIcon::fromTheme(QStringLiteral("help-contents")), i18n("Hardware Viewer &Handbook"), this);
     connect(handbookAction, &QAction::triggered, []() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral(DEVMGMT_WEBSITE_URL "/wiki")));
+        QDesktopServices::openUrl(QUrl(QStringLiteral(HWVIEW_WEBSITE_URL "/wiki")));
     });
     menuHelp->addAction(handbookAction);
 
@@ -792,15 +790,15 @@ void MainWindow::postSetupMenus() {
     auto *reportBugAction = new QAction(
         QIcon::fromTheme(QStringLiteral("tools-report-bug")), i18n("&Report Bug..."), this);
     connect(reportBugAction, &QAction::triggered, []() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral(DEVMGMT_WEBSITE_URL "/issues")));
+        QDesktopServices::openUrl(QUrl(QStringLiteral(HWVIEW_WEBSITE_URL "/issues")));
     });
     menuHelp->addAction(reportBugAction);
 
     menuHelp->addSeparator();
 
-    // About Device Manager
+    // About Hardware Viewer
     auto *aboutAppAction = new QAction(
-        QIcon::fromTheme(QStringLiteral("help-about")), i18n("&About Device Manager"), this);
+        QIcon::fromTheme(QStringLiteral("help-about")), i18n("&About Hardware Viewer"), this);
     connect(aboutAppAction, &QAction::triggered, this, &MainWindow::about);
     menuHelp->addAction(aboutAppAction);
 
@@ -808,10 +806,10 @@ void MainWindow::postSetupMenus() {
     auto *kdeHelpMenu = new KHelpMenu(this, KAboutData::applicationData());
     menuHelp->addAction(kdeHelpMenu->action(KHelpMenu::menuAboutKDE));
 }
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
 void MainWindow::setupMenus() {
-#ifndef DEVMGMT_USE_KDE
+#ifndef HWVIEW_USE_KDE
     // Non-KDE: Use standard Qt menus
     connect(actionAbout, &QAction::triggered, this, &MainWindow::about);
 
@@ -820,7 +818,7 @@ void MainWindow::setupMenus() {
 
     // Website - open project website
     connect(actionWebsite, &QAction::triggered, []() {
-        QDesktopServices::openUrl(QUrl(QStringLiteral(DEVMGMT_WEBSITE_URL)));
+        QDesktopServices::openUrl(QUrl(QStringLiteral(HWVIEW_WEBSITE_URL)));
     });
 
     // Exit action
@@ -835,5 +833,5 @@ void MainWindow::setupMenus() {
     if (menuHelp) {
         menuHelp->removeAction(actionHelpTopics);
     }
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 }

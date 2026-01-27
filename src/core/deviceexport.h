@@ -8,10 +8,10 @@
 class DeviceInfo;
 
 /**
- * @brief Exports device manager data to a JSON file for viewing in a separate application.
+ * @brief Exports hardware viewer data to a JSON file for viewing in a separate application.
  *
  * This class provides functionality to serialize all device information and device properties
- * to a JSON format that can be opened by a "Device Manager Viewer" app. The export includes
+ * to a JSON format that can be opened by a "Hardware Viewer" app. The export includes
  * all data necessary to display any view (Devices by Type, Devices by Connection, etc.) and
  * always includes hidden devices regardless of the current display setting.
  *
@@ -50,7 +50,7 @@ public:
     /**
      * @brief MIME type for export files.
      */
-    static constexpr const auto *MIME_TYPE = "application/x-devmgmt-export";
+    static constexpr const auto *MIME_TYPE = "application/x-hwview-export";
 
     /**
      * @brief Current export format version.

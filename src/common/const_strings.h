@@ -3,9 +3,9 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QString>
 
-#ifndef DEVMGMT_CLI_ONLY
+#ifndef HWVIEW_CLI_ONLY
 #include "const_strings_icons.h"
-#endif // DEVMGMT_CLI_ONLY
+#endif // HWVIEW_CLI_ONLY
 #include "const_strings_udev.h"
 #include "namemappings.h"
 

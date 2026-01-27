@@ -4,5 +4,5 @@ authors:
 cff-version: '1.2.0'
 date-released: '2026-01-25'
 message: 'If you use this software, please cite it as below.'
-title: 'devmgmt'
+title: 'hwview'
 version: '0.0.1'

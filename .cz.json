@@ -11,8 +11,8 @@
       "package.json",
       "vcpkg.json",
       "CMakeLists.txt",
-      "man/devmgmt.1",
-      "sh.tat.devmgmt.yml",
+      "man/hwview.1",
+      "sh.tat.hwview.yml",
       "src/main.cpp"
     ],
     "version_provider": "npm",

@@ -1,14 +1,14 @@
 {
   security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
-  project_name: 'devmgmt',
+  project_name: 'hwview',
   version: '0.0.1',
   description: 'Hardware information utility, inspired by Redmond.',
-  keywords: ['device', 'manager', 'system', 'information', 'linux'],
+  keywords: ['device', 'hardware', 'viewer', 'system', 'information', 'linux'],
   want_main: false,
   want_codeql: false,
   want_tests: false,
   copilot+: {
-    intro: 'Device Manager is a Qt-based system device information viewer, inspired by Device Manager (`devmgmt.msc`) on Windows.',
+    intro: 'Hardware Viewer is a Qt-based system device information viewer, inspired by Device Manager (`devmgmt.msc`) on Windows.',
   },
   package_json+: {
     cspell+: {
@@ -20,7 +20,7 @@
     scripts+: {
       'check-formatting': "clang-format -n src/*.cpp src/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules' '#vcpkg_installed'",
       'flatpak-build-install': 'flatpak run --command=flathub-build org.flatpak.Builder --install sh.tat..yml',
-      'flatpak-install': 'flatpak uninstall -y  || true && flatpak install -y --user --reinstall flathub sh.tat.devmgmt',
+      'flatpak-install': 'flatpak uninstall -y  || true && flatpak install -y --user --reinstall flathub sh.tat.hwview',
       'flatpak-lint': 'flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest sh.tat..yml',
       'flatpak-run': 'flatpak run sh.tat.',
       'flatpak-uninstall': 'flatpak uninstall -y sh.tat.',
@@ -32,8 +32,8 @@
     commitizen+: {
       version_files+: [
         'CMakeLists.txt',
-        'man/devmgmt.1',
-        'sh.tat.devmgmt.yml',
+        'man/hwview.1',
+        'sh.tat.hwview.yml',
         'src/main.cpp',
       ],
     },

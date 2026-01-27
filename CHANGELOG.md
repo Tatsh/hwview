@@ -13,5 +13,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 First version.
 
-[unreleased]: https://github.com/Tatsh/devmgmt/compare/v0.0.1...HEAD
-[0.0.1]: https://github.com/Tatsh/devmgmt/releases/tag/v0.0.1
+[unreleased]: https://github.com/Tatsh/hwview/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/Tatsh/hwview/releases/tag/v0.0.1

@@ -11,10 +11,10 @@
     }
   ],
   "description": "Hardware information utility, inspired by Redmond.",
-  "documentation": "https://devmgmt.readthedocs.org",
-  "homepage": "https://tatsh.github.io/devmgmt/",
+  "documentation": "https://hwview.readthedocs.org",
+  "homepage": "https://tatsh.github.io/hwview/",
   "license": "MIT",
   "maintainers": ["Andrew Udvare <audvare@gmail.com>"],
-  "name": "devmgmt",
+  "name": "hwview",
   "version": "0.0.1"
 }

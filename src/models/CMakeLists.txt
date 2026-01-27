@@ -1,5 +1,5 @@
 add_library(
-  devmgmt_models STATIC
+  hwview_models STATIC
   basetreemodel.cpp
   devbyconnmodel.cpp
   devbydrivermodel.cpp
@@ -10,5 +10,5 @@ add_library(
   resbyconnmodel.cpp
   resbytypemodel.cpp)
 
-target_include_directories(devmgmt_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(devmgmt_models PUBLIC devmgmt_common Qt6::Widgets)
+target_include_directories(hwview_models PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(hwview_models PUBLIC hwview_common Qt6::Widgets)

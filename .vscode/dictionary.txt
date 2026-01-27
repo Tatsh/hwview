@@ -91,8 +91,12 @@ hwdata
 hwdb
 hwmon
 hwrng
+hwview
+hwviewrc
+hwviewui
 hynix
 importeddeviceinfo
+instdir
 interprocedural
 ioahci
 iocd
@@ -195,6 +199,7 @@ setupapideviceinfo
 setupapimanager
 setupapimonitor
 sgnr
+shctx
 shellformat
 shpchp
 silentinstall

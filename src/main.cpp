@@ -2,21 +2,21 @@
 #include <QtCore/QTextStream>
 #include <QtNetwork/QHostInfo>
 
-#ifndef DEVMGMT_HEADLESS
+#ifndef HWVIEW_HEADLESS
 #include <QtCore/QSize>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
 #include <KAboutData>
 #include <KLocalizedString>
-#endif // DEVMGMT_USE_KDE
-#endif // DEVMGMT_HEADLESS
+#endif // HWVIEW_USE_KDE
+#endif // HWVIEW_HEADLESS
 
 #include "deviceexport.h"
 #include "deviceinfo.h"
-#ifndef DEVMGMT_HEADLESS
+#ifndef HWVIEW_HEADLESS
 #include "mainwindow.h"
-#endif // DEVMGMT_HEADLESS
+#endif // HWVIEW_HEADLESS
 #include "systeminfo.h"
 
 namespace {
@@ -26,7 +26,7 @@ namespace {
  */
 void setAppMetadata() {
     QCoreApplication::setOrganizationName(QStringLiteral("Tatsh"));
-    QCoreApplication::setApplicationName(QStringLiteral("Device Manager"));
+    QCoreApplication::setApplicationName(QStringLiteral("Hardware Viewer"));
     QCoreApplication::setApplicationVersion(QStringLiteral("0.0.1"));
 }
 
@@ -36,7 +36,7 @@ void setAppMetadata() {
  */
 void setupParser(QCommandLineParser &parser) {
     parser.setApplicationDescription(
-        QCoreApplication::translate("main", "View and manage device hardware settings."));
+        QCoreApplication::translate("main", "View device information."));
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOption({{QStringLiteral("e"), QStringLiteral("export")},
@@ -73,7 +73,7 @@ int performExport(const QString &filePath) {
 int main(int argc, char *argv[]) {
     QCommandLineParser parser;
 
-#ifdef DEVMGMT_HEADLESS
+#ifdef HWVIEW_HEADLESS
     QCoreApplication app(argc, argv);
     setAppMetadata();
     setupParser(parser);
@@ -96,23 +96,23 @@ int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     setAppMetadata();
 
-#ifdef DEVMGMT_USE_KDE
-    KLocalizedString::setApplicationDomain(QByteArrayLiteral("devmgmt"));
-    KAboutData aboutData(QStringLiteral("devmgmt"),
-                         i18n("Device Manager"),
+#ifdef HWVIEW_USE_KDE
+    KLocalizedString::setApplicationDomain(QByteArrayLiteral("hwview"));
+    KAboutData aboutData(QStringLiteral("hwview"),
+                         i18n("Hardware Viewer"),
                          QStringLiteral("0.0.1"),
-                         i18n("View and manage device hardware settings and driver software."),
+                         i18n("View device information and driver software."),
                          KAboutLicense::MIT,
                          i18n("(c) 2024-2026 Tatsh"));
     aboutData.addAuthor(i18n("Tatsh"),
                         i18n("Developer"),
                         QStringLiteral("audvare@gmail.com"),
-                        QStringLiteral(DEVMGMT_WEBSITE_URL));
-    aboutData.setHomepage(QStringLiteral(DEVMGMT_WEBSITE_URL));
-    aboutData.setBugAddress(QByteArrayLiteral(DEVMGMT_WEBSITE_URL "/issues"));
+                        QStringLiteral(HWVIEW_WEBSITE_URL));
+    aboutData.setHomepage(QStringLiteral(HWVIEW_WEBSITE_URL));
+    aboutData.setBugAddress(QByteArrayLiteral(HWVIEW_WEBSITE_URL "/issues"));
     aboutData.setOrganizationDomain(QByteArrayLiteral("tat.sh"));
     KAboutData::setApplicationData(aboutData);
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
     setupParser(parser);
     parser.addPositionalArgument(QStringLiteral("file"),
@@ -155,5 +155,5 @@ int main(int argc, char *argv[]) {
     }
 
     return app.exec();
-#endif // DEVMGMT_HEADLESS
+#endif // HWVIEW_HEADLESS
 }

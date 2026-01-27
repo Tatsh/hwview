@@ -2,7 +2,7 @@
 
 #include <dbt.h>
 
-const wchar_t *SetupApiMonitor::kWindowClassName = L"DevMgmtDeviceNotifyWindow";
+const wchar_t *SetupApiMonitor::kWindowClassName = L"HwViewDeviceNotifyWindow";
 
 SetupApiMonitor::SetupApiMonitor(QObject *parent) : DeviceMonitor(parent) {
 }
@@ -33,7 +33,7 @@ std::expected<void, DeviceMonitorError> SetupApiMonitor::start() {
     // Create message-only window
     messageWindow_ = CreateWindowExW(0,
                                      kWindowClassName,
-                                     L"DevMgmt Device Monitor",
+                                     L"HwView Device Monitor",
                                      0,
                                      0,
                                      0,

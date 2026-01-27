@@ -964,20 +964,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"devmgmt@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "devmgmt@workspace:."
-  dependencies:
-    "@prettier/plugin-xml": "npm:^3.4.2"
-    cspell: "npm:^9.6.0"
-    markdownlint-cli2: "npm:^0.20.0"
-    prettier: "npm:^3.8.1"
-    prettier-plugin-ini: "npm:^1.3.0"
-    prettier-plugin-sort-json: "npm:^4.2.0"
-    prettier-plugin-toml: "npm:^2.0.6"
-  languageName: unknown
-  linkType: soft
-
 "entities@npm:^4.4.0":
   version: 4.5.0
   resolution: "entities@npm:4.5.0"
@@ -1111,6 +1097,20 @@ __metadata:
   checksum: 10c0/e4107be0579bcdd9642b8dff86aeafeaf62b2b9dd116669ab6e02e0e0c07ada0d972c2db182dee7588b460fe8c8919ddcc6b1cc4db405ca3a2adc9d35fa6eb21
   languageName: node
   linkType: hard
+
+"hwview@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "hwview@workspace:."
+  dependencies:
+    "@prettier/plugin-xml": "npm:^3.4.2"
+    cspell: "npm:^9.6.0"
+    markdownlint-cli2: "npm:^0.20.0"
+    prettier: "npm:^3.8.1"
+    prettier-plugin-ini: "npm:^1.3.0"
+    prettier-plugin-sort-json: "npm:^4.2.0"
+    prettier-plugin-toml: "npm:^2.0.6"
+  languageName: unknown
+  linkType: soft
 
 "ignore@npm:^7.0.5":
   version: 7.0.5

@@ -10,8 +10,8 @@
  * loaded in the following order, with later files overriding earlier ones at the key level:
  *
  * 1. Adjacent @c data/ directory (relative to executable, for development/portable use)
- * 2. System locations (@c /usr/share/devmgmt, etc.)
- * 3. User location (@c ~/.local/share/devmgmt, etc.)
+ * 2. System locations (@c /usr/share/hwview, etc.)
+ * 3. User location (@c ~/.local/share/hwview, etc.)
  *
  * Within each location, files are loaded in this order:
  * - Default file (@c name-mappings.json or @c name-mappings.en-US.json)
@@ -21,14 +21,14 @@
  * locale-specific files retain their values from the default file.
  *
  * System locations:
- * - Linux: @c /usr/share/devmgmt, @c /usr/local/share/devmgmt
- * - Windows: @c C:/ProgramData/devmgmt
- * - macOS: @c /Library/Application Support/devmgmt
+ * - Linux: @c /usr/share/hwview, @c /usr/local/share/hwview
+ * - Windows: @c C:/ProgramData/hwview
+ * - macOS: @c /Library/Application Support/hwview
  *
  * User locations:
- * - Linux: @c ~/.local/share/devmgmt
- * - Windows: @c C:/Users/{USER}/AppData/Local/devmgmt
- * - macOS: @c ~/Library/Application Support/devmgmt
+ * - Linux: @c ~/.local/share/hwview
+ * - Windows: @c C:/Users/{USER}/AppData/Local/hwview
+ * - macOS: @c ~/Library/Application Support/hwview
  *
  * The JSON file format is:
  * @code

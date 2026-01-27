@@ -1,10 +1,10 @@
 #pragma once
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
 #include <KXmlGuiWindow>
 #else
 #include <QtWidgets/QMainWindow>
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
 #include <QtCore/QFutureWatcher>
 #include <QtCore/QSet>
@@ -18,9 +18,9 @@ class QProgressDialog;
 QT_END_NAMESPACE
 
 /**
- * @brief The main application window for Device Manager.
+ * @brief The main application window for Hardware Viewer.
  *
- * This class provides the main user interface for viewing and managing devices. It supports
+ * This class provides the main user interface for viewing devices. It supports
  * multiple view modes (Devices by Type, Devices by Connection, etc.) and automatically refreshes
  * when devices are added or removed.
  *
@@ -34,11 +34,11 @@ QT_END_NAMESPACE
  * - Device properties dialog
  * - Hardware scan functionality
  */
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
 class MainWindow : public KXmlGuiWindow, private Ui::MainWindow {
 #else
 class MainWindow : public QMainWindow, private Ui::MainWindow {
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
     Q_OBJECT
 
 public:
@@ -89,10 +89,10 @@ private:
                              const QString &parentPath,
                              const QSet<QString> &expandedPaths);
 
-#ifdef DEVMGMT_USE_KDE
+#ifdef HWVIEW_USE_KDE
     void setupActions();
     void postSetupMenus();
-#endif // DEVMGMT_USE_KDE
+#endif // HWVIEW_USE_KDE
 
     QActionGroup *actionGroupView;
     QAction *currentViewAction = nullptr;

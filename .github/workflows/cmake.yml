@@ -21,24 +21,24 @@ jobs:
         uses: 'actions/upload-artifact@v6'
         with:
           if-no-files-found: error
-          name: devmgmt-${{ matrix.build-type }}-${{ matrix.os }}
+          name: hwview-${{ matrix.build-type }}-${{ matrix.os }}
           path: |
-            ${{github.workspace}}/devmgmt-*.zip
-            ${{github.workspace}}/devmgmt-*.dmg
+            ${{github.workspace}}/hwview-*.zip
+            ${{github.workspace}}/hwview-*.dmg
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
-            ${{github.workspace}}/devmgmt-*.zip
-            ${{github.workspace}}/devmgmt-*.dmg
+            ${{github.workspace}}/hwview-*.zip
+            ${{github.workspace}}/hwview-*.dmg
       - if: ${{ github.ref_type == 'tag' }}
         name: Upload package
         uses: softprops/action-gh-release@v2
         with:
           fail_on_unmatched_files: true
           files: |
-            ${{github.workspace}}/devmgmt-*.zip
-            ${{github.workspace}}/devmgmt-*.dmg
+            ${{github.workspace}}/hwview-*.zip
+            ${{github.workspace}}/hwview-*.dmg
     strategy:
       fail-fast: false
       matrix:
@@ -94,24 +94,24 @@ jobs:
         uses: 'actions/upload-artifact@v6'
         with:
           if-no-files-found: error
-          name: devmgmt-${{ matrix.build-type }}-${{ matrix.sys.name }}
+          name: hwview-${{ matrix.build-type }}-${{ matrix.sys.name }}
           path: |
-            ${{github.workspace}}/devmgmt-*.exe
-            ${{github.workspace}}/devmgmt-*.zip
+            ${{github.workspace}}/hwview-*.exe
+            ${{github.workspace}}/hwview-*.zip
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
-            ${{github.workspace}}/devmgmt-*.exe
-            ${{github.workspace}}/devmgmt-*.zip
+            ${{github.workspace}}/hwview-*.exe
+            ${{github.workspace}}/hwview-*.zip
       - if: ${{ github.ref_type == 'tag' && matrix.sys.name == 'ucrt64' }}
         name: Upload package
         uses: softprops/action-gh-release@v2
         with:
           fail_on_unmatched_files: true
           files: |
-            ${{github.workspace}}/devmgmt-*.exe
-            ${{github.workspace}}/devmgmt-*.zip
+            ${{github.workspace}}/hwview-*.exe
+            ${{github.workspace}}/hwview-*.zip
     strategy:
       fail-fast: false
       matrix:
@@ -155,31 +155,31 @@ jobs:
           chmod +x linuxdeploy-x86_64.AppImage
           ./linuxdeploy-x86_64.AppImage --appdir ${{github.workspace}}/build/AppDir --output appimage
           rm ./linuxdeploy-x86_64.AppImage
-          mv ${{github.workspace}}/*.AppImage ${{github.workspace}}/devmgmt-${{matrix.build-type}}-x86_64.AppImage
+          mv ${{github.workspace}}/*.AppImage ${{github.workspace}}/hwview-${{matrix.build-type}}-x86_64.AppImage
       - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
         name: Rename with tag
-        run: mv -v ${{github.workspace}}/devmgmt-*.AppImage ${{github.workspace}}/devmgmt-${{github.ref}}-x86_64.AppImage
+        run: mv -v ${{github.workspace}}/hwview-*.AppImage ${{github.workspace}}/hwview-${{github.ref}}-x86_64.AppImage
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v6'
         with:
           if-no-files-found: error
-          name: devmgmt-${{ matrix.build-type }}-Linux
+          name: hwview-${{ matrix.build-type }}-Linux
           path: |
-            ${{github.workspace}}/devmgmt-*.AppImage
-            ${{github.workspace}}/devmgmt-*.zip
+            ${{github.workspace}}/hwview-*.AppImage
+            ${{github.workspace}}/hwview-*.zip
       - name: Attest
         uses: actions/attest-build-provenance@v3
         with:
           subject-path: |
-            ${{github.workspace}}/devmgmt-*.AppImage
-            ${{github.workspace}}/devmgmt-*.zip
+            ${{github.workspace}}/hwview-*.AppImage
+            ${{github.workspace}}/hwview-*.zip
       - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
         name: Upload package
         uses: softprops/action-gh-release@v2
         with:
           fail_on_unmatched_files: true
           files: |
-            ${{github.workspace}}/build/devmgmt-*.AppImage
+            ${{github.workspace}}/build/hwview-*.AppImage
     strategy:
       fail-fast: false
       matrix:

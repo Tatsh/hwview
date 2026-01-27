@@ -1,6 +1,6 @@
 # Copilot Instructions
 
-Device Manager is a Qt-based system device information viewer, inspired by Device Manager
+Hardware Viewer is a Qt-based system device information viewer, inspired by Device Manager
 (`devmgmt.msc`) on Windows.
 
 ## General

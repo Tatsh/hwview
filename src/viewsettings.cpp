@@ -7,7 +7,7 @@ namespace {
 QSettings createSettings() {
     // Use platform-appropriate config location
     auto configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-    return QSettings(configPath + QStringLiteral("/devmgmtrc"), QSettings::IniFormat);
+    return QSettings(configPath + QStringLiteral("/hwviewrc"), QSettings::IniFormat);
 }
 } // namespace
 

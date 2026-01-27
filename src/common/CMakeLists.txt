@@ -1,8 +1,8 @@
-add_library(devmgmt_common STATIC namemappings.cpp importeddeviceinfo.cpp)
+add_library(hwview_common STATIC namemappings.cpp importeddeviceinfo.cpp)
 
 target_include_directories(
-  devmgmt_common
+  hwview_common
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-target_link_libraries(devmgmt_common PUBLIC Qt6::Core)
+target_link_libraries(hwview_common PUBLIC Qt6::Core)

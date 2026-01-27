@@ -1,6 +1,6 @@
-# How to contribute to devmgmt
+# How to contribute to hwview
 
-Thank you for your interest in contributing to devmgmt! Please follow these guidelines to help
+Thank you for your interest in contributing to hwview! Please follow these guidelines to help
 maintain code quality and consistency.
 
 ## General Guidelines
