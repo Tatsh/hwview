@@ -46,6 +46,12 @@ Save device information for later viewing or sharing.
 
 Command-line export without GUI (build-time option).
 
+## Gallery
+
+![Screenshot](https://raw.githubusercontent.com/Tatsh/hwview/master/screenshot1.png)
+
+![Screenshot](https://raw.githubusercontent.com/Tatsh/hwview/master/screenshot2.png)
+
 ## Installation
 
 Not yet written.
