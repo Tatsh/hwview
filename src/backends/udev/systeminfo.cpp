@@ -1249,17 +1249,17 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
 
     info.isBuiltin = filename == QStringLiteral("(builtin)");
     info.hasDriverFiles = !filename.isEmpty() && !info.isBuiltin;
-
-    auto isOutOfTree =
+    info.isOutOfTree =
         !filename.isEmpty() && !info.isBuiltin && !filename.contains(QStringLiteral("/kernel/"));
 
     if (driver == QStringLiteral("nvidia") || driver.startsWith(QStringLiteral("nvidia_"))) {
         info.provider = QStringLiteral("NVIDIA Corporation");
+        info.isOutOfTree = true;
         if (!version.isEmpty()) {
             info.version = version;
         }
         info.signer = QStringLiteral("NVIDIA Corporation");
-    } else if (isOutOfTree) {
+    } else if (info.isOutOfTree) {
         if (!author.isEmpty()) {
             info.provider = author;
         }

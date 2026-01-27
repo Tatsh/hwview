@@ -47,6 +47,7 @@ private Q_SLOTS:
     void onEventSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void onDriverDetailsClicked();
     void onDisableDeviceClicked();
+    void onUpdateDriverClicked();
     void onViewAllEventsClicked();
     void onCopyDevicePath();
     void onEventsLoaded();
@@ -71,4 +72,5 @@ private:
     QFutureWatcher<BasicDriverInfo> *driverInfoWatcher_ = nullptr;
     QFutureWatcher<QList<ResourceInfo>> *resourcesWatcher_ = nullptr;
     QList<PropertyMapping> propertyMappings_;
+    QString vendorSupportUrl_;
 };

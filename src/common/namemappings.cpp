@@ -31,6 +31,7 @@ void NameMappings::reload() {
     hidBusType_.clear();
     softwareDevice_.clear();
     acpiDevice_.clear();
+    vendorUrls_.clear();
 
     auto locale = systemLocale();
 
@@ -98,6 +99,26 @@ void NameMappings::loadFromDirectory(const QString &dirPath, const QString &loca
             dirPath + QStringLiteral("/name-mappings.") + locale + QStringLiteral(".json");
         if (QFile::exists(localePath)) {
             loadFromFile(localePath);
+        }
+    }
+
+    // Load vendors.json (not locale-specific)
+    auto vendorsPath = dirPath + QStringLiteral("/vendors.json");
+    if (QFile::exists(vendorsPath)) {
+        QFile file(vendorsPath);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QJsonParseError error;
+            auto doc = QJsonDocument::fromJson(file.readAll(), &error);
+            file.close();
+
+            if (error.error == QJsonParseError::NoError && doc.isObject()) {
+                auto root = doc.object();
+                for (auto it = root.begin(); it != root.end(); ++it) {
+                    if (it.value().isString()) {
+                        vendorUrls_.insert(it.key(), it.value().toString());
+                    }
+                }
+            }
         }
     }
 }
@@ -203,4 +224,8 @@ QString NameMappings::acpiDeviceDisplayName(const QString &pnpId) const {
     // Normalize to uppercase for lookup
     auto normalizedId = pnpId.toUpper();
     return acpiDevice_.value(normalizedId);
+}
+
+QString NameMappings::vendorSupportUrl(const QString &vendorName) const {
+    return vendorUrls_.value(vendorName);
 }

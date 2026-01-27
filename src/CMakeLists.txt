@@ -87,7 +87,7 @@ qt_deploy_runtime_dependencies(
         FILES icons/hwview.icns
         DESTINATION "${BUNDLE_INSTALL_PREFIX}/$<TARGET_FILE_NAME:hwview>.app/Contents/Resources")
       install(
-        FILES ../data/name-mappings.json
+        FILES ../data/name-mappings.json ../data/vendors.json
         DESTINATION "${BUNDLE_INSTALL_PREFIX}/$<TARGET_FILE_NAME:hwview>.app/Contents/Resources")
       if(NOT NON_PORTABLE_MACOS_BUNDLE)
         install(
@@ -165,5 +165,6 @@ endif()
 # Data files for FHS builds only (macOS bundles install to Resources folder above)
 if(FHS)
   install(FILES ${CMAKE_SOURCE_DIR}/data/name-mappings.json
+                ${CMAKE_SOURCE_DIR}/data/vendors.json
           DESTINATION ${CMAKE_INSTALL_DATADIR}/hwview)
 endif()

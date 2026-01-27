@@ -88,6 +88,13 @@ public:
     QString acpiDeviceDisplayName(const QString &pnpId) const;
 
     /**
+     * @brief Returns the support URL for a vendor.
+     * @param vendorName The vendor name (e.g., "NVIDIA Corporation").
+     * @returns The support URL, or empty string if not found.
+     */
+    QString vendorSupportUrl(const QString &vendorName) const;
+
+    /**
      * @brief Reloads all mappings from JSON files.
      *
      * Clears existing mappings and reloads from system and user locations, respecting locale.
@@ -109,6 +116,7 @@ private:
     QHash<int, QString> hidBusType_;
     QHash<QString, QString> softwareDevice_;
     QHash<QString, QString> acpiDevice_;
+    QHash<QString, QString> vendorUrls_;
 
     static constexpr const char *kDefaultLocale = "en-US";
 };

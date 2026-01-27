@@ -7,6 +7,7 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QUrl>
 #include <QtGui/QClipboard>
+#include <QtGui/QDesktopServices>
 #include <QtGui/QFontDatabase>
 #include <QtGui/QShortcut>
 #include <QtWidgets/QApplication>
@@ -23,6 +24,7 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 
+#include "common/namemappings.h"
 #include "devicecache.h"
 #include "driverdetailsdialog.h"
 #include "propertiesdialog.h"
@@ -78,6 +80,10 @@ PropertiesDialog::PropertiesDialog(QWidget *parent)
             &QPushButton::clicked,
             this,
             &PropertiesDialog::onDisableDeviceClicked);
+
+    // Connect update driver button
+    connect(
+        buttonUpdateDriver, &QPushButton::clicked, this, &PropertiesDialog::onUpdateDriverClicked);
 
     // Connect view all events button
     connect(buttonViewAllEvents,
@@ -282,6 +288,13 @@ void PropertiesDialog::onDriverInfoLoaded() {
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
     buttonDisableDevice->setEnabled(info.hasDriverFiles && !info.isBuiltin);
 #endif
+
+    // Enable update driver button for out-of-tree drivers with known vendor URLs
+    vendorSupportUrl_.clear();
+    if (info.isOutOfTree && !info.provider.isEmpty()) {
+        vendorSupportUrl_ = NameMappings::instance().vendorSupportUrl(info.provider);
+        buttonUpdateDriver->setEnabled(!vendorSupportUrl_.isEmpty());
+    }
 }
 
 QString PropertiesDialog::getDeviceCategory() {
@@ -550,6 +563,14 @@ void PropertiesDialog::onDisableDeviceClicked() {
     layout->addLayout(buttonLayout);
 
     dialog.exec();
+}
+
+void PropertiesDialog::onUpdateDriverClicked() {
+    if (vendorSupportUrl_.isEmpty()) {
+        return;
+    }
+
+    QDesktopServices::openUrl(QUrl(vendorSupportUrl_));
 }
 
 void PropertiesDialog::onViewAllEventsClicked() {
