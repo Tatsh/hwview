@@ -98,7 +98,7 @@ qt_deploy_runtime_dependencies(
       install(FILES ../LICENSE.txt ../README.md ../CHANGELOG.md ../SECURITY.md TYPE DOC)
       install(FILES ../CITATION.cff DESTINATION ${CMAKE_INSTALL_DATADIR}/hwview)
       if(MINGW)
-        get_filename_component(_mingw_bin_dir ${CMAKE_C_COMPILER} DIRECTORY)
+        get_filename_component(_mingw_bin_dir ${CMAKE_CXX_COMPILER} DIRECTORY)
         install(
           RUNTIME_DEPENDENCY_SET hwview-deps
           PRE_EXCLUDE_REGEXES
