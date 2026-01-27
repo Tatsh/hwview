@@ -1,6 +1,8 @@
 acpixxxx
 addaction
 apic
+appdir
+appimage
 armpe
 atkbd
 audioendpoint
@@ -29,10 +31,12 @@ commitizen
 configret
 corefoundation
 coveragerc
+cpack
 ctad
 customizedialog
 dbcc
 dbuild
+dcmake
 designware
 destinationlabel
 devbyconnmodel
@@ -47,6 +51,7 @@ devmgmt
 devmgmtrc
 devmgmtui
 devtyp
+dfhs
 dialog
 digcf
 diskarbitration
@@ -88,6 +93,7 @@ hwmon
 hwrng
 hynix
 importeddeviceinfo
+interprocedural
 ioahci
 iocd
 iodma
@@ -106,6 +112,7 @@ iwlwifi
 iwyu
 jsonnet
 jsonschema
+jurplel
 kioxia
 kpartgui
 kxmlguidir
@@ -113,6 +120,7 @@ lexar
 libc
 libjsonnet
 libudev
+linuxdeploy
 liteon
 lnxcpu
 lnxpower
@@ -128,10 +136,12 @@ mcelog
 mdio
 metadot
 mmconfig
+msystem
 mwevent
 namemappings
 nnection
 nrvo
+nsis
 ntdll
 ntstatus
 ntsync
@@ -143,6 +153,7 @@ optiarc
 osversioninfoexw
 osversioninfow
 osvi
+pacboy
 pcieport
 pcwsz
 phison
@@ -164,6 +175,7 @@ qstrcmp
 qstringbuilder
 qstrlen
 qtbase
+qtmultimedia
 qulonglong
 razer
 realtek
@@ -188,6 +200,7 @@ shpchp
 silentinstall
 sizepolicy
 smbus
+softprops
 sourcelabel
 spcc
 spdrp
@@ -202,6 +215,7 @@ tcorp
 teac
 touchpads
 tpmrm
+ucrt
 udevdeviceinfo
 udevenumerate
 udevmanager
