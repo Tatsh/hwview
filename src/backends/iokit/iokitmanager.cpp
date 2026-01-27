@@ -1,5 +1,7 @@
 #include "iokitmanager.h"
 
+#include <array>
+
 #include <IOKit/IOBSD.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <IOKit/storage/IOMedia.h>
@@ -142,16 +144,16 @@ QString IOKitManager::getBSDName(io_service_t service) {
 
 QString IOKitManager::getProductName(io_service_t service) {
     // Try multiple property keys that might contain the product name
-    static const CFStringRef productKeys[] = {
+    static const std::array productKeys = {
         CFSTR("Product Name"),
         CFSTR("USB Product Name"),
-        CFSTR(kIOHIDProductKey),
+        CFSTR("Product"), // kIOHIDProductKey
         CFSTR("Model"),
         CFSTR("device_type"),
         CFSTR("IOName"),
     };
 
-    for (auto key : productKeys) {
+    for (const auto &key : productKeys) {
         auto name = getStringProperty(service, key);
         if (!name.isEmpty()) {
             return name;
@@ -169,14 +171,13 @@ QString IOKitManager::getProductName(io_service_t service) {
 }
 
 QString IOKitManager::getVendorName(io_service_t service) {
-    static const CFStringRef vendorKeys[] = {
+    static const std::array vendorKeys = {
         CFSTR("USB Vendor Name"),
-        CFSTR(kIOHIDManufacturerKey),
-        CFSTR("Manufacturer"),
+        CFSTR("Manufacturer"), // kIOHIDManufacturerKey
         CFSTR("vendor-id"),
     };
 
-    for (auto key : vendorKeys) {
+    for (const auto &key : vendorKeys) {
         auto vendor = getStringProperty(service, key);
         if (!vendor.isEmpty()) {
             return vendor;

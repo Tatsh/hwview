@@ -13,7 +13,7 @@ std::expected<void, DeviceMonitorError> IOKitMonitor::start() {
     }
 
     // Create notification port
-    notificationPort_ = IONotificationPortCreate(kIOMasterPortDefault);
+    notificationPort_ = IONotificationPortCreate(kIOMainPortDefault);
     if (!notificationPort_) {
         return std::unexpected(DeviceMonitorError::NotificationPortFailed);
     }

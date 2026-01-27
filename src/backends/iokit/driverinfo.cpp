@@ -9,9 +9,9 @@
 namespace {
 
 QString readBundleIdentifier(const QString &kextPath) {
-    auto plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
+    auto plistPath = QString(kextPath + QStringLiteral("/Contents/Info.plist"));
     if (!QFile::exists(plistPath)) {
-        plistPath = kextPath + QStringLiteral("/Info.plist");
+        plistPath = QString(kextPath + QStringLiteral("/Info.plist"));
     }
     if (QFile::exists(plistPath)) {
         QSettings plist(plistPath, QSettings::NativeFormat);
@@ -92,9 +92,9 @@ DriverInfo getDriverInfo(const QString &kextPath) {
     info.filename = kextPath;
 
     // Read Info.plist from the kext bundle
-    auto plistPath = kextPath + QStringLiteral("/Contents/Info.plist");
+    auto plistPath = QString(kextPath + QStringLiteral("/Contents/Info.plist"));
     if (!QFile::exists(plistPath)) {
-        plistPath = kextPath + QStringLiteral("/Info.plist");
+        plistPath = QString(kextPath + QStringLiteral("/Info.plist"));
     }
 
     if (QFile::exists(plistPath)) {

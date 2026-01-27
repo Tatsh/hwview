@@ -524,7 +524,7 @@ QList<ResourceInfo> getDeviceResources(const QString &syspath, const QString &dr
     }
 
     // Extract memory ranges from IODeviceMemory or reg property
-    QRegularExpression memoryRe(QStringLiteral(R"("(?:IODeviceMemory|reg)"\s*=\s*\(([^)]+)\))"));
+    QRegularExpression memoryRe(QStringLiteral("\"(?:IODeviceMemory|reg)\"\\s*=\\s*\\(([^)]+)\\)"));
     auto memoryMatch = memoryRe.match(output);
     if (memoryMatch.hasMatch()) {
         auto memData = memoryMatch.captured(1);
