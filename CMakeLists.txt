@@ -13,7 +13,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Configurable website URL
 set(HWVIEW_WEBSITE_URL "https://github.com/Tatsh/hwview" CACHE STRING "Project website URL")
-set(DISPLAY_NAME "Hardware View" CACHE STRING "Display name for the application")
+set(DISPLAY_NAME "Hardware Viewer" CACHE STRING "Display name for the application")
 
 option(HWVIEW_CLI_ONLY "Build CLI-only version without GUI." OFF)
 option(HWVIEW_CXX_WARN_ERROR_ALL "Do not use." OFF)
