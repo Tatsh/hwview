@@ -6,7 +6,9 @@ appimage
 armpe
 atkbd
 audioendpoint
+autobuild
 autofs
+autoinstall
 automoc
 automount
 autorcc
@@ -33,6 +35,7 @@ configret
 corefoundation
 coveragerc
 cpack
+cppreference
 ctad
 customizedialog
 datarootdir
@@ -75,6 +78,7 @@ foxundermoon
 friendlyname
 gmock
 goodix
+graphviz
 grayed
 gwlp
 hardwareid
@@ -138,10 +142,12 @@ lnxtherm
 lpfn
 lpss
 lpsz
+mainpage
 mainwindow
 mandir
 matshita
 mcelog
+mdfile
 mdio
 metadot
 metainfo
@@ -186,7 +192,10 @@ qstrcmp
 qstringbuilder
 qstrlen
 qtbase
+qtcore
+qtgui
 qtmultimedia
+qtwidgets
 qulonglong
 razer
 realtek
@@ -222,6 +231,8 @@ strequal
 synaptics
 sysfs
 systeminfo
+tagfile
+tagfiles
 tatsh
 tcorp
 teac

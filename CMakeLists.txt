@@ -15,8 +15,30 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(HWVIEW_WEBSITE_URL "https://github.com/Tatsh/hwview" CACHE STRING "Project website URL")
 set(DISPLAY_NAME "Hardware Viewer" CACHE STRING "Display name for the application")
 
+option(BUILD_DOCS "Build documentation." OFF)
+option(BUILD_DOCS_ONLY "Build documentation only." OFF)
+
+if(BUILD_DOCS OR BUILD_DOCS_ONLY)
+  set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_BINARY_DIR}/html/hwview.tags")
+  set(DOXYGEN_INTERACTIVE_SVG YES)
+  set(DOXYGEN_MARKDOWN_ID_STYLE GITHUB)
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md")
+  set(DOXYGEN_TAGFILES
+      ./.docs/cppreference-doxygen-web.tag.xml=https://en.cppreference.com/w/
+      ./.docs/qtcore.tags=http://doc.qt.io/qt-6/
+      ./.docs/qtgui.tags=http://doc.qt.io/qt-6/
+      ./.docs/qtwidgets.tags=http://doc.qt.io/qt-6/)
+  find_package(Doxygen REQUIRED COMPONENTS dot)
+  doxygen_add_docs(docs README.md src ALL)
+endif()
+
+if(BUILD_DOCS_ONLY)
+  return()
+endif()
+
 option(HWVIEW_CLI_ONLY "Build CLI-only version without GUI." OFF)
 option(HWVIEW_CXX_WARN_ERROR_ALL "Do not use." OFF)
+mark_as_advanced(HWVIEW_CXX_WARN_ERROR_ALL)
 option(HWVIEW_USE_KDE "Build with KDE Frameworks integration." OFF)
 
 # Installation options (FHS is always ON for Linux).
@@ -42,6 +64,7 @@ else()
   find_package(Qt6Network CONFIG REQUIRED)
   find_package(Qt6Widgets CONFIG REQUIRED)
 endif()
+qt_standard_project_setup()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   pkg_check_modules(UDEV libudev REQUIRED IMPORTED_TARGET)
