@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+/** @file */
 #pragma once
 
 #ifdef HWVIEW_USE_KDE

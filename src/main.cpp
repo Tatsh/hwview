@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QTextStream>
 #include <QtNetwork/QHostInfo>

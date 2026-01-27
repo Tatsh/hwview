@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -5,6 +6,7 @@
 #include <QtCore/QMutexLocker>
 #include <QtNetwork/QHostInfo>
 
+// SPDX-License-Identifier: MIT
 #include "devicecache.h"
 #include "devicemonitor.h"
 #include "systeminfo.h"

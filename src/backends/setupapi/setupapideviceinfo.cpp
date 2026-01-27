@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QDebug>
 
 #include "devclass_guids.h"

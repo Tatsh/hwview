@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <utility>
 
 #include "common/importeddeviceinfo.h"

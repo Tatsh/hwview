@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "models/basetreemodel.h"
 
 BaseTreeModel::BaseTreeModel(QObject *parent) : QAbstractItemModel(parent) {

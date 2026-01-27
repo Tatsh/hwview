@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "udevenumerate.h"
 #include "udevmanager.h"
 

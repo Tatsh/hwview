@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "models/resbytypemodel.h"
 #include "const_strings.h"
 #include "devicecache.h"

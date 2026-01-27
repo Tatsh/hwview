@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <sys/mount.h>
 #include <sys/utsname.h>
 #include <unistd.h>

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "setupapimanager.h"
 
 #include <devpkey.h>

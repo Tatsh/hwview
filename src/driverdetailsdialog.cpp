@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtConcurrent/QtConcurrent>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
@@ -5,6 +6,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QVBoxLayout>
 
+// SPDX-License-Identifier: MIT
 #include "driverdetailsdialog.h"
 #include "driverinfo.h"
 #include "systeminfo.h"

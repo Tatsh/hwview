@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QFile>

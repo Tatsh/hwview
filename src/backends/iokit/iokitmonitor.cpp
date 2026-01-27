@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "iokitmonitor.h"
 
 IOKitMonitor::IOKitMonitor(QObject *parent) : DeviceMonitor(parent) {

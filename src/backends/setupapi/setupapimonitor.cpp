@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include "setupapimonitor.h"
 
 #include <dbt.h>

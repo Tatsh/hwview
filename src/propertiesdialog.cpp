@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
 #include <QtCore/QFile>
@@ -22,6 +23,7 @@
 
 #include "devicecache.h"
 #include "driverdetailsdialog.h"
+// SPDX-License-Identifier: MIT
 #include "propertiesdialog.h"
 #include "systeminfo.h"
 

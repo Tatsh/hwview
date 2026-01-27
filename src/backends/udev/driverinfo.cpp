@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QProcess>
 #include <QtCore/QRegularExpression>
 

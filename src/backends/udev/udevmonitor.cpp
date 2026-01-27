@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QSocketNotifier>
 
 #include "udevmonitor.h"

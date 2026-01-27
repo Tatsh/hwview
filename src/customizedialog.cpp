@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: MIT
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QVBoxLayout>
 
+// SPDX-License-Identifier: MIT
 #include "customizedialog.h"
 
 CustomizeDialog::CustomizeDialog(QWidget *parent) : QDialog(parent) {

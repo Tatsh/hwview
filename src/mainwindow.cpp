@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QUrl>

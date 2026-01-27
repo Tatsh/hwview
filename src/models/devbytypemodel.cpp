@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 #include <QtCore/QRegularExpression>
 
 #include "const_strings.h"
