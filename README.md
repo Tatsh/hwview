@@ -52,6 +52,21 @@ Command-line export without GUI (build-time option).
 
 ![Screenshot](https://raw.githubusercontent.com/Tatsh/hwview/master/screenshot2.png)
 
-## Installation
+## Building
 
-Not yet written.
+Required dependencies:
+
+- CMake at build time
+- [ECM](https://invent.kde.org/frameworks/extra-cmake-modules) at build time
+- Qt 6.7 or later with Concurrency, Network, and Widgets components
+
+In the cloned project:
+
+```shell
+mkdir build
+cmake ..
+make
+```
+
+On MacPorts, set the `CMAKE_PREFIX_PATH` variable to
+`/opt/local/libexec/ffmpeg7;/opt/local/libexec/qt6`.

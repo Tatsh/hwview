@@ -130,6 +130,7 @@ kxmlguidir
 launchable
 lexar
 libc
+libexec
 libjsonnet
 libudev
 linuxdeploy
