@@ -19,14 +19,14 @@ and system resources on Linux, macOS, and Windows.
 
 ### Multiple views
 
-- *Devices by type* — categorised view with ability to show drivers in use.
-- *Devices by connection* — hierarchical view showing the device tree.
-- *Devices by driver* — devices grouped by their kernel driver.
-- *Drivers by type* — drivers organised by device category.
-- *Drivers by device* — drivers with their associated devices.
-- *Resources by type* — flat view of system resources (IRQs, I/O ports, memory ranges, DMA
+- _Devices by type_ — categorised view with ability to show drivers in use.
+- _Devices by connection_ — hierarchical view showing the device tree.
+- _Devices by driver_ — devices grouped by their kernel driver.
+- _Drivers by type_ — drivers organised by device category.
+- _Drivers by device_ — drivers with their associated devices.
+- _Resources by type_ — flat view of system resources (IRQs, I/O ports, memory ranges, DMA
   channels).
-- *Resources by connection* — resources shown in hierarchy.
+- _Resources by connection_ — resources shown in hierarchy.
 
 ### Device properties
 
