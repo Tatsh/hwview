@@ -570,7 +570,7 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
         return info;
     }
 
-    auto driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
+    QString driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
     HKEY hKey;
     std::wstring keyPath = driverKeyPath.toStdWString();
 
@@ -727,9 +727,9 @@ ExportDriverInfo getExportDriverInfo(const DeviceInfo &info) {
     driverInfo.name = driver;
 
     // Windows driver info from registry
-    auto driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
+    QString driverKeyPath = QStringLiteral(R"(SYSTEM\CurrentControlSet\Control\Class\)") + driver;
     HKEY hKey;
-    auto keyPath = driverKeyPath.toStdWString();
+    std::wstring keyPath = driverKeyPath.toStdWString();
 
     if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, keyPath.c_str(), 0, KEY_READ, &hKey) == ERROR_SUCCESS) {
         wchar_t value[256];

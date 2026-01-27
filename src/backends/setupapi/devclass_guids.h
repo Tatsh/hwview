@@ -1,13 +1,48 @@
 #pragma once
 
-#include <devguid.h>
-#include <initguid.h>
 #include <windows.h>
+
+#include <initguid.h>
+
+#include <devguid.h>
 
 #include "deviceinfo.h"
 
 // Device class GUID to DeviceCategory mapping
 // These GUIDs are defined in devguid.h from the Windows SDK
+
+// Fallback definitions for GUIDs not available in older SDKs (e.g., MSYS2/MinGW)
+#ifndef GUID_DEVCLASS_AUDIOENDPOINT
+// {c166523c-fe0c-4a94-a586-f1a80cfbbf3e}
+DEFINE_GUID(GUID_DEVCLASS_AUDIOENDPOINT,
+            0xc166523c,
+            0xfe0c,
+            0x4a94,
+            0xa5,
+            0x86,
+            0xf1,
+            0xa8,
+            0x0c,
+            0xfb,
+            0xbf,
+            0x3e);
+#endif
+
+#ifndef GUID_DEVCLASS_SOFTWAREDEVICE
+// {62f9c741-b25a-46ce-b54c-9bccce08b6f2}
+DEFINE_GUID(GUID_DEVCLASS_SOFTWAREDEVICE,
+            0x62f9c741,
+            0xb25a,
+            0x46ce,
+            0xb5,
+            0x4c,
+            0x9b,
+            0xcc,
+            0xce,
+            0x08,
+            0xb6,
+            0xf2);
+#endif
 
 namespace setupapi {
 

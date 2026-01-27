@@ -170,7 +170,7 @@ DriverInfo getDriverInfo(const QString &driverPath) {
     fileInfo.cbStruct = sizeof(WINTRUST_FILE_INFO);
     fileInfo.pcwszFilePath = wpath.c_str();
 
-    auto policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
+    GUID policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
 
     WINTRUST_DATA trustData;
     memset(&trustData, 0, sizeof(trustData));
