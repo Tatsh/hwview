@@ -5,7 +5,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes system resources by type.
+ * @brief Tree model that organises system resources by type.
  *
  * This model displays system resources (IRQs, I/O ports, DMA channels,
  * memory ranges) grouped by their type. Each resource type is a category

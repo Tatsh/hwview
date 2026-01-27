@@ -5,7 +5,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes devices by their driver.
+ * @brief Tree model that organises devices by their driver.
  *
  * This model displays devices grouped under their kernel driver names.
  * Devices using the same driver are shown together under a driver node.

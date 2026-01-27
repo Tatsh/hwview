@@ -48,7 +48,7 @@ protected:
     /**
      * @brief Returns whether icons should be displayed.
      *
-     * Subclasses can override this to control icon display behavior. Default returns @c true.
+     * Subclasses can override this to control icon display behaviour. Default returns @c true.
      *
      * @returns @c true if icons should be shown, @c false otherwise.
      */

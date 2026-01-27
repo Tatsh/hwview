@@ -7,7 +7,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes system resources by connection hierarchy.
+ * @brief Tree model that organises system resources by connection hierarchy.
  *
  * This model displays system resources (IRQs, I/O ports, DMA channels,
  * memory ranges) in a hierarchical structure that reflects how they are

@@ -120,7 +120,7 @@ DriverInfo getDriverInfo(const QString &kextPath) {
         } else if (bundleId.startsWith(QStringLiteral("com.intel."))) {
             info.author = QStringLiteral("Intel Corporation");
         } else {
-            // Extract organization from bundle ID (second component)
+            // Extract organisation from bundle ID (second component)
             auto parts = bundleId.split(QLatin1Char('.'));
             if (parts.size() >= 2) {
                 auto org = parts[1];

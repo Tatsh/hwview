@@ -10,7 +10,7 @@ class QDialogButtonBox;
 QT_END_NAMESPACE
 
 /**
- * @brief Dialog for customizing view settings.
+ * @brief Dialog for customising view settings.
  *
  * This dialog allows users to configure display options such as
  * whether to show device icons, expand all nodes on load, and

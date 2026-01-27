@@ -6,10 +6,10 @@
 #include <QtCore/QString>
 
 /**
- * @brief Singleton class that holds view customization settings.
+ * @brief Singleton class that holds view customisation settings.
  *
  * This class manages persistent settings for the device tree view,
- * including icon display, expansion behavior, column visibility,
+ * including icon display, expansion behaviour, column visibility,
  * and hidden device visibility.
  *
  * Settings are automatically loaded on first access and can be

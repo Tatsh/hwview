@@ -22,7 +22,7 @@ DriverSearchResult findDriverFiles(const QString &driverName) {
 
     auto imagePath = reg.value(QStringLiteral("ImagePath")).toString();
     if (!imagePath.isEmpty()) {
-        // Expand environment variables and normalize path
+        // Expand environment variables and normalise path
         if (imagePath.startsWith(QStringLiteral(R"(\SystemRoot\)"))) {
             imagePath.replace(QStringLiteral(R"(\SystemRoot\)"),
                               QDir::toNativeSeparators(QDir::rootPath()) +

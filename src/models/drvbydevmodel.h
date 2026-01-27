@@ -5,7 +5,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes drivers by the devices they support.
+ * @brief Tree model that organises drivers by the devices they support.
  *
  * This model displays drivers as parent nodes with their supported
  * devices as children. This shows the one-to-many relationship between

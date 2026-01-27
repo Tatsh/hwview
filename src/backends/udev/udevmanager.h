@@ -22,7 +22,7 @@
 class UdevManager {
 public:
     /**
-     * @brief Constructs a @c UdevManager and initializes the @c udev context.
+     * @brief Constructs a @c UdevManager and initialises the @c udev context.
      */
     UdevManager();
 

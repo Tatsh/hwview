@@ -5,7 +5,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes drivers by device category/type.
+ * @brief Tree model that organises drivers by device category/type.
  *
  * This model displays drivers grouped under category nodes based on
  * the type of devices they support. Each category contains the drivers

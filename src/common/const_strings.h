@@ -237,7 +237,7 @@ inline QString acpiDeviceDisplayName(const QString &devPath, const QString &fall
         return displayName;
     }
 
-    // Fallback: capitalize simple names like "battery" -> "Battery"
+    // Fallback: capitalise simple names like "battery" -> "Battery"
     if (!fallbackName.isEmpty()) {
         auto result = fallbackName;
         result[0] = result[0].toUpper();

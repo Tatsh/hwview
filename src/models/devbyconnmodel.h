@@ -9,7 +9,7 @@
 class DeviceInfo;
 
 /**
- * @brief Tree model that organizes devices by their physical connection hierarchy.
+ * @brief Tree model that organises devices by their physical connection hierarchy.
  *
  * This model displays devices in a tree structure that reflects the actual
  * hardware connection topology. Devices are shown as children of their

@@ -47,7 +47,7 @@ public:
     /**
      * @brief Constructs the main window.
      *
-     * Initializes the UI, sets up menus and actions, restores the last view, and connects to the
+     * Initialises the UI, sets up menus and actions, restores the last view, and connects to the
      * device monitor for automatic updates.
      */
     MainWindow();

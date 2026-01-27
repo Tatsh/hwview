@@ -48,7 +48,7 @@ constexpr char SUBSYSTEM[] = "SUBSYSTEM";                             ///< Subsy
 } // namespace propertyNames
 
 /**
- * @brief udev property value constants organized by property type.
+ * @brief udev property value constants organised by property type.
  */
 namespace propertyValues {
 

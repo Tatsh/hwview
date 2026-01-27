@@ -224,7 +224,7 @@ void DevicesByTypeModel::buildTree() {
         }
     }
 
-    // Finalize categories - only add non-empty ones
+    // Finalise categories - only add non-empty ones
     finalizeCategory(audioInputsAndOutputsItem);
     finalizeCategory(batteriesItem);
     finalizeCategory(computerItem);

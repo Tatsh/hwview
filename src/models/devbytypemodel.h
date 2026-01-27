@@ -5,7 +5,7 @@
 #include "basetreemodel.h"
 
 /**
- * @brief Tree model that organizes devices by their category/type.
+ * @brief Tree model that organises devices by their category/type.
  *
  * This model displays devices grouped under category nodes such as
  * "Disk Drives", "Network Adapters", "USB Controllers", etc.

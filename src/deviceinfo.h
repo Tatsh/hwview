@@ -13,7 +13,7 @@ class DeviceInfoPrivate;
 /**
  * @brief Pre-computed device category for fast classification.
  *
- * Devices are categorized at construction time to avoid repeated classification logic during
+ * Devices are categorised at construction time to avoid repeated classification logic during
  * display.
  */
 enum class DeviceCategory {

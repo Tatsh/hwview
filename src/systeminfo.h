@@ -96,7 +96,7 @@ struct BuiltinDriverInfo {
     QString version;        ///< Kernel version string.
     QString copyright;      ///< Copyright notice.
     QString signer;         ///< Signature signer.
-    QString builtinMessage; ///< Localized message like "(Built-in kernel module)".
+    QString builtinMessage; ///< Localised message like "(Built-in kernel module)".
 };
 
 /**
@@ -141,7 +141,7 @@ QString formatDriverPath(const QString &path);
  * @brief Get display name for a device category.
  * @param category The device category enum value.
  * @param fallback Fallback string to use for Unknown category (typically subsystem name).
- * @returns Localized display name for the category.
+ * @returns Localised display name for the category.
  */
 QString getCategoryDisplayName(DeviceCategory category, const QString &fallback);
 
@@ -189,10 +189,10 @@ bool hasDriverInfo(const DeviceInfo &info);
 /**
  * @brief Get the display name for the Computer entry.
  *
- * Returns a localized name based on system type (e.g., "ACPI x64-based PC",
+ * Returns a localised name based on system type (e.g., "ACPI x64-based PC",
  * "Apple Silicon Mac", "x64-based PC").
  *
- * @returns Localized computer display name.
+ * @returns Localised computer display name.
  */
 QString getComputerDisplayName();
 
@@ -233,7 +233,7 @@ QString getKernelVersion();
 
 /**
  * @brief Get the kernel build date formatted according to user locale.
- * @returns Localized date string or version info if date unavailable.
+ * @returns Localised date string or version info if date unavailable.
  */
 QString getKernelBuildDate();
 

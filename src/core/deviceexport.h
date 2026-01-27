@@ -12,7 +12,7 @@ class DeviceInfo;
 /**
  * @brief Exports hardware viewer data to a JSON file for viewing in a separate application.
  *
- * This class provides functionality to serialize all device information and device properties
+ * This class provides functionality to serialise all device information and device properties
  * to a JSON format that can be opened by a "Hardware Viewer" app. The export includes
  * all data necessary to display any view (Devices by Type, Devices by Connection, etc.) and
  * always includes hidden devices regardless of the current display setting.
@@ -60,8 +60,8 @@ public:
     static constexpr auto FORMAT_VERSION = 1;
 
     /**
-     * @brief Serializes a DeviceInfo object to JSON.
-     * @param info The device info to serialize.
+     * @brief Serialises a DeviceInfo object to JSON.
+     * @param info The device info to serialise.
      * @returns A QJsonObject containing all device properties.
      */
     static QJsonObject serializeDevice(const DeviceInfo &info);
@@ -84,7 +84,7 @@ public:
     static QJsonObject collectSystemResources();
 
     /**
-     * @brief Serializes driver information to JSON.
+     * @brief Serialises driver information to JSON.
      * @param info The device info.
      * @returns A QJsonObject containing driver details.
      */
