@@ -73,6 +73,7 @@ struct BasicDriverInfo {
     QString signer;              ///< Digital signature signer.
     QString date;                ///< Driver date or build date.
     bool hasDriverFiles = false; ///< Whether driver files were found.
+    bool isBuiltin = false;      ///< Whether driver is built into the kernel.
 };
 
 /**

@@ -46,6 +46,7 @@ private Q_SLOTS:
     void onPropertySelectionChanged(int index);
     void onEventSelectionChanged(const QModelIndex &current, const QModelIndex &previous);
     void onDriverDetailsClicked();
+    void onDisableDeviceClicked();
     void onViewAllEventsClicked();
     void onCopyDevicePath();
     void onEventsLoaded();

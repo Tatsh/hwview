@@ -7,6 +7,7 @@
 #include <QtCore/QRegularExpression>
 #include <QtCore/QUrl>
 #include <QtGui/QClipboard>
+#include <QtGui/QFontDatabase>
 #include <QtGui/QShortcut>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
@@ -15,6 +16,7 @@
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
@@ -23,7 +25,6 @@
 
 #include "devicecache.h"
 #include "driverdetailsdialog.h"
-// SPDX-License-Identifier: MIT
 #include "propertiesdialog.h"
 #include "systeminfo.h"
 
@@ -71,6 +72,12 @@ PropertiesDialog::PropertiesDialog(QWidget *parent)
             &QPushButton::clicked,
             this,
             &PropertiesDialog::onDriverDetailsClicked);
+
+    // Connect disable device button
+    connect(buttonDisableDevice,
+            &QPushButton::clicked,
+            this,
+            &PropertiesDialog::onDisableDeviceClicked);
 
     // Connect view all events button
     connect(buttonViewAllEvents,
@@ -270,6 +277,11 @@ void PropertiesDialog::onDriverInfoLoaded() {
     labelDigitalSignerValue->setText(info.signer);
     labelDriverDateValue->setText(info.date);
     buttonDriverDetails->setEnabled(info.hasDriverFiles);
+
+    // Enable disable button only if driver has files and is not built-in
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACOS)
+    buttonDisableDevice->setEnabled(info.hasDriverFiles && !info.isBuiltin);
+#endif
 }
 
 QString PropertiesDialog::getDeviceCategory() {
@@ -466,6 +478,77 @@ void PropertiesDialog::onDriverDetailsClicked() {
     DriverDetailsDialog dialog(this);
     dialog.setCategoryIcon(categoryIcon_);
     dialog.setDriverName(driver);
+    dialog.exec();
+}
+
+void PropertiesDialog::onDisableDeviceClicked() {
+    if (!deviceInfo_)
+        return;
+
+    auto driver = deviceInfo_->driver();
+    if (driver.isEmpty()) {
+        return;
+    }
+
+    // Build the platform-specific unload command
+    QString command;
+#ifdef Q_OS_LINUX
+    command = QStringLiteral("modprobe -r %1").arg(driver);
+#elif defined(Q_OS_MACOS)
+    command = QStringLiteral("kextunload -b %1").arg(driver);
+#else
+    return; // Not supported on other platforms
+#endif
+
+    // Create dialog
+    QDialog dialog(this);
+    dialog.setWindowTitle(tr("Disable Device"));
+    dialog.setMinimumWidth(400);
+
+    auto *layout = new QVBoxLayout(&dialog);
+
+    auto *infoLabel = new QLabel(tr("To disable this device, run the following command:"), &dialog);
+    infoLabel->setWordWrap(true);
+    layout->addWidget(infoLabel);
+
+    layout->addSpacing(10);
+
+    // Command display in fixed-width font
+    auto *commandEdit = new QLineEdit(command, &dialog);
+    commandEdit->setReadOnly(true);
+    commandEdit->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    commandEdit->selectAll();
+    layout->addWidget(commandEdit);
+
+    layout->addSpacing(10);
+
+    // Notes about root privileges, dependencies, and potential failures
+    auto *notesLabel = new QLabel(
+        tr("Note: This command most likely requires root privileges. Additionally, drivers may "
+           "have dependencies that must be unloaded first. The command may fail if the device is "
+           "in use (e.g., Wayland or X11 using the GPU)."),
+        &dialog);
+    notesLabel->setWordWrap(true);
+    layout->addWidget(notesLabel);
+
+    layout->addSpacing(10);
+
+    // Copy button and close button
+    auto *buttonLayout = new QHBoxLayout();
+    auto *copyButton = new QPushButton(tr("Copy to Clipboard"), &dialog);
+    connect(copyButton, &QPushButton::clicked, &dialog, [command]() {
+        QApplication::clipboard()->setText(command);
+    });
+    buttonLayout->addWidget(copyButton);
+
+    buttonLayout->addStretch();
+
+    auto *closeButton = new QPushButton(tr("Close"), &dialog);
+    connect(closeButton, &QPushButton::clicked, &dialog, &QDialog::accept);
+    buttonLayout->addWidget(closeButton);
+
+    layout->addLayout(buttonLayout);
+
     dialog.exec();
 }
 

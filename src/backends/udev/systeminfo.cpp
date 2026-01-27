@@ -1247,10 +1247,11 @@ BasicDriverInfo getBasicDriverInfo(const QString &driver) {
         }
     }
 
-    info.hasDriverFiles = !filename.isEmpty();
+    info.isBuiltin = filename == QStringLiteral("(builtin)");
+    info.hasDriverFiles = !filename.isEmpty() && !info.isBuiltin;
 
-    auto isOutOfTree = !filename.isEmpty() && filename != QStringLiteral("(builtin)") &&
-                       !filename.contains(QStringLiteral("/kernel/"));
+    auto isOutOfTree =
+        !filename.isEmpty() && !info.isBuiltin && !filename.contains(QStringLiteral("/kernel/"));
 
     if (driver == QStringLiteral("nvidia") || driver.startsWith(QStringLiteral("nvidia_"))) {
         info.provider = QStringLiteral("NVIDIA Corporation");
