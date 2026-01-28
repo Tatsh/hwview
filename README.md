@@ -64,6 +64,7 @@ In the cloned project:
 
 ```shell
 mkdir build
+cd build
 cmake ..
 make
 ```
