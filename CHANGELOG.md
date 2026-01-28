@@ -23,5 +23,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 First version. Limited macOS and Windows support.
 
-[unreleased]: https://github.com/Tatsh/hwview/compare/v0.0.1...HEAD
+[unreleased]: https://github.com/Tatsh/hwview/compare/v0.0.2...HEAD
+[0.0.2]: https://github.com/Tatsh/hwview/compare/v0.0.1...v0.0.2
 [0.0.1]: https://github.com/Tatsh/hwview/releases/tag/v0.0.1
