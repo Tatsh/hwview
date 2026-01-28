@@ -132,6 +132,7 @@ kxmlguidir
 launchable
 lexar
 libc
+libera
 libexec
 libjsonnet
 libudev
