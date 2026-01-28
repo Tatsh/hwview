@@ -24,6 +24,9 @@ private Q_SLOTS:
     void rawName_setRawName();
     void sortChildren();
     void sortChildren_updatesRowIndices();
+    void disabledPixmap_noIcon();
+    void disabledPixmap_withIcon();
+    void disabledPixmap_caching();
 };
 
 void NodeTest::defaultConstructor() {
@@ -207,6 +210,39 @@ void NodeTest::sortChildren_updatesRowIndices() {
     QCOMPARE(apple->row(), 0);
     QCOMPARE(mango->row(), 1);
     QCOMPARE(zebra->row(), 2);
+}
+
+void NodeTest::disabledPixmap_noIcon() {
+    Node node;
+    QPixmap pixmap = node.disabledPixmap(16);
+    QVERIFY(pixmap.isNull());
+}
+
+void NodeTest::disabledPixmap_withIcon() {
+    Node node;
+    // Create a simple non-null icon with a solid color pixmap
+    QPixmap sourcePixmap(32, 32);
+    sourcePixmap.fill(Qt::red);
+    QIcon icon(sourcePixmap);
+    node.setIcon(icon);
+
+    QPixmap disabledPix = node.disabledPixmap(16);
+    // The pixmap should be created (may be null if platform has no icon engine, but method works)
+    QCOMPARE(disabledPix.width(), 16);
+    QCOMPARE(disabledPix.height(), 16);
+}
+
+void NodeTest::disabledPixmap_caching() {
+    Node node;
+    QPixmap sourcePixmap(32, 32);
+    sourcePixmap.fill(Qt::blue);
+    QIcon icon(sourcePixmap);
+    node.setIcon(icon);
+
+    QPixmap first = node.disabledPixmap(16);
+    QPixmap second = node.disabledPixmap(16);
+    // Both calls should return the same cached pixmap
+    QCOMPARE(first.cacheKey(), second.cacheKey());
 }
 
 QTEST_MAIN(NodeTest)
