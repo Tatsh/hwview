@@ -11,6 +11,8 @@
 [![License](https://img.shields.io/github/license/Tatsh/hwview)](https://github.com/Tatsh/hwview/blob/master/LICENSE.txt)
 [![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/hwview/v0.0.1/master)](https://github.com/Tatsh/hwview/compare/v0.0.1...master)
 [![CodeQL](https://github.com/Tatsh/hwview/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/codeql.yml)
+[![Tests](https://github.com/Tatsh/hwview/actions/workflows/tests.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/Tatsh/hwview/badge.svg?branch=master)](https://coveralls.io/github/Tatsh/hwview?branch=master)
 [![QA](https://github.com/Tatsh/hwview/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/qa.yml)
 [![GitHub Pages](https://github.com/Tatsh/hwview/actions/workflows/pages.yml/badge.svg)](https://tatsh.github.io/hwview/)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
