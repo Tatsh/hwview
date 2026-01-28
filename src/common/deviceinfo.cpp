@@ -3,7 +3,7 @@
 
 #include "deviceinfo.h"
 #include "deviceinfo_p.h"
-#include "importeddeviceinfo.h"
+#include "importeddeviceinfo_p.h"
 
 // Static empty objects for returning references when no data available
 static const QJsonObject emptyObject;

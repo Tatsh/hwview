@@ -5,7 +5,7 @@
 
 #include "common/const_strings_udev.h"
 #include "deviceinfo.h"
-#include "udevdeviceinfo.h"
+#include "udevdeviceinfo_p.h"
 
 namespace props = strings::udev::propertyNames;
 

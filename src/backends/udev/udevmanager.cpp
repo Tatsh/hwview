@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include "udevmanager.h"
-#include "udevdeviceinfo.h"
+#include "udevdeviceinfo_p.h"
 
 #include "deviceinfo.h"
 

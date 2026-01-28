@@ -13,7 +13,7 @@
 #include <cfgmgr32.h>
 
 #include "driverinfo.h"
-#include "setupapideviceinfo.h"
+#include "setupapideviceinfo_p.h"
 #include "setupapimanager.h"
 #include "setupapimonitor.h"
 #include "systeminfo.h"

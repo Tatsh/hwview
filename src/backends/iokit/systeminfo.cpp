@@ -16,7 +16,7 @@
 #include <QtGui/QDesktopServices>
 
 #include "driverinfo.h"
-#include "iokitdeviceinfo.h"
+#include "iokitdeviceinfo_p.h"
 #include "iokitmanager.h"
 #include "iokitmonitor.h"
 #include "systeminfo.h"

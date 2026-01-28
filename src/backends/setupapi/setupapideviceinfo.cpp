@@ -3,7 +3,7 @@
 
 #include "devclass_guids.h"
 #include "deviceinfo.h"
-#include "setupapideviceinfo.h"
+#include "setupapideviceinfo_p.h"
 #include "setupapimanager.h"
 
 SetupApiDeviceInfoPrivate::SetupApiDeviceInfoPrivate(HDEVINFO devInfo, SP_DEVINFO_DATA *devInfoData)

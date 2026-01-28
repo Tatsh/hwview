@@ -2,7 +2,7 @@
 #include <QtCore/QDebug>
 
 #include "deviceinfo.h"
-#include "iokitdeviceinfo.h"
+#include "iokitdeviceinfo_p.h"
 #include "iokitmanager.h"
 
 IOKitDeviceInfoPrivate::IOKitDeviceInfoPrivate(io_service_t service) : DeviceInfoPrivate() {

@@ -16,7 +16,7 @@
 
 #include "driverinfo.h"
 #include "systeminfo.h"
-#include "udevdeviceinfo.h"
+#include "udevdeviceinfo_p.h"
 #include "udevmanager.h"
 #include "udevmonitor.h"
 
