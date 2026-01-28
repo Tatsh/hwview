@@ -566,6 +566,7 @@ void MainWindow::applyViewSettings() {
     if (showDriverColumn) {
         treeView->header()->setVisible(true);
         treeView->setHeaderHidden(false);
+        treeView->setColumnHidden(1, false);
         // Name column interactive, Driver column with fixed width
         treeView->header()->setStretchLastSection(false);
         treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
