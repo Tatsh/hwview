@@ -70,3 +70,7 @@ make
 
 On MacPorts, set the `CMAKE_PREFIX_PATH` variable to
 `/opt/local/libexec/ffmpeg7;/opt/local/libexec/qt6`.
+
+## Windows support
+
+Support for Windows will be limited until Linux and macOS support are considered complete.
