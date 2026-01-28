@@ -102,6 +102,8 @@ hwview
 hwviewrc
 hwviewui
 hynix
+iconset
+iconutil
 importeddeviceinfo
 instdir
 interprocedural

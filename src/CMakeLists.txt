@@ -47,6 +47,43 @@ else()
   if(NOT FHS OR NON_PORTABLE_MACOS_BUNDLE)
     # macOS bundle, non-portable macOS bundle, or plain Windows (no MSYS, etc).
     if(APPLE)
+      # Temporary: Generate icns file from PNG icons until a proper macOS icon is made.
+      set(ICONSET_DIR "${CMAKE_CURRENT_BINARY_DIR}/hwview.iconset")
+      set(ICNS_FILE "${CMAKE_CURRENT_BINARY_DIR}/hwview.icns")
+      file(MAKE_DIRECTORY ${ICONSET_DIR})
+      add_custom_command(
+        OUTPUT ${ICNS_FILE}
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_16.png
+                ${ICONSET_DIR}/icon_16x16.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_32.png
+                ${ICONSET_DIR}/icon_16x16@2x.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_32.png
+                ${ICONSET_DIR}/icon_32x32.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_64.png
+                ${ICONSET_DIR}/icon_32x32@2x.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_128.png
+                ${ICONSET_DIR}/icon_128x128.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_256.png
+                ${ICONSET_DIR}/icon_128x128@2x.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_256.png
+                ${ICONSET_DIR}/icon_256x256.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_512.png
+                ${ICONSET_DIR}/icon_256x256@2x.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_512.png
+                ${ICONSET_DIR}/icon_512x512.png
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_512@2x.png
+                ${ICONSET_DIR}/icon_512x512@2x.png
+        COMMAND iconutil -c icns -o ${ICNS_FILE} ${ICONSET_DIR}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_16.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_32.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_64.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_128.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_256.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_512.png
+                ${CMAKE_CURRENT_SOURCE_DIR}/icons/icon_512@2x.png
+        COMMENT "Generating hwview.icns from PNG icons."
+        VERBATIM)
+      add_custom_target(hwview_icns ALL DEPENDS ${ICNS_FILE})
       set_target_properties(
         hwview
         PROPERTIES OUTPUT_NAME ${DISPLAY_NAME}
@@ -57,6 +94,7 @@ else()
                    MACOSX_BUNDLE_GUI_IDENTIFIER "sh.tat.${CMAKE_PROJECT_NAME}"
                    MACOSX_BUNDLE_COPYRIGHT "Copyright (c) ${YEAR} ${DISPLAY_NAME} authors."
                    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
+      add_dependencies(hwview hwview_icns)
       set(deploy_tool_options_arg -hardened-runtime)
       set(executable_path "$<TARGET_FILE_NAME:hwview>.app")
       set(executable_dir ${BUNDLE_INSTALL_PREFIX})
@@ -84,7 +122,7 @@ qt_deploy_runtime_dependencies(
     endif()
     if(APPLE)
       install(
-        FILES icons/hwview.icns
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/hwview.icns
         DESTINATION "${BUNDLE_INSTALL_PREFIX}/$<TARGET_FILE_NAME:hwview>.app/Contents/Resources")
       install(
         FILES ../data/name-mappings.json ../data/vendors.json
