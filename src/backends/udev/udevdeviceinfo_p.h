@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-/** @file */
 #pragma once
 
 #include "deviceinfo_p.h"
