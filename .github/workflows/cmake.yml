@@ -13,6 +13,8 @@ jobs:
             --install-prefix ${{github.workspace}}/build/prefix
           cmake --build build --config ${{matrix.build-type}} --verbose
           cmake --install ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
+      - name: Ad-hoc codesign
+        run: codesign --force --deep --sign - "${{github.workspace}}/build/prefix/Hardware Viewer.app"
       - name: Package
         run: >-
           cpack -C ${{matrix.build-type}}

@@ -95,7 +95,7 @@ else()
                    MACOSX_BUNDLE_COPYRIGHT "Copyright (c) ${YEAR} ${DISPLAY_NAME} authors."
                    MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}")
       add_dependencies(hwview hwview_icns)
-      set(deploy_tool_options_arg -hardened-runtime)
+      set(deploy_tool_options_arg "")
       set(executable_path "$<TARGET_FILE_NAME:hwview>.app")
       set(executable_dir ${BUNDLE_INSTALL_PREFIX})
     elseif(WIN32)
