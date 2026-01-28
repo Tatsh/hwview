@@ -9,6 +9,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+## [0.0.2] - 2026-01-28
+
+### Added
+
+- Name mappings for Apple Silicon devices.
+
+### Fixes
+
+- Possibly fix signing issue on macOS.
+
 ## [0.0.1] - 2026-01-28
 
 First version. Limited macOS and Windows support.
