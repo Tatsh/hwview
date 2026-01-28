@@ -101,14 +101,38 @@ public:
      */
     void reload();
 
+    /**
+     * @brief Clears all mappings.
+     *
+     * This is primarily useful for testing to reset state before loading test data.
+     */
+    void clear();
+
+    /**
+     * @brief Loads mappings from a specific directory.
+     *
+     * This is primarily useful for testing to load mappings from a known location.
+     *
+     * @param dirPath Path to the directory containing JSON mapping files.
+     * @param locale Locale string (e.g., "en-US") for locale-specific overrides.
+     */
+    void loadFromDirectory(const QString &dirPath, const QString &locale);
+
+    /**
+     * @brief Loads mappings from a specific file.
+     *
+     * This is primarily useful for testing to load mappings from a known file.
+     *
+     * @param filePath Path to the JSON file.
+     */
+    void loadFromFile(const QString &filePath);
+
 private:
     NameMappings();
     ~NameMappings() = default;
     NameMappings(const NameMappings &) = delete;
     NameMappings &operator=(const NameMappings &) = delete;
 
-    void loadFromFile(const QString &filePath);
-    void loadFromDirectory(const QString &dirPath, const QString &locale);
     QString systemLocale() const;
 
     QHash<QString, QString> guidToCategory_;

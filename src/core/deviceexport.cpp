@@ -225,6 +225,7 @@ QJsonObject DeviceExport::collectSystemInfo(const QString &hostname) {
     return info;
 }
 
+// LCOV_EXCL_START - Reads from /proc filesystem (platform-specific)
 QJsonObject DeviceExport::collectSystemResources() {
     QJsonObject resources;
 
@@ -235,6 +236,7 @@ QJsonObject DeviceExport::collectSystemResources() {
 
     return resources;
 }
+// LCOV_EXCL_STOP
 
 QJsonObject DeviceExport::serializeDriverInfo(const DeviceInfo &info) {
     QJsonObject driverInfoObj;

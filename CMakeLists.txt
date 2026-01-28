@@ -121,6 +121,22 @@ endif()
 
 add_subdirectory(src)
 
+# Testing
+option(BUILD_TESTS "Build tests." OFF)
+option(COVERAGE "Enable code coverage (GCC/Clang only)." OFF)
+if(COVERAGE)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(--coverage)
+    add_link_options(--coverage)
+  else()
+    message(WARNING "COVERAGE is only supported with GCC or Clang.")
+  endif()
+endif()
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()
+
 set(CPACK_PACKAGE_VENDOR "Tatsh")
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PROJECT_DESCRIPTION})

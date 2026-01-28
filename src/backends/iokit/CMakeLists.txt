@@ -12,6 +12,7 @@ target_include_directories(hwview_iokit PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_link_libraries(hwview_iokit PUBLIC
+  hwview_common
   Qt6::Core
   ${IOKIT_FRAMEWORK}
   ${COREFOUNDATION_FRAMEWORK}

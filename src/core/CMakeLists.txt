@@ -1,7 +1,6 @@
 add_library(
   hwview_core STATIC
-  deviceexport.cpp
-  ../deviceinfo.cpp)
+  deviceexport.cpp)
 
 target_include_directories(
   hwview_core

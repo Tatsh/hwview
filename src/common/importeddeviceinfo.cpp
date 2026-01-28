@@ -51,6 +51,7 @@ DeviceInfoPrivate *ImportedDeviceInfoPrivate::clone(DeviceInfo *q) const {
     return new ImportedDeviceInfoPrivate(*this, q);
 }
 
+// LCOV_EXCL_START - Debug method
 void ImportedDeviceInfoPrivate::dump() const {
     qDebug() << "ImportedDeviceInfoPrivate:";
     qDebug() << "  syspath:" << syspath_;
@@ -59,6 +60,7 @@ void ImportedDeviceInfoPrivate::dump() const {
     qDebug() << "  category:" << static_cast<int>(category_);
     qDebug() << "  isHidden:" << isHidden_;
 }
+// LCOV_EXCL_STOP
 
 DeviceInfoPrivate *createDeviceInfoFromJson(const QJsonObject &json) {
     return new ImportedDeviceInfoPrivate(json);

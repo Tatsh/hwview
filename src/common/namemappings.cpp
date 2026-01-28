@@ -18,6 +18,15 @@ NameMappings::NameMappings() {
     reload();
 }
 
+void NameMappings::clear() {
+    guidToCategory_.clear();
+    hidVendor_.clear();
+    hidBusType_.clear();
+    softwareDevice_.clear();
+    acpiDevice_.clear();
+    vendorUrls_.clear();
+}
+
 QString NameMappings::systemLocale() const {
     // Get locale in format like "en-US", "de-DE", "ja-JP"
     auto localeName = QLocale::system().name(); // Returns "en_US" format
@@ -26,13 +35,9 @@ QString NameMappings::systemLocale() const {
 }
 
 void NameMappings::reload() {
-    guidToCategory_.clear();
-    hidVendor_.clear();
-    hidBusType_.clear();
-    softwareDevice_.clear();
-    acpiDevice_.clear();
-    vendorUrls_.clear();
+    clear();
 
+    // LCOV_EXCL_START - Platform-specific path resolution
     auto locale = systemLocale();
 
     // Load from data/ directory adjacent to the executable first (lowest priority)
@@ -73,6 +78,7 @@ void NameMappings::reload() {
     // applicationDirPath() returns AppName.app/Contents/MacOS, Resources is ../Resources
     loadFromDirectory(appDir + QStringLiteral("/../Resources"), locale);
 #endif
+    // LCOV_EXCL_STOP
 }
 
 void NameMappings::loadFromDirectory(const QString &dirPath, const QString &locale) {
@@ -196,6 +202,21 @@ void NameMappings::loadFromFile(const QString &filePath) {
                 auto pnpId = it.key().toUpper();
                 acpiDevice_.insert(pnpId, it.value().toString());
             }
+        }
+    }
+
+    // If the file is a simple vendor URL mapping (like vendors.json),
+    // check if all top-level keys are strings (URL values) and load them
+    bool isVendorFile = true;
+    for (auto it = root.begin(); it != root.end(); ++it) {
+        if (!it.value().isString()) {
+            isVendorFile = false;
+            break;
+        }
+    }
+    if (isVendorFile && !root.isEmpty()) {
+        for (auto it = root.begin(); it != root.end(); ++it) {
+            vendorUrls_.insert(it.key(), it.value().toString());
         }
     }
 }

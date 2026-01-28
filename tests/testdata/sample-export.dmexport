@@ -1,0 +1,127 @@
+{
+  "applicationName": "hwview",
+  "applicationVersion": "0.0.1",
+  "devices": [
+    {
+      "category": 5,
+      "categoryName": "Display adapters",
+      "devPath": "/devices/pci0000:00/0000:00:02.0",
+      "devnode": "",
+      "driver": "i915",
+      "driverInfo": {
+        "description": "Intel Graphics Driver",
+        "hasDriver": true,
+        "name": "i915"
+      },
+      "ids": {
+        "cdrom": "",
+        "devType": "",
+        "inputKeyboard": "",
+        "inputMouse": "",
+        "modelFromDatabase": "UHD Graphics 630",
+        "type": ""
+      },
+      "isHidden": false,
+      "isValidForDisplay": true,
+      "name": "Intel UHD Graphics 630",
+      "parentSyspath": "/sys/devices/pci0000:00",
+      "pci": {
+        "class": "Display controller",
+        "interface": "",
+        "subclass": "VGA compatible controller"
+      },
+      "properties": {
+        "DRIVER": "i915",
+        "PCI_ID": "8086:3E92",
+        "PCI_SUBSYS_ID": "1028:0869"
+      },
+      "resources": [
+        {
+          "displayValue": "0xA0000000 - 0xAFFFFFFF",
+          "end": "0xAFFFFFFF",
+          "start": "0xA0000000",
+          "type": "Memory"
+        }
+      ],
+      "subsystem": "pci",
+      "syspath": "/sys/devices/pci0000:00/0000:00:02.0"
+    },
+    {
+      "category": 16,
+      "categoryName": "Universal Serial Bus controllers",
+      "devPath": "/devices/pci0000:00/0000:00:14.0",
+      "devnode": "",
+      "driver": "xhci_hcd",
+      "driverInfo": {
+        "hasDriver": true,
+        "name": "xhci_hcd"
+      },
+      "ids": {
+        "cdrom": "",
+        "devType": "",
+        "inputKeyboard": "",
+        "inputMouse": "",
+        "modelFromDatabase": "200 Series/Z370 Chipset Family USB 3.0 xHCI Controller",
+        "type": ""
+      },
+      "isHidden": false,
+      "isValidForDisplay": true,
+      "name": "Intel USB Controller",
+      "parentSyspath": "/sys/devices/pci0000:00",
+      "properties": {
+        "DRIVER": "xhci_hcd",
+        "PCI_ID": "8086:A2AF"
+      },
+      "resources": [],
+      "subsystem": "pci",
+      "syspath": "/sys/devices/pci0000:00/0000:00:14.0"
+    },
+    {
+      "category": 11,
+      "categoryName": "Software devices",
+      "devPath": "/devices/virtual/misc/cpu_dma_latency",
+      "devnode": "/dev/cpu_dma_latency",
+      "driver": "",
+      "driverInfo": {
+        "hasDriver": false
+      },
+      "ids": {
+        "cdrom": "",
+        "devType": "",
+        "inputKeyboard": "",
+        "inputMouse": "",
+        "modelFromDatabase": "",
+        "type": ""
+      },
+      "isHidden": true,
+      "isValidForDisplay": true,
+      "name": "cpu_dma_latency",
+      "parentSyspath": "",
+      "properties": {},
+      "resources": [],
+      "subsystem": "misc",
+      "syspath": "/sys/devices/virtual/misc/cpu_dma_latency"
+    }
+  ],
+  "exportDate": "2025-01-15T10:30:00.000Z",
+  "formatVersion": 1,
+  "includesHiddenDevices": true,
+  "mimeType": "application/x-hwview-export",
+  "system": {
+    "buildCpuArchitecture": "x86_64",
+    "cpuArchitecture": "x86_64",
+    "hostname": "test-machine",
+    "kernelType": "linux",
+    "kernelVersion": "6.12.0-test",
+    "locale": "en_US",
+    "prettyProductName": "Test Linux",
+    "productType": "linux",
+    "productVersion": "unknown"
+  },
+  "systemResources": {
+    "dma": "",
+    "interrupts": "",
+    "iomem": "",
+    "ioports": ""
+  }
+}

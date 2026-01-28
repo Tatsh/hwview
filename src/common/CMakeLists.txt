@@ -1,4 +1,7 @@
-add_library(hwview_common STATIC namemappings.cpp importeddeviceinfo.cpp)
+add_library(hwview_common STATIC
+  deviceinfo.cpp
+  importeddeviceinfo.cpp
+  namemappings.cpp)
 
 target_include_directories(
   hwview_common

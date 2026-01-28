@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 #include <utility>
 
-#include "common/importeddeviceinfo.h"
 #include "deviceinfo.h"
 #include "deviceinfo_p.h"
+#include "importeddeviceinfo.h"
 
 // Static empty objects for returning references when no data available
 static const QJsonObject emptyObject;
@@ -111,12 +111,14 @@ const QString &DeviceInfo::devnode() const {
     return d ? d->devnode_ : emptyString;
 }
 
+// LCOV_EXCL_START - Debug method
 void DeviceInfo::dump() {
     Q_D(DeviceInfo);
     if (d) {
         d->dump();
     }
 }
+// LCOV_EXCL_STOP
 
 const QString &DeviceInfo::devPath() const {
     Q_D(const DeviceInfo);

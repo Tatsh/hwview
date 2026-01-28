@@ -1,0 +1,30 @@
+{
+  "acpi-device": {
+    "LNXCPU": "ACPI Processor",
+    "PNP0C09": "ACPI Embedded Controller",
+    "PNP0C0A": "ACPI-Compliant Control Method Battery"
+  },
+  "guid-to-category": {
+    "{36fc9e60-c465-11cf-8056-444553540000}": "Universal Serial Bus controllers",
+    "{4d36e968-e325-11ce-bfc1-08002be10318}": "Display adapters",
+    "{4d36e96b-e325-11ce-bfc1-08002be10318}": "Keyboards",
+    "{4d36e96f-e325-11ce-bfc1-08002be10318}": "Mice and other pointing devices"
+  },
+  "hid-bus-type": {
+    "1": "PCI",
+    "3": "USB",
+    "5": "Bluetooth",
+    "6": "Virtual"
+  },
+  "hid-vendor": {
+    "046d": "Logitech",
+    "056a": "Wacom",
+    "1532": "Razer"
+  },
+  "software-device": {
+    "fuse": "FUSE",
+    "kvm": "KVM",
+    "loop0": "Loop device 0",
+    "uinput": "User-space input device"
+  }
+}
