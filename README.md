@@ -9,7 +9,7 @@
 [![C++](https://img.shields.io/badge/C++-00599C?logo=c%2B%2B)](https://isocpp.org)
 [![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/hwview)](https://github.com/Tatsh/hwview/tags)
 [![License](https://img.shields.io/github/license/Tatsh/hwview)](https://github.com/Tatsh/hwview/blob/master/LICENSE.txt)
-[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/hwview/v0.0.1/master)](https://github.com/Tatsh/hwview/compare/v0.0.1...master)
+[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/hwview/v0.0.2/master)](https://github.com/Tatsh/hwview/compare/v0.0.2...master)
 [![CodeQL](https://github.com/Tatsh/hwview/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/codeql.yml)
 [![Tests](https://github.com/Tatsh/hwview/actions/workflows/tests.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/Tatsh/hwview/badge.svg?branch=master)](https://coveralls.io/github/Tatsh/hwview?branch=master)

@@ -1,7 +1,7 @@
 {
   security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
   project_name: 'hwview',
-  version: '0.0.1',
+  version: '0.0.2',
   description: 'Hardware information utility, inspired by Redmond.',
   keywords: ['device', 'hardware', 'viewer', 'system', 'information', 'linux'],
   want_main: false,

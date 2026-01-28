@@ -28,7 +28,7 @@ namespace {
 void setAppMetadata() {
     QCoreApplication::setOrganizationName(QStringLiteral("Tatsh"));
     QCoreApplication::setApplicationName(QStringLiteral("Hardware Viewer"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.0.1"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.0.2"));
 }
 
 /**
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     KLocalizedString::setApplicationDomain(QByteArrayLiteral("hwview"));
     KAboutData aboutData(QStringLiteral("hwview"),
                          i18n("Hardware Viewer"),
-                         QStringLiteral("0.0.1"),
+                         QStringLiteral("0.0.2"),
                          i18n("View device information and driver software."),
                          KAboutLicense::MIT,
                          i18n("(c) 2024-2026 Tatsh"));

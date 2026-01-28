@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.31)
-project(hwview LANGUAGES CXX VERSION 0.0.1 DESCRIPTION "Hardware information utility." HOMEPAGE_URL "https://github.com/Tatsh/hwview")
+project(hwview LANGUAGES CXX VERSION 0.0.2 DESCRIPTION "Hardware information utility." HOMEPAGE_URL "https://github.com/Tatsh/hwview")
 
 include(FindPkgConfig)
 include(GNUInstallDirs)
