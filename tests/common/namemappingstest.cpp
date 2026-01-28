@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+#include <QtCore/QTemporaryFile>
 #include <QtTest/QTest>
 
 #include "namemappings.h"
@@ -27,6 +28,8 @@ private Q_SLOTS:
     void vendorSupportUrl_unknown();
     void clear_removesAllMappings();
     void loadFromFile_loadsMappings();
+    void loadFromFile_nonexistentFile();
+    void loadFromFile_invalidJson();
 };
 
 void NameMappingsTest::initTestCase() {
@@ -166,6 +169,34 @@ void NameMappingsTest::loadFromFile_loadsMappings() {
     QCOMPARE(NameMappings::instance().hidVendorName(QStringLiteral("046d")),
              QStringLiteral("Logitech"));
     QCOMPARE(NameMappings::instance().hidBusTypeName(3), QStringLiteral("USB"));
+}
+
+void NameMappingsTest::loadFromFile_nonexistentFile() {
+    NameMappings::instance().clear();
+
+    // Try to load a file that doesn't exist - should not crash and not load anything
+    NameMappings::instance().loadFromFile(
+        QStringLiteral("/nonexistent/path/to/file-that-does-not-exist.json"));
+
+    // Mappings should still be empty
+    QVERIFY(NameMappings::instance().hidVendorName(QStringLiteral("046d")).isEmpty());
+}
+
+void NameMappingsTest::loadFromFile_invalidJson() {
+    NameMappings::instance().clear();
+
+    // Create a temporary file with invalid JSON
+    QTemporaryFile tempFile;
+    tempFile.setAutoRemove(true);
+    QVERIFY(tempFile.open());
+    tempFile.write("{ this is not valid json }");
+    tempFile.close();
+
+    // Try to load the invalid JSON file - should not crash and not load anything
+    NameMappings::instance().loadFromFile(tempFile.fileName());
+
+    // Mappings should still be empty
+    QVERIFY(NameMappings::instance().hidVendorName(QStringLiteral("046d")).isEmpty());
 }
 
 QTEST_MAIN(NameMappingsTest)

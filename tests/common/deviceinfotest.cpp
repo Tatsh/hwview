@@ -18,9 +18,13 @@ private Q_SLOTS:
     void copyAssignment();
     void moveConstructor();
     void moveAssignment();
+    void propertyValue_imported();
     void properties_imported();
+    void properties_nonImported();
     void driverInfo_imported();
+    void driverInfo_nonImported();
     void resources_imported();
+    void resources_nonImported();
     void isValidForDisplay_validCategory();
     void isValidForDisplay_unknownCategory();
     void emptyDeviceInfo_handlesNullptr();
@@ -201,6 +205,26 @@ void DeviceInfoTest::moveAssignment() {
     QCOMPARE(first.category(), DeviceCategory::Batteries);
 }
 
+void DeviceInfoTest::propertyValue_imported() {
+    QJsonObject props;
+    props[QStringLiteral("PCI_ID")] = QStringLiteral("8086:3E92");
+    props[QStringLiteral("DRIVER")] = QStringLiteral("i915");
+    props[QStringLiteral("SUBSYSTEM")] = QStringLiteral("pci");
+
+    QJsonObject json;
+    json[QStringLiteral("syspath")] = QStringLiteral("/sys/devices/test");
+    json[QStringLiteral("name")] = QStringLiteral("Test Device");
+    json[QStringLiteral("category")] = static_cast<int>(DeviceCategory::DisplayAdapters);
+    json[QStringLiteral("properties")] = props;
+
+    DeviceInfo info(json);
+
+    QCOMPARE(info.propertyValue("PCI_ID"), QStringLiteral("8086:3E92"));
+    QCOMPARE(info.propertyValue("DRIVER"), QStringLiteral("i915"));
+    QCOMPARE(info.propertyValue("SUBSYSTEM"), QStringLiteral("pci"));
+    QVERIFY(info.propertyValue("NONEXISTENT").isEmpty());
+}
+
 void DeviceInfoTest::properties_imported() {
     QJsonObject props;
     props[QStringLiteral("PCI_ID")] = QStringLiteral("8086:3E92");
@@ -216,6 +240,12 @@ void DeviceInfoTest::properties_imported() {
 
     QVERIFY(!info.properties().isEmpty());
     QCOMPARE(info.properties()[QStringLiteral("PCI_ID")].toString(), QStringLiteral("8086:3E92"));
+}
+
+void DeviceInfoTest::properties_nonImported() {
+    // Non-imported device (created with nullptr) should return empty properties
+    DeviceInfo info(static_cast<DeviceInfoPrivate *>(nullptr));
+    QVERIFY(info.properties().isEmpty());
 }
 
 void DeviceInfoTest::driverInfo_imported() {
@@ -236,6 +266,12 @@ void DeviceInfoTest::driverInfo_imported() {
     QCOMPARE(info.driverInfo()[QStringLiteral("name")].toString(), QStringLiteral("i915"));
 }
 
+void DeviceInfoTest::driverInfo_nonImported() {
+    // Non-imported device should return empty driverInfo
+    DeviceInfo info(static_cast<DeviceInfoPrivate *>(nullptr));
+    QVERIFY(info.driverInfo().isEmpty());
+}
+
 void DeviceInfoTest::resources_imported() {
     QJsonArray resources;
     QJsonObject resource;
@@ -253,6 +289,12 @@ void DeviceInfoTest::resources_imported() {
 
     QVERIFY(!info.resources().isEmpty());
     QCOMPARE(info.resources().size(), 1);
+}
+
+void DeviceInfoTest::resources_nonImported() {
+    // Non-imported device should return empty resources
+    DeviceInfo info(static_cast<DeviceInfoPrivate *>(nullptr));
+    QVERIFY(info.resources().isEmpty());
 }
 
 void DeviceInfoTest::isValidForDisplay_validCategory() {

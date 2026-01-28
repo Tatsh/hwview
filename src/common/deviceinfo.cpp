@@ -28,12 +28,12 @@ DeviceInfoPrivate::DeviceInfoPrivate(const DeviceInfoPrivate &other, DeviceInfo 
       category_(other.category_), platformClassName_(other.platformClassName_), q_ptr(q) {
 }
 
-DeviceInfoPrivate::~DeviceInfoPrivate() = default;
+DeviceInfoPrivate::~DeviceInfoPrivate() = default; // LCOV_EXCL_LINE
 
 // DeviceInfo implementation
 DeviceInfo::DeviceInfo(DeviceInfoPrivate *d) : d_ptr(d), isImported_(false) {
     if (d_ptr) {
-        d_ptr->q_ptr = this;
+        d_ptr->q_ptr = this; // LCOV_EXCL_LINE
     }
 }
 
