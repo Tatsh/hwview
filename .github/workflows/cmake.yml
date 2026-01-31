@@ -181,7 +181,7 @@ jobs:
         with:
           fail_on_unmatched_files: true
           files: |
-            ${{github.workspace}}/build/hwview-*.AppImage
+            ${{github.workspace}}/hwview-*.AppImage
     strategy:
       fail-fast: false
       matrix:
