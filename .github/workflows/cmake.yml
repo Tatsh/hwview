@@ -28,7 +28,7 @@ jobs:
             ${{github.workspace}}/hwview-*.zip
             ${{github.workspace}}/hwview-*.dmg
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{github.workspace}}/hwview-*.zip
@@ -101,7 +101,7 @@ jobs:
             ${{github.workspace}}/hwview-*.exe
             ${{github.workspace}}/hwview-*.zip
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{github.workspace}}/hwview-*.exe
@@ -170,7 +170,7 @@ jobs:
             ${{github.workspace}}/hwview-*.AppImage
             ${{github.workspace}}/hwview-*.zip
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{github.workspace}}/hwview-*.AppImage
