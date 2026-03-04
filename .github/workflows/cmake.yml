@@ -20,7 +20,7 @@ jobs:
           cpack -C ${{matrix.build-type}}
           --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-${{ matrix.os }}
@@ -93,7 +93,7 @@ jobs:
           --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
         shell: msys2 {0}
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-${{ matrix.sys.name }}
@@ -162,7 +162,7 @@ jobs:
         name: Rename with tag
         run: mv -v ${{github.workspace}}/hwview-*.AppImage ${{github.workspace}}/hwview-${{github.ref_name}}-x86_64.AppImage
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-Linux
