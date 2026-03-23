@@ -16,7 +16,6 @@ autoinstall
 automoc
 automount
 autorcc
-autosort
 autouic
 basetreemodel
 basetreemodeltest
@@ -49,6 +48,7 @@ cppreference
 ctad
 ctest
 customizedialog
+dashcam
 datarootdir
 dbcc
 dbuild
@@ -70,8 +70,6 @@ deviceinfotest
 devicemonitor
 deviceremovecomplete
 devmgmt
-devmgmtrc
-devmgmtui
 devnode
 devtyp
 dfhs
@@ -81,6 +79,7 @@ diskarbitration
 dmar
 dmexport
 docstrings
+dorny
 driverdetailsdialog
 driverinfo
 drvbydevmodel
@@ -167,6 +166,7 @@ libc
 libera
 libexec
 libjsonnet
+libsonnet
 libudev
 linuxdeploy
 liteon
@@ -188,11 +188,13 @@ mdfile
 mdio
 metadot
 metainfo
+mktemp
 mmconfig
 mroot
 msys
 msystem
 mwevent
+mypy
 namemappings
 namemappingstest
 nnection
@@ -208,6 +210,7 @@ nvmem
 offscreen
 ohci
 olyhal
+oneline
 optiarc
 osversioninfoexw
 osversioninfow
@@ -227,13 +230,11 @@ propertiesdialog
 prov
 prtl
 psmouse
-pyyaml
 qcompare
 qintptr
 qobject
 qresource
 qsizetype
-qstrcmp
 qstringbuilder
 qstrlen
 qtbase
@@ -242,12 +243,12 @@ qtest
 qtgui
 qtmultimedia
 qtwidgets
-qulonglong
 qverify
 razer
 realtek
 rect
 reflow
+regen
 resbyconnmodel
 resbytypemodel
 rfkill
@@ -267,6 +268,7 @@ setupapimanager
 setupapimonitor
 sgnr
 shctx
+shellcheck
 shellformat
 shpchp
 silentinstall
@@ -274,6 +276,7 @@ sizepolicy
 skywalk
 smbus
 smcpmu
+snapcraft
 softprops
 sourcelabel
 spcc
@@ -321,6 +324,8 @@ uvcvideo
 vboxdrvu
 vboxnetctl
 vedantmgoyal
+vendored
+venv
 vermagic
 verstretch
 viewsettings
@@ -345,3 +350,5 @@ xhci
 xnco
 xpwm
 xxgpio
+yarnrc
+ångström

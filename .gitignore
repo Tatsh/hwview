@@ -5,11 +5,11 @@
 .*.swp
 .*_cache/
 .DS_Store*
+.claude/settings.local.json
 .coverage
 .cspellcache
 .directory
 .pnp.*
-/.cache/
 /.flatpak-builder/
 /.yarn/install-state.gz
 /CMakeUserPresets.json
@@ -18,5 +18,4 @@
 /dist/
 /repo/
 /vcpkg_installed/
-compile_commands.json
 node_modules/
