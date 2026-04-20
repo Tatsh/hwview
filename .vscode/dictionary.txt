@@ -1,6 +1,7 @@
 acpixxxx
 addaction
 afkep
+Ångström
 apfs
 apic
 appdir
@@ -39,6 +40,7 @@ clpc
 codesign
 commitizen
 configret
+cooldown
 corefoundation
 coveragerc
 coverallsapp
@@ -69,7 +71,6 @@ deviceexport
 deviceinfotest
 devicemonitor
 deviceremovecomplete
-devmgmt
 devnode
 devtyp
 dfhs
@@ -79,13 +80,13 @@ diskarbitration
 dmar
 dmexport
 docstrings
-dorny
 driverdetailsdialog
 driverinfo
 drvbydevmodel
 drvbytypemodel
 ehci
 endforeach
+esac
 esbenp
 evices
 fasteoi
@@ -153,6 +154,7 @@ irqd
 irqs
 iwlwifi
 iwyu
+jinja
 jsonnet
 jsonschema
 jurplel
@@ -165,7 +167,6 @@ lexar
 libc
 libera
 libexec
-libjsonnet
 libsonnet
 libudev
 linuxdeploy
@@ -199,6 +200,7 @@ namemappings
 namemappingstest
 nnection
 nodetest
+npmjs
 nrvo
 nsis
 ntdll
@@ -230,6 +232,7 @@ propertiesdialog
 prov
 prtl
 psmouse
+pylock
 qcompare
 qintptr
 qobject
@@ -252,6 +255,7 @@ regen
 resbyconnmodel
 resbytypemodel
 rfkill
+ripgreprc
 rtsx
 sabrent
 sart
@@ -339,6 +343,7 @@ whatsthis
 winget
 wintrust
 wiswa
+wiswa's
 wndclassexw
 wpath
 wpessimizing
@@ -351,4 +356,3 @@ xnco
 xpwm
 xxgpio
 yarnrc
-ångström

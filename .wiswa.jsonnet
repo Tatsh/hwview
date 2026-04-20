@@ -1,4 +1,5 @@
 {
+  uses_user_defaults: true,
   security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
   project_name: 'hwview',
   version: '0.0.2',
@@ -7,9 +8,6 @@
   want_main: false,
   want_codeql: false,
   want_tests: false,
-  copilot+: {
-    intro: 'Hardware Viewer is a Qt-based system device information viewer, inspired by Device Manager (`devmgmt.msc`) on Windows.',
-  },
   package_json+: {
     cspell+: {
       ignorePaths+: [
