@@ -1,3 +1,4 @@
+aclocal
 acpixxxx
 addaction
 afkep
@@ -35,6 +36,8 @@ bytearray
 cdrom
 centralwidget
 cfgmgr
+choco
+clangarm
 clcd
 clpc
 codesign
@@ -56,6 +59,7 @@ dbcc
 dbuild
 dcmake
 dcoverage
+dcpack
 dcpav
 dcpavsac
 dcpdp
@@ -163,10 +167,12 @@ kioxia
 kpartgui
 kxmlguidir
 launchable
+ldflags
 lexar
 libc
 libera
 libexec
+libqwayland
 libsonnet
 libudev
 linuxdeploy
@@ -274,12 +280,14 @@ sgnr
 shctx
 shellcheck
 shellformat
+shlib
 shpchp
 silentinstall
 sizepolicy
 skywalk
 smbus
 smcpmu
+snapcore
 snapcraft
 softprops
 sourcelabel
@@ -307,6 +315,7 @@ tcorp
 teac
 testdata
 timesync
+tostring
 touchpads
 tpmrm
 ucrt
@@ -340,6 +349,7 @@ weverything
 wevtutil
 whats
 whatsthis
+winarm
 winget
 wintrust
 wiswa
