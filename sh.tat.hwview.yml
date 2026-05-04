@@ -1,0 +1,36 @@
+---
+id: sh.tat.hwview
+runtime: org.kde.Platform
+runtime-version: '6.9'
+sdk: org.kde.Sdk
+command: hwview
+finish-args:
+  - --device=all
+  - --filesystem=/sys:ro
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+cleanup:
+  - /include
+  - /lib/cmake
+  - /lib/pkgconfig
+  - /share/man
+  - /share/aclocal
+  - /share/pkgconfig
+  - /share/doc
+  - '*.a'
+  - '*.la'
+modules:
+  - name: hwview
+    builddir: true
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DFHS=ON
+    sources:
+      - type: git
+        url: https://github.com/Tatsh/hwview.git
+        tag: v0.0.2
+        x-checker-data:
+          type: git
+          tag-pattern: '^v([\d.]+)$'
