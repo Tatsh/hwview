@@ -319,6 +319,7 @@ tcorp
 teac
 testdata
 timesync
+tolower
 tostring
 touchpads
 tpmrm
@@ -353,6 +354,7 @@ weverything
 wevtutil
 whats
 whatsthis
+winarch
 winarm
 winget
 wintrust
