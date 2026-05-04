@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+#include <QtCore/QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -92,7 +93,10 @@ void DeviceCache::startMonitoring() {
         if (deviceMonitor) {
             connect(
                 deviceMonitor, &DeviceMonitor::deviceChanged, this, &DeviceCache::onDeviceChanged);
-            deviceMonitor->start();
+            if (const auto result = deviceMonitor->start(); !result) {
+                qWarning("DeviceMonitor::start() failed with error %d",
+                         static_cast<int>(result.error()));
+            }
         }
     }
 }
@@ -196,7 +200,10 @@ void DeviceCache::reloadLiveData() {
     if (monitor_) {
         auto *deviceMonitor = qobject_cast<DeviceMonitor *>(monitor_);
         if (deviceMonitor) {
-            deviceMonitor->start();
+            if (const auto result = deviceMonitor->start(); !result) {
+                qWarning("DeviceMonitor::start() failed with error %d",
+                         static_cast<int>(result.error()));
+            }
         }
     }
 
