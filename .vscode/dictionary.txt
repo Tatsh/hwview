@@ -229,6 +229,10 @@ pcieport
 pcwsz
 phison
 pixart
+pkgbuild
+pkgcheck
+pkgrel
+pkgver
 plextor
 pmgr
 pnpxxxx
