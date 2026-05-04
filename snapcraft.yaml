@@ -34,6 +34,8 @@ parts:
     build-packages:
       - 'extra-cmake-modules'
       - 'libudev-dev'
+    build-snaps:
+      - 'cmake/latest/stable'
     cmake-parameters:
       - '-DCMAKE_BUILD_TYPE=Release'
       - '-DCMAKE_INSTALL_PREFIX=/usr'
