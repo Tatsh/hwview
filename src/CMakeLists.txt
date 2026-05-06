@@ -135,8 +135,8 @@ qt_deploy_runtime_dependencies(
     elseif(WIN32)
       install(FILES ../LICENSE.txt ../README.md ../CHANGELOG.md ../SECURITY.md TYPE DOC)
       install(FILES ../CITATION.cff DESTINATION ${CMAKE_INSTALL_DATADIR}/hwview)
-      if(MINGW)
-        get_filename_component(_mingw_bin_dir ${CMAKE_CXX_COMPILER} DIRECTORY)
+      if(WIN32)
+        get_filename_component(_compiler_bin_dir ${CMAKE_CXX_COMPILER} DIRECTORY)
         install(
           RUNTIME_DEPENDENCY_SET hwview-deps
           PRE_EXCLUDE_REGEXES
@@ -146,7 +146,7 @@ qt_deploy_runtime_dependencies(
           POST_EXCLUDE_REGEXES
             [=[.*system32\/.*\.dll]=]
           DIRECTORIES
-            ${_mingw_bin_dir}
+            ${_compiler_bin_dir}
             $<TARGET_FILE_DIR:hwview>)
       endif()
     endif()
