@@ -3,7 +3,7 @@
   security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
   project_name: 'hwview',
   local _self = self,
-  version: '0.0.2',
+  version: '0.0.3',
   description: 'Hardware information utility, inspired by Redmond.',
   social+: {
     custom_badges: [

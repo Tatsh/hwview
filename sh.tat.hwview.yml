@@ -30,7 +30,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/Tatsh/hwview.git
-        tag: v0.0.2
+        tag: v0.0.3
         x-checker-data:
           type: git
           tag-pattern: '^v([\d.]+)$'
