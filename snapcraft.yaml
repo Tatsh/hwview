@@ -41,7 +41,9 @@ parts:
       - '-DCMAKE_INSTALL_PREFIX=/usr'
       - '-DFHS=ON'
     plugin: 'cmake'
-    source: '.'
+    source: 'https://github.com/Tatsh/hwview.git'
+    source-tag: 'v0.0.3'
+    source-type: 'git'
     stage-packages:
       - 'libudev1'
 platforms:
@@ -52,5 +54,5 @@ platforms:
 source-code: 'https://github.com/Tatsh/hwview'
 summary: 'Hardware information utility'
 title: 'Hardware Viewer'
-version: '0.0.2'
+version: '0.0.3'
 website: 'https://github.com/Tatsh/hwview'

@@ -13,6 +13,7 @@
       "CMakeLists.txt",
       "man/hwview.1",
       "sh.tat.hwview.yml",
+      "snapcraft.yaml",
       "src/main.cpp"
     ],
     "version_provider": "npm",

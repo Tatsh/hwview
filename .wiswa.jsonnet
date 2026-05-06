@@ -30,13 +30,14 @@
       'flatpak-uninstall': 'flatpak uninstall -y sh.tat.%s' % _self.project_name,
     },
   },
-  prettierignore+: ['*.desktop', '*.tags', 'src/icon.rc'],
+  prettierignore+: ['*.desktop', '*.dmexport', '*.tags', 'src/icon.rc'],
   cz+: {
     commitizen+: {
       version_files+: [
         'CMakeLists.txt',
         'man/hwview.1',
         'sh.tat.hwview.yml',
+        'snapcraft.yaml',
         'src/main.cpp',
       ],
     },
