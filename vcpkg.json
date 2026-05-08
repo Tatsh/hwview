@@ -5,16 +5,23 @@
       "version>=": "6.7.0"
     },
     {
-      "features": ["concurrent", "gui", "network", "widgets"],
+      "features": [
+        "concurrent",
+        "gui",
+        "network",
+        "widgets"
+      ],
       "name": "qtbase",
-      "version>=": "6.8.3"
+      "version>=": "6.10.2"
     }
   ],
   "description": "Hardware information utility, inspired by Redmond.",
   "documentation": "https://hwview.readthedocs.org",
   "homepage": "https://tatsh.github.io/hwview/",
   "license": "MIT",
-  "maintainers": ["Andrew Udvare <audvare@gmail.com>"],
+  "maintainers": [
+    "Andrew Udvare <audvare@gmail.com>"
+  ],
   "name": "hwview",
   "version": "0.0.3"
 }
