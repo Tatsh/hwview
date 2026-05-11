@@ -5,12 +5,16 @@
   local _self = self,
   version: '0.0.3',
   description: 'Hardware information utility, inspired by Redmond.',
-  social+: {
-    custom_badges: [
-      '[![Tests](https://github.com/Tatsh/hwview/actions/workflows/tests.yml/badge.svg)](https://github.com/Tatsh/hwview/actions/workflows/tests.yml)',
-      '[![Coverage Status](https://coveralls.io/repos/github/Tatsh/hwview/badge.svg?branch=master)](https://coveralls.io/github/Tatsh/hwview?branch=master)',
-    ],
-  },
+  custom_project_badges: [
+    {
+      anchor: '[![Tests](https://github.com/Tatsh/hwview/actions/workflows/tests.yml/badge.svg)]',
+      href: 'https://github.com/Tatsh/hwview/actions/workflows/tests.yml',
+    },
+    {
+      anchor: '[![Coverage Status](https://coveralls.io/repos/github/Tatsh/hwview/badge.svg?branch=master)]',
+      href: 'https://coveralls.io/github/Tatsh/hwview?branch=master',
+    },
+  ],
   keywords: ['device', 'hardware', 'viewer', 'system', 'information', 'linux'],
   want_main: false,
   want_codeql: false,

@@ -206,7 +206,6 @@ namemappings
 namemappingstest
 nnection
 nodetest
-npmjs
 nrvo
 nsis
 ntdll
@@ -244,6 +243,7 @@ prov
 prtl
 psmouse
 pylock
+pyproject
 qcompare
 qintptr
 qobject
@@ -333,6 +333,8 @@ udvare
 uhci
 uhid
 uinput
+undraft
+undrafted
 usbhid
 usbmon
 usbxdci
@@ -362,6 +364,7 @@ wintrust
 wiswa
 wiswa's
 wndclassexw
+worktree
 wpath
 wpessimizing
 wswitch
