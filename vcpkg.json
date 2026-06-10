@@ -12,7 +12,7 @@
         "widgets"
       ],
       "name": "qtbase",
-      "version>=": "6.11.0"
+      "version>=": "6.11.1"
     }
   ],
   "description": "Hardware information utility, inspired by Redmond.",
