@@ -3,38 +3,39 @@ jobs:
     container:
       image: 'ghcr.io/flathub-infra/flatpak-github-actions:kde-6.9'
       options: '--privileged'
+    permissions:
+      attestations: 'write'
+      contents: 'read'
+      id-token: 'write'
     runs-on: '${{ matrix.system.image }}'
     steps:
-      - uses: 'actions/checkout@v7'
-      - id: 'flatpak_bundle'
+      - uses: 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' # v7.0.1
+        with:
+          persist-credentials: false
+      - env:
+          ARCH: '${{ matrix.system.arch }}'
+        id: 'flatpak_bundle'
         name: 'Set Flatpak bundle filename'
         run: |
           version=$(jq -r '.version' package.json)
           echo "version=${version}" >> "$GITHUB_OUTPUT"
-          echo "filename=sh.tat.hwview-${version}-${{ matrix.system.arch }}.flatpak" >> "$GITHUB_OUTPUT"
+          echo "filename=sh.tat.hwview-${version}-${ARCH}.flatpak" >> "$GITHUB_OUTPUT"
       - name: 'Build Flatpak'
-        uses: 'flatpak/flatpak-github-actions/flatpak-builder@v6.7'
+        uses: 'flatpak/flatpak-github-actions/flatpak-builder@401fe28a8384095fc1531b9d320b292f0ee45adb' # v6.7
         with:
           arch: '${{ matrix.system.arch }}'
           bundle: '${{ steps.flatpak_bundle.outputs.filename }}'
           manifest-path: 'sh.tat.hwview.yml'
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v7.0.1'
+        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
         with:
           if-no-files-found: 'error'
           name: 'sh.tat.hwview-${{ steps.flatpak_bundle.outputs.version }}-${{ matrix.system.arch }}'
           path: '${{ steps.flatpak_bundle.outputs.filename }}'
       - name: 'Attest'
-        uses: 'actions/attest@v4.2.2'
+        uses: 'actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6' # v4.2.2
         with:
           subject-path: '${{ steps.flatpak_bundle.outputs.filename }}'
-      - if: "github.ref_type == 'tag'"
-        name: 'Upload package'
-        uses: 'softprops/action-gh-release@v3.0.2'
-        with:
-          draft: true
-          fail_on_unmatched_files: true
-          files: '${{ steps.flatpak_bundle.outputs.filename }}'
     strategy:
       matrix:
         system:
@@ -42,6 +43,42 @@ jobs:
             image: 'ubuntu-latest'
           - arch: 'aarch64'
             image: 'ubuntu-24.04-arm'
+  # The build job runs inside the Flathub container image, which is not guaranteed to ship the
+  # GitHub CLI, so the release upload happens here on the runner itself.
+  upload:
+    if: "github.ref_type == 'tag'"
+    needs:
+      - 'build'
+    permissions:
+      contents: 'write'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: 'Download bundles'
+        uses: 'actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c' # v8.0.1
+        with:
+          merge-multiple: true
+          path: 'bundles'
+          pattern: 'sh.tat.hwview-*'
+      - env:
+          GH_TOKEN: '${{ github.token }}'
+          REPO: '${{ github.repository }}'
+          TAG: '${{ github.ref_name }}'
+        name: 'Upload package'
+        run: |
+          shopt -s nullglob
+          files=(bundles/*.flatpak)
+          if [[ ${#files[@]} -eq 0 ]]; then
+            echo '::error::No Flatpak bundles were produced; refusing to upload.'
+            exit 1
+          fi
+          for _ in {1..10}; do
+            if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+              break
+            fi
+            gh release create "$TAG" --repo "$REPO" --draft --title "$TAG" --notes '' && break
+            sleep 5
+          done
+          gh release upload "$TAG" --repo "$REPO" --clobber "${files[@]}"
 name: 'Flatpak'
 'on':
   push:
@@ -57,6 +94,4 @@ name: 'Flatpak'
     tags:
       - 'v*.*.*'
 permissions:
-  attestations: 'write'
-  contents: 'write'
-  id-token: 'write'
+  contents: 'read'

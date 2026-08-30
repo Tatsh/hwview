@@ -1,0 +1,25 @@
+# Assets every release must carry before it may leave draft state.
+# @VERSION@ expands to the version without the leading v, @TAG@ to the tag itself.
+# Lines starting with # and blank lines are ignored.
+hwview-@TAG@-aarch64.AppImage
+hwview-@TAG@-x86_64.AppImage
+hwview-@VERSION@-Darwin-arm64-Debug.dmg
+hwview-@VERSION@-Darwin-arm64-Debug.zip
+hwview-@VERSION@-Darwin-arm64-Release.dmg
+hwview-@VERSION@-Darwin-arm64-Release.zip
+hwview-@VERSION@-Darwin-x86_64-Debug.dmg
+hwview-@VERSION@-Darwin-x86_64-Debug.zip
+hwview-@VERSION@-Darwin-x86_64-Release.dmg
+hwview-@VERSION@-Darwin-x86_64-Release.zip
+hwview-@VERSION@-win64-Debug.exe
+hwview-@VERSION@-win64-Debug.zip
+hwview-@VERSION@-win64-Release.exe
+hwview-@VERSION@-win64-Release.zip
+hwview-@VERSION@-winarm64-Debug.exe
+hwview-@VERSION@-winarm64-Debug.zip
+hwview-@VERSION@-winarm64-Release.exe
+hwview-@VERSION@-winarm64-Release.zip
+hwview_@VERSION@_amd64.snap
+hwview_@VERSION@_arm64.snap
+sh.tat.hwview-@VERSION@-aarch64.flatpak
+sh.tat.hwview-@VERSION@-x86_64.flatpak

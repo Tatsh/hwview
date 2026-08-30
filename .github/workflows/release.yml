@@ -1,9 +1,15 @@
 ---
 jobs:
   publish-release:
+    permissions:
+      actions: 'write'
+      contents: 'write'
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: 'actions/checkout@v7'
+      - uses: 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' # v7.0.1
+        with:
+          persist-credentials: false
+          ref: '${{ github.event.workflow_run.head_sha }}'
       - env:
           GH_TOKEN: '${{ github.token }}'
           HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
@@ -40,53 +46,126 @@ jobs:
           echo "Found release tag ${tag} for SHA ${HEAD_SHA}."
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo 'proceed=true' >> "$GITHUB_OUTPUT"
+      # A required workflow that failed is fatal; one that has not finished (or has not appeared
+      # yet) only means the release is not ready, so the run exits without publishing and a later
+      # run retries.
       - env:
           GH_TOKEN: '${{ github.token }}'
           HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
+          OPTIONAL_WORKFLOWS: 'Prettier Spelling Tests clang-format markdownlint'
+          REQUIRED_WORKFLOWS: 'Build Flatpak Snap'
           TAG: '${{ steps.guard.outputs.tag }}'
         id: 'check'
         if: "steps.guard.outputs.proceed == 'true'"
         name: 'Check all required workflows succeeded'
         run: |
-          tag="$TAG"
-          sha="$HEAD_SHA"
-          all_success=true
-          for workflow in Build Flatpak Prettier Snap Spelling Tests clang-format markdownlint; do
-            run=$(gh run list --workflow "$workflow" --commit "$sha" --json status,conclusion --jq '.[0]')
+          ready=true
+          check_workflow() {
+            local workflow="$1" required="$2" run status conclusion
+            run=$(gh run list --workflow "$workflow" --commit "$HEAD_SHA" \
+              --json status,conclusion --jq '.[0]')
             if [[ -z "$run" || "$run" == 'null' ]]; then
-              echo "Workflow '$workflow' did not run for this commit; treating as optional."
-              continue
+              if [[ "$required" == 'true' ]]; then
+                echo "Required workflow '${workflow}' has not run for ${HEAD_SHA} yet."
+                ready=false
+              else
+                echo "Optional workflow '${workflow}' did not run for this commit; ignoring."
+              fi
+              return 0
             fi
-            status=$(echo "$run" | jq -r '.status')
-            conclusion=$(echo "$run" | jq -r '.conclusion')
+            status=$(jq -r '.status' <<<"$run")
+            conclusion=$(jq -r '.conclusion' <<<"$run")
             case "$conclusion" in
               failure|cancelled|timed_out|startup_failure|action_required)
-                echo "::error::Workflow '$workflow' ${conclusion}."
-                exit 1
+                echo "::error::Workflow '${workflow}' ${conclusion}."
+                return 1
                 ;;
-              success|skipped|neutral) ;;
-              *)
-                if [[ "$status" == 'completed' ]]; then
-                  echo "::error::Workflow '$workflow' completed with unexpected conclusion '${conclusion}'."
-                  exit 1
+              success)
+                return 0
+                ;;
+              skipped|neutral)
+                if [[ "$required" == 'true' ]]; then
+                  echo "::error::Required workflow '${workflow}' was ${conclusion}."
+                  return 1
                 fi
-                echo "Workflow '$workflow' still pending (status=${status})."
-                all_success=false
+                return 0
                 ;;
             esac
+            if [[ "$status" == 'completed' ]]; then
+              echo "::error::Workflow '${workflow}' completed with unexpected conclusion" \
+                "'${conclusion}'."
+              return 1
+            fi
+            echo "Workflow '${workflow}' still pending (status=${status})."
+            ready=false
+          }
+          read -ra required_list <<<"$REQUIRED_WORKFLOWS"
+          read -ra optional_list <<<"$OPTIONAL_WORKFLOWS"
+          for workflow in "${required_list[@]}"; do
+            check_workflow "$workflow" true || exit 1
           done
-          if [[ "$all_success" != 'true' ]]; then
+          for workflow in "${optional_list[@]}"; do
+            check_workflow "$workflow" false || exit 1
+          done
+          if [[ "$ready" != 'true' ]]; then
             echo 'Not all workflows have completed yet.'
             exit 0
           fi
-          echo "All required workflows succeeded for ${tag}."
-          echo "tag=${tag}" >> "$GITHUB_ENV"
-          echo "ready=true" >> "$GITHUB_OUTPUT"
+          echo "All required workflows succeeded for ${TAG}."
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+      # The workflow-level checks above only prove the jobs finished. An upload can still be lost
+      # (a matrix leg that produced a differently named file, a clobbered duplicate), so the draft
+      # is only published once every asset named in .github/release-assets.txt is actually present.
       - env:
           GH_TOKEN: '${{ github.token }}'
+          MANIFEST: '.github/release-assets.txt'
+          REPO: '${{ github.repository }}'
+          TAG: '${{ steps.guard.outputs.tag }}'
+        if: "steps.check.outputs.ready == 'true'"
+        name: 'Verify all expected assets are attached'
+        run: |
+          if [[ ! -f "$MANIFEST" ]]; then
+            echo "::error::Asset manifest ${MANIFEST} is missing; refusing to publish."
+            exit 1
+          fi
+          version="${TAG#v}"
+          mapfile -t expected < <(sed -e "s/@VERSION@/${version}/g" -e "s/@TAG@/${TAG}/g" \
+            "$MANIFEST" | sed -e 's/[[:space:]]*$//' -e '/^#/d' -e '/^$/d')
+          if [[ ${#expected[@]} -eq 0 ]]; then
+            echo "::error::Asset manifest ${MANIFEST} lists no assets; refusing to publish."
+            exit 1
+          fi
+          mapfile -t actual < <(gh release view "$TAG" --repo "$REPO" --json assets \
+            --jq '.assets[] | select(.state == "uploaded") | .name')
+          missing=()
+          for name in "${expected[@]}"; do
+            found=false
+            for have in "${actual[@]}"; do
+              if [[ "$have" == "$name" ]]; then
+                found=true
+                break
+              fi
+            done
+            if [[ "$found" != 'true' ]]; then
+              missing+=("$name")
+            fi
+          done
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "::error::Release ${TAG} is missing ${#missing[@]} of ${#expected[@]} expected" \
+              'assets; refusing to publish.'
+            for name in "${missing[@]}"; do
+              echo "::error::Missing asset: ${name}"
+            done
+            exit 1
+          fi
+          echo "All ${#expected[@]} expected assets are attached to ${TAG}."
+      - env:
+          GH_TOKEN: '${{ github.token }}'
+          REPO: '${{ github.repository }}'
+          TAG: '${{ steps.guard.outputs.tag }}'
         if: "steps.check.outputs.ready == 'true'"
         name: 'Publish release'
-        run: 'gh release edit "$tag" --draft=false'
+        run: 'gh release edit "$TAG" --repo "$REPO" --draft=false'
       - env:
           GH_TOKEN: '${{ github.token }}'
           REPO: '${{ github.repository }}'
