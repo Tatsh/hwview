@@ -2,7 +2,6 @@ aclocal
 acpixxxx
 addaction
 afkep
-Ångström
 apfs
 apic
 appdir
@@ -43,7 +42,6 @@ clpc
 codesign
 commitizen
 configret
-cooldown
 corefoundation
 coveragerc
 coverallsapp
@@ -103,6 +101,7 @@ goodix
 graphviz
 grayed
 gwlp
+handoff
 hardwareid
 hdaudio
 hdcp
@@ -161,7 +160,6 @@ iwyu
 jinja
 jsonnet
 jsonschema
-jurplel
 kext
 kioxia
 kpartgui
@@ -188,6 +186,7 @@ lpsz
 mainpage
 mainwindow
 mandir
+mapfile
 matshita
 mcdp
 mcelog
@@ -211,6 +210,7 @@ nsis
 ntdll
 ntstatus
 ntsync
+nullglob
 nullptr
 nvme
 nvmem
@@ -242,6 +242,7 @@ propertiesdialog
 prov
 prtl
 psmouse
+pyinstaller
 pylock
 pyproject
 qcompare
@@ -286,6 +287,7 @@ shctx
 shellcheck
 shellformat
 shlib
+shopt
 shpchp
 silentinstall
 sizepolicy
@@ -294,7 +296,6 @@ smbus
 smcpmu
 snapcore
 snapcraft
-softprops
 sourcelabel
 spcc
 spdrp
@@ -303,6 +304,7 @@ spmipmu
 spmipmurtc
 spuhid
 spuvd
+statusline
 stdset
 strcmp
 strequal
@@ -376,3 +378,5 @@ xnco
 xpwm
 xxgpio
 yarnrc
+zizmor
+Ångström

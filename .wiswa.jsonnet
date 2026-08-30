@@ -1,3 +1,5 @@
+local utils = import 'utils.libsonnet';
+
 {
   uses_user_defaults: true,
   security_policy_supported_versions: { '0.0.x': ':white_check_mark:' },
@@ -83,16 +85,23 @@
     dependencies: [
       {
         name: 'ecm',
-        'version>=': '6.7.0',
+        'version>=': utils.latestVcpkgPortVersion('ecm'),
       },
       {
         features: ['concurrent', 'gui', 'network', 'widgets'],
         name: 'qtbase',
-        'version>=': '6.8.3',
+        'version>=': utils.latestVcpkgPortVersion('qtbase'),
       },
     ],
   },
   github+: {
+    zizmor+: {
+      rules+: {
+        'dangerous-triggers'+: {
+          ignore+: ['publish-gentoo-ebuild.yml'],
+        },
+      },
+    },
     publish_winget: {
       identifier: 'Tatsh.',
       max_versions_to_keep: 1,

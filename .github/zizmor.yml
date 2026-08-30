@@ -1,0 +1,9 @@
+rules:
+  cache-poisoning:
+    ignore:
+      - 'pyinstaller.yml'
+  dangerous-triggers:
+    ignore:
+      - 'publish-winget.yml'
+      - 'release.yml'
+      - 'publish-gentoo-ebuild.yml'

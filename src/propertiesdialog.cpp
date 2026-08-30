@@ -192,8 +192,9 @@ void PropertiesDialog::setCategoryIcon(const QIcon &icon) {
 }
 
 void PropertiesDialog::populateGeneralTab() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     // Device type - use category name matching "Devices by type" view
     auto deviceType = getDeviceCategory();
@@ -231,8 +232,9 @@ void PropertiesDialog::populateGeneralTab() {
 }
 
 void PropertiesDialog::populateDriverTab() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     auto driverName = deviceInfo_->driver();
 
@@ -306,8 +308,9 @@ QString PropertiesDialog::getDeviceCategory() {
 }
 
 void PropertiesDialog::populateDetailsTab() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     // Clear the combo box and rebuild with only properties that have values
     comboBoxDetailsProperty->clear();
@@ -349,8 +352,9 @@ void PropertiesDialog::populateDetailsTab() {
 void PropertiesDialog::onPropertySelectionChanged(int index) {
     listWidgetDetailsPropertyValue->clear();
 
-    if (index < 0 || !deviceInfo_)
+    if (index < 0 || !deviceInfo_) {
         return;
+    }
 
     auto propertyKey = comboBoxDetailsProperty->currentData().toString();
     QString value;
@@ -393,8 +397,9 @@ void PropertiesDialog::onPropertySelectionChanged(int index) {
 }
 
 void PropertiesDialog::populateEventsTab() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     eventsModel_->removeRows(0, eventsModel_->rowCount());
     textEditEventsInfo->setPlainText(tr("Loading events..."));
@@ -423,8 +428,9 @@ void PropertiesDialog::populateEventsTab() {
 }
 
 void PropertiesDialog::onEventsLoaded() {
-    if (!eventsWatcher_)
+    if (!eventsWatcher_) {
         return;
+    }
 
     allEvents_ = eventsWatcher_->result();
     delete eventsWatcher_;
@@ -480,8 +486,9 @@ void PropertiesDialog::onEventSelectionChanged(const QModelIndex &current,
 }
 
 void PropertiesDialog::onDriverDetailsClicked() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     auto driver = deviceInfo_->driver();
     if (driver.isEmpty()) {
@@ -495,8 +502,9 @@ void PropertiesDialog::onDriverDetailsClicked() {
 }
 
 void PropertiesDialog::onDisableDeviceClicked() {
-    if (!deviceInfo_)
+    if (!deviceInfo_) {
         return;
+    }
 
     auto driver = deviceInfo_->driver();
     if (driver.isEmpty()) {
