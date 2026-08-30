@@ -67,6 +67,14 @@ jobs:
             sleep 5
           done
           gh release upload "$TAG" --repo "$REPO" --clobber "${files[@]}"
+          printf '%s\n' "${files[@]##*/}" > release-manifest.txt
+      - if: ${{ github.ref_type == 'tag' }}
+        name: 'Declare uploaded assets'
+        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        with:
+          if-no-files-found: error
+          name: release-manifest-macos-${{ matrix.build-type }}-${{ matrix.os.cpack_system }}
+          path: release-manifest.txt
     strategy:
       fail-fast: false
       matrix:
@@ -178,7 +186,15 @@ jobs:
             sleep 5
           done
           gh release upload "$TAG" --repo "$REPO" --clobber "${files[@]}"
+          printf '%s\n' "${files[@]##*/}" > release-manifest.txt
         shell: bash
+      - if: ${{ github.ref_type == 'tag' && matrix.sys.release }}
+        name: 'Declare uploaded assets'
+        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        with:
+          if-no-files-found: error
+          name: release-manifest-msys-${{ matrix.build-type }}-${{ matrix.sys.name }}
+          path: release-manifest.txt
     strategy:
       fail-fast: false
       matrix:
@@ -298,6 +314,14 @@ jobs:
             sleep 5
           done
           gh release upload "$TAG" --repo "$REPO" --clobber "${files[@]}"
+          printf '%s\n' "${files[@]##*/}" > release-manifest.txt
+      - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
+        name: 'Declare uploaded assets'
+        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        with:
+          if-no-files-found: error
+          name: release-manifest-linux-${{ matrix.build-type }}-${{ matrix.arch.deploy_arch }}
+          path: release-manifest.txt
     strategy:
       fail-fast: false
       matrix:

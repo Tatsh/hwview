@@ -6,10 +6,6 @@ jobs:
       contents: 'write'
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' # v7.0.1
-        with:
-          persist-credentials: false
-          ref: '${{ github.event.workflow_run.head_sha }}'
       - env:
           GH_TOKEN: '${{ github.token }}'
           HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
@@ -113,32 +109,66 @@ jobs:
           fi
           echo "All required workflows succeeded for ${TAG}."
           echo 'ready=true' >> "$GITHUB_OUTPUT"
-      # The workflow-level checks above only prove the jobs finished. An upload can still be lost
-      # (a matrix leg that produced a differently named file, a clobbered duplicate), so the draft
-      # is only published once every asset named in .github/release-assets.txt is actually present.
+      # Green jobs only prove the work ran, not that its output arrived. Every job that uploads to
+      # the release also publishes a release-manifest artifact naming exactly what it uploaded, so
+      # the expected set is derived from the build matrices rather than restated here. Two jobs
+      # naming the same asset means one clobbered the other, which is how a release once shipped
+      # with no arm64 macOS packages while every job reported success.
       - env:
           GH_TOKEN: '${{ github.token }}'
-          MANIFEST: '.github/release-assets.txt'
+          HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
           REPO: '${{ github.repository }}'
+          REQUIRED_WORKFLOWS: 'Build Flatpak Snap'
           TAG: '${{ steps.guard.outputs.tag }}'
         if: "steps.check.outputs.ready == 'true'"
-        name: 'Verify all expected assets are attached'
+        name: 'Verify every declared asset is attached'
         run: |
-          if [[ ! -f "$MANIFEST" ]]; then
-            echo "::error::Asset manifest ${MANIFEST} is missing; refusing to publish."
+          rm -rf manifests
+          mkdir -p manifests
+          read -ra required_list <<<"$REQUIRED_WORKFLOWS"
+          for workflow in "${required_list[@]}"; do
+            run_id=$(gh run list --workflow "$workflow" --commit "$HEAD_SHA" \
+              --json databaseId --jq '.[0].databaseId')
+            if [[ -z "$run_id" || "$run_id" == 'null' ]]; then
+              echo "::error::No ${workflow} run found for ${HEAD_SHA}."
+              exit 1
+            fi
+            if ! gh run download "$run_id" --repo "$REPO" \
+              --pattern 'release-manifest-*' --dir "manifests/${workflow}"; then
+              echo "::error::The ${workflow} run ${run_id} published no asset manifest, so it" \
+                'uploaded nothing to the release.'
+              exit 1
+            fi
+          done
+          declare -A owner
+          collisions=()
+          while IFS= read -r manifest; do
+            leg=$(basename "$(dirname "$manifest")")
+            while IFS= read -r name; do
+              [[ -z "$name" ]] && continue
+              if [[ -n "${owner[$name]:-}" ]]; then
+                collisions+=("${name} (from ${owner[$name]} and ${leg})")
+              else
+                owner["$name"]="$leg"
+              fi
+            done < "$manifest"
+          done < <(find manifests -type f -name 'release-manifest.txt' | sort)
+          if [[ ${#owner[@]} -eq 0 ]]; then
+            echo '::error::No assets were declared by any build job; refusing to publish.'
             exit 1
           fi
-          version="${TAG#v}"
-          mapfile -t expected < <(sed -e "s/@VERSION@/${version}/g" -e "s/@TAG@/${TAG}/g" \
-            "$MANIFEST" | sed -e 's/[[:space:]]*$//' -e '/^#/d' -e '/^$/d')
-          if [[ ${#expected[@]} -eq 0 ]]; then
-            echo "::error::Asset manifest ${MANIFEST} lists no assets; refusing to publish."
+          if [[ ${#collisions[@]} -gt 0 ]]; then
+            echo "::error::${#collisions[@]} asset name(s) were produced by more than one job," \
+              'so one overwrote another; refusing to publish.'
+            for entry in "${collisions[@]}"; do
+              echo "::error::Colliding asset: ${entry}"
+            done
             exit 1
           fi
           mapfile -t actual < <(gh release view "$TAG" --repo "$REPO" --json assets \
             --jq '.assets[] | select(.state == "uploaded") | .name')
           missing=()
-          for name in "${expected[@]}"; do
+          for name in "${!owner[@]}"; do
             found=false
             for have in "${actual[@]}"; do
               if [[ "$have" == "$name" ]]; then
@@ -151,14 +181,14 @@ jobs:
             fi
           done
           if [[ ${#missing[@]} -gt 0 ]]; then
-            echo "::error::Release ${TAG} is missing ${#missing[@]} of ${#expected[@]} expected" \
+            echo "::error::Release ${TAG} is missing ${#missing[@]} of ${#owner[@]} declared" \
               'assets; refusing to publish.'
             for name in "${missing[@]}"; do
               echo "::error::Missing asset: ${name}"
             done
             exit 1
           fi
-          echo "All ${#expected[@]} expected assets are attached to ${TAG}."
+          echo "All ${#owner[@]} declared assets are attached to ${TAG}."
       - env:
           GH_TOKEN: '${{ github.token }}'
           REPO: '${{ github.repository }}'
