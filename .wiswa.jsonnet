@@ -102,9 +102,5 @@ local utils = import 'utils.libsonnet';
         },
       },
     },
-    publish_winget: {
-      identifier: 'Tatsh.',
-      max_versions_to_keep: 1,
-    },
   },
 }
