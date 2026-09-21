@@ -160,6 +160,7 @@ iwyu
 jinja
 jsonnet
 jsonschema
+jurplel
 kext
 kioxia
 kpartgui
