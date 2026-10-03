@@ -206,6 +206,7 @@ namemappings
 namemappingstest
 nnection
 nodetest
+noone
 nrvo
 nsis
 ntdll
@@ -213,6 +214,7 @@ ntstatus
 ntsync
 nullglob
 nullptr
+numpydoc
 nvme
 nvmem
 offscreen
@@ -356,6 +358,7 @@ viewsettings
 virtio
 vsizetype
 vtconsole
+werror
 weverything
 wevtutil
 whats
@@ -367,7 +370,6 @@ wintrust
 wiswa
 wiswa's
 wndclassexw
-worktree
 wpath
 wpessimizing
 wswitch
