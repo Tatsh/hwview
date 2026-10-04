@@ -1,6 +1,10 @@
 ---
+concurrency:
+  cancel-in-progress: true
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}'
 jobs:
   tests:
+    name: 'Tests'
     permissions:
       contents: write
     runs-on: ubuntu-latest

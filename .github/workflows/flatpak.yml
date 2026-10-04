@@ -1,8 +1,13 @@
+concurrency:
+  cancel-in-progress: false
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  queue: 'max'
 jobs:
   build:
     container:
-      image: 'ghcr.io/flathub-infra/flatpak-github-actions:kde-6.9'
+      image: 'ghcr.io/flathub-infra/flatpak-github-actions:kde-6.9@sha256:da914fcb8e6dc77aa33c04b9507143717d3cd74c05d907780abe1090c0d4e54a'
       options: '--privileged'
+    name: 'Build'
     permissions:
       attestations: 'write'
       contents: 'read'
@@ -47,6 +52,7 @@ jobs:
   # GitHub CLI, so the release upload happens here on the runner itself.
   upload:
     if: "github.ref_type == 'tag'"
+    name: 'Upload release assets'
     needs:
       - 'build'
     permissions:

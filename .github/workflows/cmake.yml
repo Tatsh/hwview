@@ -1,6 +1,11 @@
 ---
+concurrency:
+  cancel-in-progress: false
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  queue: 'max'
 jobs:
   build-macos:
+    name: 'Build (macOS)'
     permissions:
       attestations: write
       contents: write
@@ -85,6 +90,7 @@ jobs:
           - cpack_system: Darwin-x86_64
             image: macos-15-intel
   build-msys:
+    name: 'Build (MSYS2)'
     permissions:
       attestations: write
       contents: write
@@ -98,11 +104,13 @@ jobs:
         run: >-
           echo out=$($env:WORKSPACE -Replace "\\","/") | Out-File
           -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        shell: 'pwsh'
       - if: matrix.sys.name == 'clangarm64'
         name: Install NSIS via Chocolatey
         run: |
           choco install nsis -y --no-progress
           'C:\Program Files (x86)\NSIS' | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_PATH
+        shell: 'pwsh'
       - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884 # v2.32.0
         with:
           install: >-
@@ -175,6 +183,7 @@ jobs:
           if ($failed) {
             exit 1
           }
+        shell: 'pwsh'
       - env:
           BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
@@ -246,6 +255,7 @@ jobs:
             release: true
             runner: windows-11-arm
   build-linux:
+    name: 'Build (Linux)'
     permissions:
       attestations: write
       contents: write
