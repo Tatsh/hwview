@@ -235,6 +235,7 @@ passthru
 pcieport
 pcwsz
 phison
+pipx
 pixart
 pkgbuild
 pkgcheck
