@@ -199,6 +199,7 @@ metainfo
 mktemp
 mmconfig
 mroot
+msix
 msvcp
 msvcprtd
 msvcrtd

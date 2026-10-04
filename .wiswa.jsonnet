@@ -21,6 +21,7 @@ local utils = import 'utils.libsonnet';
   want_main: false,
   want_codeql: false,
   want_tests: false,
+  want_msys2: true,
   package_json+: {
     cspell+: {
       ignorePaths+: [
@@ -95,6 +96,12 @@ local utils = import 'utils.libsonnet';
     ],
   },
   github+: {
+    workflows+: {
+      publish_msys2+: {
+        fork: 'Tatsh/MINGW-packages',
+        package_name: 'hwview',
+      },
+    },
     zizmor+: {
       rules+: {
         'dangerous-triggers'+: {
