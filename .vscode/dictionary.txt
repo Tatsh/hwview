@@ -280,6 +280,7 @@ ripgreprc
 rtsx
 sabrent
 sart
+sbclaude
 schemafile
 scsiadapter
 sdhci
