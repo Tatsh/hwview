@@ -38,7 +38,7 @@ jobs:
         name: Package
         run: cpack -C "$BUILD_TYPE" --config "$WORKSPACE/build/CPackConfig.cmake" --verbose
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-${{ matrix.os.cpack_system }}
@@ -75,7 +75,7 @@ jobs:
           printf '%s\n' "${files[@]##*/}" > release-manifest.txt
       - if: ${{ github.ref_type == 'tag' }}
         name: 'Declare uploaded assets'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: release-manifest-macos-${{ matrix.build-type }}-${{ matrix.os.cpack_system }}
@@ -191,7 +191,7 @@ jobs:
         run: cpack -C "$BUILD_TYPE" --config "$WORKSPACE/build/CPackConfig.cmake" --verbose
         shell: msys2 {0}
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-${{ matrix.sys.name }}
@@ -229,7 +229,7 @@ jobs:
         shell: bash
       - if: ${{ github.ref_type == 'tag' && matrix.sys.release }}
         name: 'Declare uploaded assets'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: release-manifest-msys-${{ matrix.build-type }}-${{ matrix.sys.name }}
@@ -320,7 +320,7 @@ jobs:
         name: Rename with tag
         run: mv -v "$WORKSPACE"/hwview-*.AppImage "${WORKSPACE}/hwview-${REF_NAME}-${DEPLOY_ARCH}.AppImage"
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: hwview-${{ matrix.build-type }}-Linux-${{ matrix.arch.deploy_arch }}
@@ -357,7 +357,7 @@ jobs:
           printf '%s\n' "${files[@]##*/}" > release-manifest.txt
       - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
         name: 'Declare uploaded assets'
-        uses: 'actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a' # v7.0.1
+        uses: 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' # v7.0.2
         with:
           if-no-files-found: error
           name: release-manifest-linux-${{ matrix.build-type }}-${{ matrix.arch.deploy_arch }}
