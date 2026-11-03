@@ -2,6 +2,7 @@ aclocal
 acpixxxx
 addaction
 afkep
+analyzer
 apfs
 apic
 appdir
@@ -88,6 +89,7 @@ driverinfo
 drvbydevmodel
 drvbytypemodel
 ehci
+elif
 endforeach
 esac
 esbenp
@@ -156,6 +158,7 @@ ipcolybt
 ipcrti
 irqd
 irqs
+iterdir
 iwlwifi
 iwyu
 jinja
@@ -211,6 +214,7 @@ namemappings
 namemappingstest
 nnection
 nodetest
+nojekyll
 noone
 nrvo
 nsis
@@ -232,6 +236,7 @@ osversioninfow
 osvi
 pacboy
 passthru
+pathlib
 pcieport
 pcwsz
 phison
