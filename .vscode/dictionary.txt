@@ -240,6 +240,7 @@ pathlib
 pcieport
 pcwsz
 phison
+pipefail
 pipx
 pixart
 pkgbuild
