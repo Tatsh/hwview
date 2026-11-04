@@ -275,6 +275,7 @@ qtmultimedia
 qtwidgets
 qverify
 razer
+rdparty
 realtek
 rect
 reflow
@@ -286,6 +287,7 @@ ripgreprc
 rmtree
 rtsx
 sabrent
+sarif
 sart
 sbclaude
 schemafile
