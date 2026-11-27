@@ -2,7 +2,6 @@ aclocal
 acpixxxx
 addaction
 afkep
-analyzer
 apfs
 apic
 appdir
@@ -44,7 +43,6 @@ codesign
 commitizen
 concrt
 configret
-copytree
 corefoundation
 coveragerc
 coverallsapp
@@ -90,7 +88,6 @@ driverinfo
 drvbydevmodel
 drvbytypemodel
 ehci
-elif
 endforeach
 esac
 esbenp
@@ -236,11 +233,9 @@ osversioninfow
 osvi
 pacboy
 passthru
-pathlib
 pcieport
 pcwsz
 phison
-pipefail
 pipx
 pixart
 pkgbuild
@@ -284,7 +279,6 @@ resbyconnmodel
 resbytypemodel
 rfkill
 ripgreprc
-rmtree
 rtsx
 sabrent
 sarif
@@ -308,7 +302,6 @@ shellformat
 shlib
 shopt
 shpchp
-shutil
 silentinstall
 sizepolicy
 skywalk
