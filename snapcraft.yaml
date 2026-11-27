@@ -49,8 +49,6 @@ parts:
 platforms:
   amd64:
     build-on: 'amd64'
-  arm64:
-    build-on: 'arm64'
 source-code: 'https://github.com/Tatsh/hwview'
 summary: 'Hardware information utility'
 title: 'Hardware Viewer'
